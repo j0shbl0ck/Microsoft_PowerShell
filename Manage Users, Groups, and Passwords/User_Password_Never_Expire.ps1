@@ -10,10 +10,6 @@
     =============================================================================
     .ADDITIONAL NOTES
         You will need to have AzureAD PowerShell module
-    =============================================================================
-    .EXAMPLE
-    attrib +s +h "C:\Users\Public\Desktop\Google Chrome.lnk" | To Hide
-    attrib -s -h "C:\Users\Public\Desktop\Google Chrome.lnk" | To Unhide
 #>
 
 

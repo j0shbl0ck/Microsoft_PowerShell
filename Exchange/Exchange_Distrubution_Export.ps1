@@ -16,4 +16,4 @@
 Connect-ExchangeOnline -UserPrincipalName contoso@domain.com 
 
 # Change Distrubtion group name to whichever one needing exportation. 
-Get-DistributionGroupMember -Identity 'NameOfGroup' | Select-Object Name, PrimarySmtpAddress | Export-csv C:\Users\<Username>\ExchDist.csv -NoTypeInformation
+Get-DistributionGroupMember -Identity 'NameOfGroup' | Select-Object Name, PrimarySmtpAddress | Export-csv C:\O365\ExchDist.csv -NoTypeInformation

@@ -1,15 +1,15 @@
 ﻿<#
-    .NOTES
-    =============================================================================
+.SYNOPSIS
+    Export distrubtion group with members in CSV. 
+.DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.2
+    Version: 1.0.1
     Date: 01.04.22
     Type: Public
+.NOTES
+    You will need to have AzureAD PowerShell module [ Install-Module -Name AzureAD ]
+.LINK
     Source: https://docs.microsoft.com/en-us/microsoft-365/admin/add-users/set-password-to-never-expire?view=o365-worldwide
-    Description: Export distrubtion group with members in CSV. 
-    =============================================================================
-    .ADDITIONAL NOTES
-        You will need to have AzureAD PowerShell module
 #>
 
 # Change UPN to your global admin account.

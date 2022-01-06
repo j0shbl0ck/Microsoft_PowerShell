@@ -3,7 +3,7 @@
     View and add/delete SMTP email address
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.1
+    Version: 1.0.2
     Date: 01.06.22
     Type: Public
 .NOTES
@@ -25,7 +25,7 @@ Write-Output "Expanded Email Properties";
 Write-Output "-------------------------"
 Get-Mailbox $username | Select-Object -ExpandProperty EmailAddresses
 
-<# If you wish to add to the user's email addresses - comment out
+<# If you want to add to the user's email addresses - comment out
 
 $newemail = user@domtenant.com
 
@@ -37,7 +37,7 @@ Get-Mailbox $username | Select-Object -ExpandProperty EmailAddresses
 
 
 
-<# If you wish to remove one of the user's email addresses - comment out
+<# If you want to remove one of the user's email addresses - comment out
 
 $oldemail = user@domtenant.onmicrosoft.com
 

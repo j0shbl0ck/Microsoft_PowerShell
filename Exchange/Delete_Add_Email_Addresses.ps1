@@ -1,11 +1,15 @@
 ﻿<#
-Author: Josh Block (jblock@trustinfinitech.com)
-Version: 1.0.1
-Type: Public
-Date: 11.24.21
-Source: https://o365info.com/export-and-display-information-about-email-addresses-using-powershell-office-365-part-6-13/
-Source: https://enterinit.com/change-user-primary-email-address-in-office-365-with-powershell/
-Description: View and Change primary email address
+.SYNOPSIS
+    View and add/delete SMTP email address
+.DESCRIPTION
+    Author: j0shbl0ck https://github.com/j0shbl0ck
+    Version: 1.0.1
+    Date: 01.06.22
+    Type: Public
+.NOTES
+    You will need to have AzureAD PowerShell module [ Install-Module -Name AzureAD ]
+.LINK
+    Source: https://docs.microsoft.com/en-us/microsoft-365/admin/add-users/set-password-to-never-expire?view=o365-worldwide
 #>
 
 Connect-ExchangeOnline -UserPrincipalName globaladmin@domain.com 

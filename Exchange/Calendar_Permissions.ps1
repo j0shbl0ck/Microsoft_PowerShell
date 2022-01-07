@@ -10,6 +10,9 @@
     You will need to have AzureAD PowerShell module [ Install-Module -Name AzureAD ]
 .LINK
     Source: https://theitbros.com/add-calendar-permissions-in-office-365-via-powershell/
+.EXAMPLE
+    Add-MailboxFolderPermission -Identity firstuser@domain.com:\calendar -user seconduser@domain.com -AccessRights Owner
+
 #>
 
 # Connect to Exchange Online via Azure AD
@@ -22,9 +25,6 @@ Get-MailboxFolderPermission -Identity username:\calendar
 **Outlook Calendar Permission Levels and Access Roles**
 =======================================================
 Owner — gives full control of the mailbox folder: read, create, modify, and delete all items and folders. Also, this role allows to manage item’s permissions;
-.EXAMPLE
-Add-MailboxFolderPermission -Identity firstuser@domain.com:\calendar -user seconduser@domain.com -AccessRights Owner
-
 PublishingEditor — read, create, modify, and delete items/subfolders (all permissions, except the right to change permissions);
 Editor — read, create, modify, and delete items (can’t create subfolders);
 PublishingAuthor — create, read all items/subfolders. You can modify and delete only items you create;

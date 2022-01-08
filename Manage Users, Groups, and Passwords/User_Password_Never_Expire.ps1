@@ -6,7 +6,7 @@
     Date: 01.04.22
     Type: Public
     Source: https://docs.microsoft.com/en-us/microsoft-365/admin/add-users/set-password-to-never-expire?view=o365-worldwide
-    Description: This script is made set the password of a user to never expire. 
+    Description: This script is made set the password of an AzureAD user to never expire. 
     =============================================================================
     .ADDITIONAL NOTES
         You will need to have AzureAD PowerShell module

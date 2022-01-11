@@ -11,4 +11,4 @@
 #>
 
 # Run PowerShell as adminstrator to receive information. 
-Get-Disk
+Get-PhysicalDisk

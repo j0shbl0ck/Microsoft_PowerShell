@@ -12,3 +12,6 @@
 
 # Run PowerShell as adminstrator to receive information. 
 Get-PhysicalDisk
+Write-Output = "========================="
+# Display list of all volumes in Windows
+Get-Volume

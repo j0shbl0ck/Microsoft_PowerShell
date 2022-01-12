@@ -3,7 +3,7 @@
     This script allows you to view, add or remove mailbox calendar permissions on O365
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.1
+    Version: 1.0.3
     Date: 01.06.22
     Type: Public
 .NOTES
@@ -17,14 +17,33 @@
 
 #>
 
+# ======= VARIABLES ======= #
+$gadmin = Read-Host -Prompt 'Input Global Admin UPN (globaladmin@domain.com)' 
+$mainuser = Read-Host -Prompt 'Input User to view calendar permissions of (enduser@domain.com)'
+#$seconduser = seconduser@domain.com
+# ======= VARIABLES ======= #
+
 # Connect to Exchange Online via Azure AD
-Connect-ExchangeOnline -UserPrincipalName globaladmin@domain.com 
+Connect-ExchangeOnline -UserPrincipalName $gadmin
 
 # Change username to which email you are changing.
-Get-MailboxFolderPermission -Identity username:\calendar
+Write-Host '======= Calendar Rights Other Users Have to Main User  =======' -ForegroundColor Yellow
+Get-MailboxFolderPermission -Identity ${mainuser}:\calendar
 
-# To view permissions of a user's other calendars. For example, user has a calendar named "time off". Uncomment below.
+# To view access rights of a user's other calendars. For example, user has a calendar named "time off". Uncomment below.
 #Get-MailboxFolderPermission -Identity "username:\calendar\time off"
+
+# View calender's shared with user. 
+Write-Host '======= Calendars Main User Has Rights To =======' -ForegroundColor Yellow
+(Get-Mailbox) | ForEach-Object {
+    $Identity = $_.Identity
+    Get-Mailboxfolderpermission (($_.PrimarySmtpAddress)+":\calendar") `
+        -User $mainuser -ErrorAction SilentlyContinue
+    } | Select-Object @{n='Identity';e={$Identity}}, User, Accessrights
+
+# View calenders created by user. Uncomment below.
+Write-Host '======= Calendars Created By Main User =======' -ForegroundColor Yellow
+Get-MailboxFolderStatistics -Identity $mainuser | Where-Object { ($_.Identity -like "*calendar*") -and ($_.FolderType -ne 'CalendarLogging') } | Format-Table Name,Identity,FolderPath,FolderType
 
 <#
 **Outlook Calendar Permission Levels and Access Roles**
@@ -43,7 +62,9 @@ None — no permissions to access folder and files.
 #>
 
 # The first email address is the one you're needing access. The second email is who you're giving access rights to. 
-Add-MailboxFolderPermission -Identity firstuser@domain.com:\calendar -user seconduser@domain.com -AccessRights Editor
+#Add-MailboxFolderPermission -Identity ${mainuser}:\calendar -user $seconduser -AccessRights Editor
 
 # Comment out line below, if you need to also view events marked as private.
 #Add-MailboxFolderPermission -Identity firstuser@domain.com:\calendar -user seconduser@domain.com -AccessRights Editor -SharingPermissionFlags Delegate,CanViewPrivateItems
+
+Pause

@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    This script allows disables Active Directory syncing with Azure. 
+    This script disables Active Directory syncing with Azure. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
     Version: 1.0.0

@@ -8,6 +8,7 @@
     Type: Public
 .NOTES
     You will need to have AzureAD PowerShell module [ Install-Module -Name AzureAD ]
+    Username can vary on whether authenticating against domain or Azure AD. flast or firstlast@domain.com
 .LINK
     Source: https://theitbros.com/add-calendar-permissions-in-office-365-via-powershell/
 .EXAMPLE
@@ -20,6 +21,9 @@ Connect-ExchangeOnline -UserPrincipalName globaladmin@domain.com
 
 # Change username to which email you are changing.
 Get-MailboxFolderPermission -Identity username:\calendar
+
+# To view permissions of a user's other calendars. For example, user has a calendar named "time off". Uncomment below.
+#Get-MailboxFolderPermission -Identity "username:\calendar\time off"
 
 <#
 **Outlook Calendar Permission Levels and Access Roles**

@@ -11,6 +11,7 @@
     Username can vary on whether authenticating against domain or Azure AD. flast or firstlast@domain.com
 .LINK
     Source: https://theitbros.com/add-calendar-permissions-in-office-365-via-powershell/
+    Source: https://community.spiceworks.com/topic/2319204-o365-calendar-sharing-with-powershell 
 .EXAMPLE
     Add-MailboxFolderPermission -Identity firstuser@domain.com:\calendar -user seconduser@domain.com -AccessRights Owner
 

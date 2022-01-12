@@ -8,7 +8,7 @@ Install-Module -Name ExchangeOnlineManagement
 # Installs SharePoint Online Powershell Module
 Install-Module -Name PowerShellGet -Force -AllowClobber
 
-Install SharePoint PNP
+# Install SharePoint PNP Powershell Module
 Install-Module PnP.PowerShell
 
 # Install AzureAD V1 Powershell Module

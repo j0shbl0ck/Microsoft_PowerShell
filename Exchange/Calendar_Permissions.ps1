@@ -19,13 +19,13 @@
 
 # ======= VARIABLES ======= #
 $gadmin = Read-Host -Prompt 'Input Global Admin UPN (globaladmin@domain.com)' 
-$credentials = Read-Host -Prompt 'Input AAD (Azure AD) Password'
 $mainuser = Read-Host -Prompt 'Input User to view calendar permissions of (enduser@domain.com)'
 #$seconduser = seconduser@domain.com
 # ======= VARIABLES ======= #
 
 # Connect to Exchange Online via Azure AD
-Connect-ExchangeOnline -UserPrincipalName $gadmin -credentials $credentials
+Connect-ExchangeOnline -Credential $Cred
+#-UserPrincipalName $gadmin -credentials $credentials
 
 # Change username to which email you are changing.
 Write-Host '======= Calendar Rights Other Users Have to Main User  =======' -ForegroundColor Yellow
@@ -67,5 +67,7 @@ None — no permissions to access folder and files.
 
 # Comment out line below, if you need to also view events marked as private.
 #Add-MailboxFolderPermission -Identity firstuser@domain.com:\calendar -user seconduser@domain.com -AccessRights Editor -SharingPermissionFlags Delegate,CanViewPrivateItems
+
+Write-Host '======= End Of Script =======' -ForegroundColor Cyan
 
 Pause

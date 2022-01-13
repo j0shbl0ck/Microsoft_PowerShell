@@ -28,16 +28,16 @@ Connect-ExchangeOnline -UserPrincipalName $gadmin
 
 # Change username to which email you are changing.
 Write-Host '======= Calendar Rights Other Users Have to Main User  =======' -ForegroundColor Yellow
-Get-MailboxPermission -Identity ${mainuser}:\calendar
+Get-EXOMailboxFolderPermission -Identity ${mainuser}:\calendar
 
 # To view access rights of a user's other calendars. For example, user has a calendar named "time off". Uncomment below.
 #Get-MailboxFolderPermission -Identity "username:\calendar\time off"
 
 # View calender's shared with user. 
 Write-Host '======= Calendars Main User Has Rights To =======' -ForegroundColor Yellow
-(Get-EXOMailbox) | ForEach-Object {
+(Get-Mailbox) | ForEach-Object {
     $Identity = $_.Identity
-    Get-MailboxPermission (($_.PrimarySmtpAddress)+":\calendar") 
+    Get-MailboxFolderPermission (($_.PrimarySmtpAddress)+":\calendar")  `
         -User $mainuser -ErrorAction SilentlyContinue
     } | Select-Object @{n='Identity';e={$Identity}}, User, Accessrights
 

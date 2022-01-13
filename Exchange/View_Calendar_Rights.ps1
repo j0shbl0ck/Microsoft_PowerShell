@@ -35,9 +35,9 @@ Get-EXOMailboxFolderPermission -Identity ${mainuser}:\calendar
 
 # View calender's shared with user. 
 Write-Host '======= Calendars Main User Has Rights To =======' -ForegroundColor Yellow
-(Get-Mailbox) | ForEach-Object {
+(Get-EXOMailbox) | ForEach-Object {
     $Identity = $_.Identity
-    Get-MailboxFolderPermission (($_.PrimarySmtpAddress)+":\calendar")  `
+    Get-EXOMailboxFolderPermission (($_.PrimarySmtpAddress)+":\calendar")  `
         -User $mainuser -ErrorAction SilentlyContinue
     } | Select-Object @{n='Identity';e={$Identity}}, User, Accessrights
 

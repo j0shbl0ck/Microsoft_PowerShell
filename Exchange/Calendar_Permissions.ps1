@@ -3,7 +3,7 @@
     This script allows you to view, add or remove mailbox calendar permissions on O365
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.3
+    Version: 1.0.4
     Date: 01.06.22
     Type: Public
 .NOTES
@@ -19,12 +19,13 @@
 
 # ======= VARIABLES ======= #
 $gadmin = Read-Host -Prompt 'Input Global Admin UPN (globaladmin@domain.com)' 
+$credentials = Read-Host -Prompt 'Input AAD (Azure AD) Password'
 $mainuser = Read-Host -Prompt 'Input User to view calendar permissions of (enduser@domain.com)'
 #$seconduser = seconduser@domain.com
 # ======= VARIABLES ======= #
 
 # Connect to Exchange Online via Azure AD
-Connect-ExchangeOnline -UserPrincipalName $gadmin
+Connect-ExchangeOnline -UserPrincipalName $gadmin -credentials $credentials
 
 # Change username to which email you are changing.
 Write-Host '======= Calendar Rights Other Users Have to Main User  =======' -ForegroundColor Yellow

@@ -3,7 +3,7 @@
     This script allows you to view, add or remove mailbox calendar permissions on O365
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.4
+    Version: 1.0.5
     Date: 01.06.22
     Type: Public
 .NOTES
@@ -24,8 +24,7 @@ $mainuser = Read-Host -Prompt 'Input User to view calendar permissions of (endus
 # ======= VARIABLES ======= #
 
 # Connect to Exchange Online via Azure AD
-Connect-ExchangeOnline -Credential $Cred
-#-UserPrincipalName $gadmin -credentials $credentials
+Connect-ExchangeOnline -UserPrincipalName $gadmin 
 
 # Change username to which email you are changing.
 Write-Host '======= Calendar Rights Other Users Have to Main User  =======' -ForegroundColor Yellow
@@ -68,6 +67,6 @@ None — no permissions to access folder and files.
 # Comment out line below, if you need to also view events marked as private.
 #Add-MailboxFolderPermission -Identity firstuser@domain.com:\calendar -user seconduser@domain.com -AccessRights Editor -SharingPermissionFlags Delegate,CanViewPrivateItems
 
-Write-Host '======= End Of Script =======' -ForegroundColor Cyan
-
+Write-Host 'Terminating Exchange Online PS Session...' -ForegroundColor Cyan
+Disconnect-ExchangeOnline -ShowProgress $true
 Pause

@@ -3,7 +3,7 @@
     This script allows you to view, add or remove mailbox calendar permissions on O365
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.5
+    Version: 1.0.6
     Date: 01.06.22
     Type: Public
 .NOTES
@@ -19,7 +19,7 @@
 
 # ======= VARIABLES ======= #
 $gadmin = Read-Host -Prompt 'Input Global Admin UPN (globaladmin@domain.com)' 
-$mainuser = Read-Host -Prompt 'Input User to view calendar permissions of (enduser@domain.com)'
+$mainuser = Read-Host -Prompt 'Input User (enduser@domain.com) to view calendar permissions of'
 #$seconduser = seconduser@domain.com
 # ======= VARIABLES ======= #
 
@@ -68,5 +68,6 @@ None — no permissions to access folder and files.
 #Add-MailboxFolderPermission -Identity firstuser@domain.com:\calendar -user seconduser@domain.com -AccessRights Editor -SharingPermissionFlags Delegate,CanViewPrivateItems
 
 Write-Host 'Terminating Exchange Online PS Session...' -ForegroundColor Cyan
-Disconnect-ExchangeOnline -ShowProgress $true
+Disconnect-ExchangeOnline 
+Write-Host 'Complete!' -ForegroundColor Cyan
 Pause

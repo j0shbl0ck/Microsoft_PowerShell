@@ -35,7 +35,7 @@ Get-EXOMailboxPermission -Identity ${mainuser}:\calendar
 
 # View calender's shared with user. 
 Write-Host '======= Calendars Main User Has Rights To =======' -ForegroundColor Yellow
-(Get-Mailbox) | ForEach-Object {
+(Get-EXOMailbox) | ForEach-Object {
     $Identity = $_.Identity
     Get-EXOMailboxPermission (($_.PrimarySmtpAddress)+":\calendar") `
         -User $mainuser -ErrorAction SilentlyContinue
@@ -43,7 +43,7 @@ Write-Host '======= Calendars Main User Has Rights To =======' -ForegroundColor 
 
 # View calenders created by user. Uncomment below.
 Write-Host '======= Calendars Created By Main User =======' -ForegroundColor Yellow
-Get-MailboxFolderStatistics -Identity $mainuser | Where-Object { ($_.Identity -like "*calendar*") -and ($_.FolderType -ne 'CalendarLogging') } | Format-Table Name,Identity,FolderPath,FolderType
+Get-EXOMailboxFolderStatistics -Identity $mainuser | Where-Object { ($_.Identity -like "*calendar*") -and ($_.FolderType -ne 'CalendarLogging') } | Format-Table Name,Identity,FolderPath,FolderType
 
 <#
 **Outlook Calendar Permission Levels and Access Roles**

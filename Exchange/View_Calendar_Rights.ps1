@@ -3,7 +3,7 @@
     This script allows you to view, add or remove mailbox calendar permissions on O365
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.8
+    Version: 1.0.9
     Date: 01.06.22
     Type: Public
 .NOTES

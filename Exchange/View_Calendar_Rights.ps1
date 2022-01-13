@@ -3,7 +3,7 @@
     This script allows you to view, add or remove mailbox calendar permissions on O365
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.7
+    Version: 1.0.8
     Date: 01.06.22
     Type: Public
 .NOTES
@@ -68,6 +68,6 @@ None — no permissions to access folder and files.
 #Add-MailboxFolderPermission -Identity firstuser@domain.com:\calendar -user seconduser@domain.com -AccessRights Editor -SharingPermissionFlags Delegate,CanViewPrivateItems
 
 Write-Host 'Terminating Exchange Online PS Session...' -ForegroundColor Cyan
-Disconnect-ExchangeOnline -Confirm$false
-Write-Host 'Complete!' -ForegroundColor Cyan
+Disconnect-ExchangeOnline -Confirm:$false
+
 Pause

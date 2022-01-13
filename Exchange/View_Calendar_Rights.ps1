@@ -3,7 +3,7 @@
     This script allows you to view, add or remove mailbox calendar permissions on O365
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.9
+    Version: 1.1.0
     Date: 01.06.22
     Type: Public
 .NOTES
@@ -28,7 +28,7 @@ Connect-ExchangeOnline -UserPrincipalName $gadmin
 
 # Change username to which email you are changing.
 Write-Host '======= Calendar Rights Other Users Have to Main User  =======' -ForegroundColor Yellow
-Get-EXOMailboxPermission -Identity ${mainuser}:\calendar
+Get-MailboxPermission -Identity ${mainuser}:\calendar
 
 # To view access rights of a user's other calendars. For example, user has a calendar named "time off". Uncomment below.
 #Get-MailboxFolderPermission -Identity "username:\calendar\time off"
@@ -37,7 +37,7 @@ Get-EXOMailboxPermission -Identity ${mainuser}:\calendar
 Write-Host '======= Calendars Main User Has Rights To =======' -ForegroundColor Yellow
 (Get-EXOMailbox) | ForEach-Object {
     $Identity = $_.Identity
-    Get-EXOMailboxPermission (($_.PrimarySmtpAddress)+":\calendar") `
+    Get-MailboxPermission (($_.PrimarySmtpAddress)+":\calendar") 
         -User $mainuser -ErrorAction SilentlyContinue
     } | Select-Object @{n='Identity';e={$Identity}}, User, Accessrights
 

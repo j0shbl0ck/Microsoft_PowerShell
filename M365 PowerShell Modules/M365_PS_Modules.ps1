@@ -18,7 +18,7 @@ Set-ExecutionPolicy RemoteSigned
 Install-Module -Name PowerShellGet -Force -AllowClobber
 
 # Installs Exchange Powershell Module
-Install-Module -Name ExchangeOnlineManagement
+Install-Module -Name ExchangeOnlineManagement -RequiredVersion 2.0.5
 
 # Installs SharePoint Online Powershell Module
 Install-Module -Name PowerShellGet -Force -AllowClobber

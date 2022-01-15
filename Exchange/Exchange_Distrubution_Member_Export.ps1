@@ -12,8 +12,8 @@
     Source: https://docs.microsoft.com/en-us/microsoft-365/admin/add-users/set-password-to-never-expire?view=o365-worldwide
 #>
 
-# Change UPN to your global admin account.
-Connect-ExchangeOnline -UserPrincipalName contoso@domain.com 
+# Change UPN to your Global/Exchange admin account.
+Connect-ExchangeOnline -UserPrincipalName admin@domain.com 
 
 # Change Distrubtion group name to whichever one needing exportation. 
 Get-DistributionGroupMember -Identity 'NameOfGroup' | Select-Object Name, PrimarySmtpAddress | Export-csv C:\O365\ExchDist.csv -NoTypeInformation

@@ -12,7 +12,7 @@
         You will need to have AzureAD PowerShell module
 #>
 
-
+# Enter Global Admin UPN and password
 Connect-AzureAD
 
 # In the qoutes, type in the UPN (for example, user@contoso.onmicrosoft.com).

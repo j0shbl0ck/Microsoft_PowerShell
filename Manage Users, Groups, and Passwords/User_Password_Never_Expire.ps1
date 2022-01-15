@@ -31,4 +31,4 @@ Get-AzureADUser -ObjectId $User_UPN | Select-Object UserprincipalName,@{
 }
 Write-Host 'Complete!' -ForegroundColor Yellow
 
-Start-Sleep -s 30
+Start-Sleep -s 10

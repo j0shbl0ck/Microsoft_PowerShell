@@ -18,6 +18,8 @@ Connect-AzureAD
 $User_UPN = Read-Host -Prompt 'Input User (enduser@domain.com) to disable password expiration'
 # ======= VARIABLES ======= #
 
+Start-Sleep 5s
+
 # This sets the password of one user to never expire
 Write-Host 'Disabling password experiation...' -ForegroundColor Yellow
 Set-AzureADUser -ObjectId $User_UPN -PasswordPolicies DisablePasswordExpiration
@@ -29,4 +31,4 @@ Get-AzureADUser -ObjectId $User_UPN | Select-Object UserprincipalName,@{
     N="PasswordNeverExpires";E={$_.PasswordPolicies -contains "DisablePasswordExpiration"}
 }
 
-Pause
+Start-Sleep 30s

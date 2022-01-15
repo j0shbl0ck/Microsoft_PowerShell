@@ -2,7 +2,7 @@
     .NOTES
     =============================================================================
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.2
+    Version: 1.0.3
     Date: 01.04.22
     Type: Public
     Source: https://docs.microsoft.com/en-us/microsoft-365/admin/add-users/set-password-to-never-expire?view=o365-worldwide
@@ -12,16 +12,22 @@
         You will need to have AzureAD PowerShell module
 #>
 
-# Enter Global Admin UPN and password
-Connect-AzureAD
+# ======= VARIABLES ======= #
+$gadmin = Read-Host -Prompt 'Input Global Admin UPN (globaladmin@domain.com)' 
+$User_UPN = Read-Host -Prompt 'Input User (enduser@domain.com) to disable password expiration'
+# ======= VARIABLES ======= #
 
-# In the qoutes, type in the UPN (for example, user@contoso.onmicrosoft.com).
-$User_UPN = "user@contoso.onmicrosoft.com"
+# Enter Global Admin UPN and password
+Connect-AzureAD -UserPrincipalName $gadmin
+
 
 # This sets the password of one user to never expire
+Write-Host 'Disabling password experiation...' -ForegroundColor Yellow
 Set-AzureADUser -ObjectId $User_UPN -PasswordPolicies DisablePasswordExpiration
+Write-Host 'Complete!' -ForegroundColor Yellow
 
 #This shows a confirmation of whether the password is set to never expire
+Write-Host '======= User Password Policy  =======' -ForegroundColor Yellow
 Get-AzureADUser -ObjectId $User_UPN | Select-Object UserprincipalName,@{
     N="PasswordNeverExpires";E={$_.PasswordPolicies -contains "DisablePasswordExpiration"}
 }

@@ -29,14 +29,14 @@ Write-Host "Outlook Calendar Permission Levels and Access Roles" -ForegroundColo
 Write-Host "=======================================================" -ForegroundColor Yellow
 Write-Host -ForegroundColor Yellow "Owner — gives full control of the mailbox folder: read, create, modify, and delete all items and folders. Also, this role allows to manage item's permissions"
 Write-Host -ForegroundColor Yellow "PublishingEditor — read, create, modify, and delete items/subfolders (all permissions, except the right to change permissions)"
-Write-Host -ForegroundColor Yellow "Editor — read, create, modify, and delete items (can't create subfolders);"
-Write-Host -ForegroundColor Yellow "PublishingAuthor — create, read all items/subfolders. You can modify and delete only items you create;"
-Write-Host -ForegroundColor Yellow "Author — create and read items. Edit and delete own items;"
-Write-Host -ForegroundColor Yellow "NonEditingAuthor — full read access, and create items. You can delete only your own items;"
-Write-Host -ForegroundColor Yellow "Reviewer — read folder items only;"
-Write-Host -ForegroundColor Yellow "Contributor — create items and folders (can't read items);"
-Write-Host -ForegroundColor Yellow "AvailabilityOnly — read Free/Busy info from the calendar;"
-Write-Host -ForegroundColor Yellow "LimitedDetails — view availability data with calendar item subject and location;"
+Write-Host -ForegroundColor Yellow "Editor — read, create, modify, and delete items (can't create subfolders)"
+Write-Host -ForegroundColor Yellow "PublishingAuthor — create, read all items/subfolders. You can modify and delete only items you create"
+Write-Host -ForegroundColor Yellow "Author — create and read items. Edit and delete own items"
+Write-Host -ForegroundColor Yellow "NonEditingAuthor — full read access, and create items. You can delete only your own items"
+Write-Host -ForegroundColor Yellow "Reviewer — read folder items only"
+Write-Host -ForegroundColor Yellow "Contributor — create items and folders (can't read items)"
+Write-Host -ForegroundColor Yellow "AvailabilityOnly — read Free/Busy info from the calendar"
+Write-Host -ForegroundColor Yellow "LimitedDetails — view availability data with calendar item subject and location"
 Write-Host -ForegroundColor Yellow "None — no permissions to access folder and files."    
 
 

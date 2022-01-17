@@ -2,7 +2,7 @@
     .NOTES
     =============================================================================
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.6
+    Version: 1.0.7
     Date: 01.04.22
     Type: Public
     Source: https://docs.microsoft.com/en-us/microsoft-365/admin/add-users/set-password-to-never-expire?view=o365-worldwide
@@ -29,6 +29,7 @@ Write-Host '======= User Password Policy  =======' -ForegroundColor Yellow
 Get-AzureADUser -ObjectId $User_UPN | Select-Object UserprincipalName,@{
     N="PasswordNeverExpires";E={$_.PasswordPolicies -contains "DisablePasswordExpiration"}
 }
-Write-Host 'Complete!' -ForegroundColor Yellow
+Write-Host 'Complete!' -ForegroundColor Green
+Write-Host 'Script will close automatically in 10 seconds' -ForegroundColor Yellow
 
 Start-Sleep -s 10

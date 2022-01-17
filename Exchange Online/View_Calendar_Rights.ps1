@@ -43,28 +43,7 @@ Write-Host '======= Calendars Main User Has Rights To =======' -ForegroundColor 
 Write-Host '======= Calendars Created By Main User =======' -ForegroundColor Yellow
 Get-EXOMailboxFolderStatistics -Identity $mainuser | Where-Object { ($_.Identity -like "*calendar*") -and ($_.FolderType -ne 'CalendarLogging') } | Format-Table Name,Identity,FolderPath,FolderType
 
-<#
-**Outlook Calendar Permission Levels and Access Roles**
-=======================================================
-Owner — gives full control of the mailbox folder: read, create, modify, and delete all items and folders. Also, this role allows to manage item’s permissions;
-PublishingEditor — read, create, modify, and delete items/subfolders (all permissions, except the right to change permissions);
-Editor — read, create, modify, and delete items (can’t create subfolders);
-PublishingAuthor — create, read all items/subfolders. You can modify and delete only items you create;
-Author — create and read items. Edit and delete own items;
-NonEditingAuthor — full read access, and create items. You can delete only your own items;
-Reviewer — read folder items only;
-Contributor — create items and folders (can’t read items);
-AvailabilityOnly — read Free/Busy info from the calendar;
-LimitedDetails — view availability data with calendar item subject and location;
-None — no permissions to access folder and files.
-#>
-
-# The first email address is the one you're needing access. The second email is who you're giving access rights to. 
-#Add-MailboxFolderPermission -Identity ${mainuser}:\calendar -user $seconduser -AccessRights Editor
-
-# Comment out line below, if you need to also view events marked as private.
-#Add-MailboxFolderPermission -Identity firstuser@domain.com:\calendar -user seconduser@domain.com -AccessRights Editor -SharingPermissionFlags Delegate,CanViewPrivateItems
-
+# Terminate Exchange Online PS Session
 Write-Host 'Terminating Exchange Online PS Session...' -ForegroundColor Cyan
 Disconnect-ExchangeOnline -Confirm:$false
 

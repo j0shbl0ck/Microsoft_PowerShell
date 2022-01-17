@@ -8,6 +8,7 @@
     Type: Public
 .NOTES
     You will need to have AzureAD PowerShell module [ Install-Module -Name AzureAD ]
+    You will need to have Exchange Online module [ Install-Module -Name ExchangeOnlineManagement -RequiredVersion 2.0.5 ]
     Username can vary on whether authenticating against domain or Azure AD. flast or firstlast@domain.com
 .LINK
     Source: https://theitbros.com/add-calendar-permissions-in-office-365-via-powershell/

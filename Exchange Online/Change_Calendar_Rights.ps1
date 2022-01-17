@@ -3,7 +3,7 @@
     This script allows you to view calendar permissions through Exchange Online PowerShell
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.7
+    Version: 1.0.8
     Date: 01.17.22
     Type: Public
 .EXAMPLE
@@ -46,19 +46,20 @@ Write-Role;
 
 
 $role = Read-Host -Prompt 'Input access role you wish to give second user to main users calendar'
-Add-MailboxFolderPermission -Identity ${mainuser}:\calendar -user $seconduser -AccessRights $role
+    try {
+        Write-Host -ForegroundColor Cyan "Allowing $seconduser the role of $role to $mainuser calendar..."
+        Set-MailboxFolderPermission -Identity ${mainuser}:\calendar -user $seconduser -AccessRights $role -ErrorAction Stop
 
-# Outputs conformation of adding calendar permissions.=
-Write-Host -ForegroundColor Cyan "Allowing $seconduser the role of $role to $mainuser calendar..."
-Write-Host -ForegroundColor Cyan "Complete!"
-Write-Host ""
+        Write-Host -ForegroundColor Cyan "Complete!"
 
-# Shows other user rights to $mainuser
-Write-Host -ForegroundColor Yellow "======= Calendar Rights Other Users Have to $mainuser =======" 
-Get-EXOMailboxFolderPermission -Identity ${mainuser}:\calendar
+        # Shows other user rights to $mainuser
+        Write-Host -ForegroundColor Yellow "======= Calendar Rights Other Users Have to $mainuser =======" 
+        Get-EXOMailboxFolderPermission -Identity ${mainuser}:\calendar
 
-Pause
+        Pause
 
-
-
-
+    }
+    catch {
+        Write-Output "Unable to add roles to ${mainuser}: $($PSItem.ToString())"
+        Pause
+    }

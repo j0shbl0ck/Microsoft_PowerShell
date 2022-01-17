@@ -23,7 +23,7 @@ $seconduser = Read-Host -Prompt 'Input user email (seconduser@domain.com) of who
 Connect-ExchangeOnline
 
 # Displays Outlook calendar permission levels and access roles.
-function Print-Roles
+function Write-Roles
 {
     Write-Host -ForegroundColor Yellow ""
     Write-Host -ForegroundColor Yellow "**Outlook Calendar Permission Levels and Access Roles**"
@@ -40,6 +40,8 @@ function Print-Roles
     Write-Host -ForegroundColor Yellow "LimitedDetails — view availability data with calendar item subject and location;"
     Write-Host -ForegroundColor Yellow "None — no permissions to access folder and files."    
 }
+
+Write-Roles; 
 
 
 $role = Read-Host -Prompt 'Input access role you wish to give second user to main users calendar'

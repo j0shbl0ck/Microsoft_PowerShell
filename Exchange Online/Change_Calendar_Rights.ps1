@@ -3,7 +3,7 @@
     This script allows you to view calendar permissions through Exchange Online PowerShell
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.9
+    Version: 1.1.0
     Date: 01.17.22
     Type: Public
 .EXAMPLE
@@ -60,10 +60,16 @@ $role = Read-Host -Prompt 'Input access role you wish to give second user to mai
         Write-Host -ForegroundColor Yellow "======= Calendar Rights Other Users Have to $mainuser =======" 
         Get-EXOMailboxFolderPermission -Identity ${mainuser}:\calendar
 
-        Pause
+        Write-Host 'Terminating Exchange Online PS Session...' -ForegroundColor Green
+        Disconnect-ExchangeOnline -Confirm:$false
 
-    }
+        Pause
+       }
     catch {
-        Write-Output "Unable to add roles to ${mainuser}: $($PSItem.ToString())"
+        Write-Output "Unable to add role to ${mainuser}: $($PSItem.ToString())"
+
+        Write-Host 'Terminating Exchange Online PS Session...' -ForegroundColor Red
+        Disconnect-ExchangeOnline -Confirm:$false
+
         Pause
     }

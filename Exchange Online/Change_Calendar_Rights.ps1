@@ -50,6 +50,9 @@ $role = Read-Host -Prompt 'Input access role you wish to give second user to mai
     try {
         Write-Host -ForegroundColor Cyan "Allowing $seconduser the role of $role to $mainuser calendar..."
         Set-MailboxFolderPermission -Identity ${mainuser}:\calendar -user $seconduser -AccessRights $role -ErrorAction Stop
+        
+        # Comment line above, then comment out line below, if you need to also view events marked as private.
+        #Add-MailboxFolderPermission -Identity ${mainuser}:\calendar -user $seconduser -AccessRights role -SharingPermissionFlags Delegate,CanViewPrivateItems -ErrorAction Stop
 
         Write-Host -ForegroundColor Cyan "Complete!"
 

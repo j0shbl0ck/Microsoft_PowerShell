@@ -3,7 +3,7 @@
     This script allows you to view calendar permissions through Exchange Online PowerShell
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.8
+    Version: 1.0.9
     Date: 01.17.22
     Type: Public
 .EXAMPLE

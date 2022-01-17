@@ -7,7 +7,7 @@
     Date: 01.17.22
     Type: Public
 .EXAMPLE
-    Add-MailboxFolderPermission -Identity firstuser@domain.com:\calendar -user seconduser@domain.com -AccessRights Owner
+    Set-MailboxFolderPermission -Identity firstuser@domain.com:\calendar -user seconduser@domain.com -AccessRights Owner
 .NOTES
     You will need to have AzureAD PowerShell module [ Install-Module -Name AzureAD ]
     Username can vary on whether authenticating against domain or Azure AD. flast or firstlast@domain.com

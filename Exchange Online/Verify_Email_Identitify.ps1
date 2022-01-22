@@ -3,7 +3,7 @@
     This script shows the identity of the mailbox recipent. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.0
+    Version: 1.0.1
     Date: 01.13.22
     Type: Public
 .NOTES
@@ -15,7 +15,7 @@
 
 # ======= VARIABLES ======= #
 $gadmin = Read-Host -Prompt 'Input Global/Exchange Admin UPN (globaladmin@domain.com)' 
-$mainuser = Read-Host -Prompt 'Input User (enduser@domain.com) to view calendar permissions of'
+$mainuser = Read-Host -Prompt 'Input User (enduser@domain.com) to view inbox identity of'
 #$seconduser = seconduser@domain.com
 # ======= VARIABLES ======= #
 

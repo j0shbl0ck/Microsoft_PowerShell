@@ -50,7 +50,10 @@ Write-Role;
 $role = Read-Host -Prompt 'Input access role you wish to give second user to main users calendar'
     try {
         Write-Host -ForegroundColor Cyan "Allowing $seconduser the role of $role to $mainuser calendar..."
-        Add-MailboxFolderPermission -Identity ${mainuser}:\calendar -user $seconduser -AccessRights $role -ErrorAction Stop
+        Get-MailboxFolderPermission -Identity ${mainuser}:\calendar -user $seconduser -AccessRights $role -ErrorAction Continue
+        # Use this to catch error if user is not added into mailbox
+        #Add-MailboxFolderPermission -Identity ${mainuser}:\calendar -user $seconduser -AccessRights $role -ErrorAction Stop
+        #Write-Host 'User not found in mailbox. Adding user to mailbox with specified role.'
         
         # Comment line above, then comment out line below, if you need to also view events marked as private.
         #Add-MailboxFolderPermission -Identity ${mainuser}:\calendar -user $seconduser -AccessRights role -SharingPermissionFlags Delegate,CanViewPrivateItems -ErrorAction Stop

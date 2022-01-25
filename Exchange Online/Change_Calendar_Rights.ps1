@@ -3,7 +3,7 @@
     This script allows you to view calendar permissions through Exchange Online PowerShell
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.1.0
+    Version: 1.1.1
     Date: 01.17.22
     Type: Public
 .EXAMPLE
@@ -21,6 +21,7 @@ $seconduser = Read-Host -Prompt 'Input user email (seconduser@domain.com) of who
 # ======= VARIABLES ======= #
 
 # Connect to Exchange Online via Azure AD with Global/Exchange admin.
+Import-Module ExchangeOnlineManagement
 Connect-ExchangeOnline
 
 # Displays Outlook calendar permission levels and access roles.

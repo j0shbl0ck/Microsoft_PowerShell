@@ -3,11 +3,10 @@
     This script installs the M365 Powershell Module Services.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.2.0
+    Version: 1.3.0
     Date: 01.12.22
     Type: Public
 .NOTES
-    You will need accept the "Untrusted Repository" prompts.
     To use Microsoft Graph Intune, you will need to run for the first time:  Connect-MSGraph -AdminConsent 
 .LINK
     Source: https://o365reports.com/2019/11/01/install-all-office-365-powershell-modules/
@@ -37,7 +36,6 @@ if (-not(Get-InstalledModule -Name $exo -MinimumVersion 2.0.5 -ErrorAction Silen
 } else {
     Write-Host -ForegroundColor Green "${exo} Installed!"
 }
-
 
 # Installs SharePoint Online Powershell Module
 Write-Host -ForegroundColor Yellow "Finding SharePoint Online PowerShell Module..."
@@ -116,6 +114,6 @@ if (-not(Get-InstalledModule -Name $mst -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Green "${mst} Installed!"
 }
 
-Write-Host -ForegroundColor Cyan "All latest M365 Powershell modules have been installed."
+Write-Host -ForegroundColor Cyan "All latest M365 Powershell modules have been installed. You may close this session."
 
 [void][System.Console]::ReadKey($FALSE)

@@ -3,7 +3,7 @@
     This script installs the M365 Powershell Module Services.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.1.0
+    Version: 1.2.0
     Date: 01.12.22
     Type: Public
 .NOTES
@@ -118,4 +118,4 @@ if (-not(Get-InstalledModule -Name $mst -ErrorAction SilentlyContinue)) {
 
 Write-Host -ForegroundColor Cyan "All latest M365 Powershell modules have been installed."
 
-Set-Pause -DisplayMessage $false
+[void][System.Console]::ReadKey($FALSE)

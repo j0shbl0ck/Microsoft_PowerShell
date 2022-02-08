@@ -3,7 +3,7 @@
     This script installs the M365 Powershell Module Services.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.8
+    Version: 1.0.9
     Date: 01.12.22
     Type: Public
 .NOTES
@@ -52,7 +52,7 @@ if (-not(Get-InstalledModule -Name $sop -ErrorAction SilentlyContinue)) {
 
 # Install SharePoint PNP Powershell Module
 Write-Host -ForegroundColor Yellow "Finding SharePoint PNP PowerShell Module..."
-$pnp = "Install-Module SharePointPnPPowerShellOnline"
+$pnp = "SharePointPnPPowerShellOnline"
 if (-not(Get-InstalledModule -Name $pnp -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Red "${pnp} Not Found. Installing ${pnp}..."
     Install-Module -Name $pnp -SkipPublisherCheck -AllowClobber -Force -Confirm:$False

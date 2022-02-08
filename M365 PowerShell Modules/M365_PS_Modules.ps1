@@ -3,7 +3,7 @@
     This script installs the M365 Powershell Module Services.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.2
+    Version: 1.0.3
     Date: 01.12.22
     Type: Public
 .NOTES
@@ -26,7 +26,7 @@ if (-not(Get-InstalledModule -Name PowerShellGet -ErrorAction SilentlyContinue))
 
 # Installs Exchange Powershell Module
 $exo = "ExchangeOnlineManagement"
-if (-not(Get-InstalledModule -Name -Name $exo -MinimumVersion 2.0.5 -ErrorAction SilentlyContinue)) {
+if (-not(Get-InstalledModule -Name $exo -MinimumVersion 2.0.5 -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Red "${exo} Not Found. Installing ${exo}..."
     Install-Module -Name ExchangeOnlineManagement -RequiredVersion 2.0.5 -Force -Confirm:$False
     Write-Host -ForegroundColor Green "${exo} Installed!"
@@ -37,7 +37,7 @@ if (-not(Get-InstalledModule -Name -Name $exo -MinimumVersion 2.0.5 -ErrorAction
 
 # Installs SharePoint Online Powershell Module
 $sop = "Microsoft.Online.SharePoint.PowerShell"
-if (-not(Get-InstalledModule -Name -Name $sop -ErrorAction SilentlyContinue)) {
+if (-not(Get-InstalledModule -Name $sop -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Red "${sop} Not Found. Installing ${sop}..."
     Install-Module -Name $sop -Force -Confirm:$False
     Write-Host -ForegroundColor Green "${sop} Installed!"
@@ -47,7 +47,7 @@ if (-not(Get-InstalledModule -Name -Name $sop -ErrorAction SilentlyContinue)) {
 
 # Install SharePoint PNP Powershell Module
 $pnp = "PnP.PowerShell"
-if (-not(Get-InstalledModule -Name -Name $pnp -ErrorAction SilentlyContinue)) {
+if (-not(Get-InstalledModule -Name $pnp -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Red "${pnp} Not Found. Installing ${pnp}..."
     Install-Module -Name $pnp -Force -Confirm:$False
     Write-Host -ForegroundColor Green "${pnp} Installed!"
@@ -57,7 +57,7 @@ if (-not(Get-InstalledModule -Name -Name $pnp -ErrorAction SilentlyContinue)) {
 
 # Install AzureAD V1 Powershell Module
 $mso = "MSOnline"
-if (-not(Get-InstalledModule -Name -Name $mso -ErrorAction SilentlyContinue)) {
+if (-not(Get-InstalledModule -Name $mso -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Red "${mso} Not Found. Installing ${mso}..."
     Install-Module -Name $mso -Force -Confirm:$False
     Write-Host -ForegroundColor Green "${mso} Installed!"
@@ -67,7 +67,7 @@ if (-not(Get-InstalledModule -Name -Name $mso -ErrorAction SilentlyContinue)) {
 
 # Install AzureAD V2 PowerShell Module
 $aad = "AzureAD"
-if (-not(Get-InstalledModule -Name -Name $aad -ErrorAction SilentlyContinue)) {
+if (-not(Get-InstalledModule -Name $aad -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Red "${aad} Not Found. Installing ${aad}..."
     Install-Module -Name $aad -Force -Confirm:$False
     Write-Host -ForegroundColor Green "${aad} Installed!"
@@ -77,7 +77,7 @@ if (-not(Get-InstalledModule -Name -Name $aad -ErrorAction SilentlyContinue)) {
 
 # Install Microsoft Intune PowerShell Module
 $mgi = "Microsoft.Graph.Intune"
-if (-not(Get-InstalledModule -Name -Name $mgi -ErrorAction SilentlyContinue)) {
+if (-not(Get-InstalledModule -Name $mgi -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Red "${mgi} Not Found. Installing ${mgi}..."
     Install-Module -Name $mgi -Force -Confirm:$False
     Write-Host -ForegroundColor Green "${mgi} Installed!"
@@ -87,7 +87,7 @@ if (-not(Get-InstalledModule -Name -Name $mgi -ErrorAction SilentlyContinue)) {
 
 # Install Autopilot Diagnostics
 $gad = "Microsoft.Graph.Intune"
-if (-not(Get-InstalledScript -Name -Name $gad -ErrorAction SilentlyContinue)) {
+if (-not(Get-InstalledScript -Name $gad -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Red "${gad} Not Found. Installing ${gad}..."
     Install-Script -Name $gad -Force -Confirm:$False
     Write-Host -ForegroundColor Green "${gad} Installed!"
@@ -97,7 +97,7 @@ if (-not(Get-InstalledScript -Name -Name $gad -ErrorAction SilentlyContinue)) {
 
 # Install Teams PowerShell Module
 $mst = "MicrosoftTeams"
-if (-not(Get-InstalledModule -Name -Name $mst -ErrorAction SilentlyContinue)) {
+if (-not(Get-InstalledModule -Name $mst -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Red "${mst} Not Found. Installing ${mst}..."
     Install-Module -Name $mst -Force -AllowClobber -Confirm:$False
     Write-Host -ForegroundColor Green "${mst} Installed!"

@@ -3,7 +3,7 @@
     This script allows you view system information of the device.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.1
+    Version: 1.0.2
     Date: 02.07.22
     Type: Public
 .NOTES
@@ -35,7 +35,7 @@ Get-CimInstance -ClassName Win32_ComputerSystem | Select-Object -Property System
 Write-Host -ForegroundColor Cyan "OS INFORMATION:"
 Get-CimInstance -ClassName Win32_OperatingSystem | Select-Object -Property Build*,OSType
 
-Write-Host -ForegroundColor Cyna "DISK INFORMATION"
+Write-Host -ForegroundColor Cyan "DISK INFORMATION"
 Get-PhysicalDisk
 Write-Output "========================="
 # Display list of all volumes in Windows

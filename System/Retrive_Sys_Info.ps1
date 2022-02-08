@@ -13,6 +13,8 @@
 # === VARIABLES START === #
 $hostname = hostname
 $userinfo = dir env:user*
+$disk = Get-PhysicalDisk
+$volume = Get-Volume
 # === VARIABLES END === #
 
 # Informational Message
@@ -36,10 +38,9 @@ Write-Host -ForegroundColor Cyan "OS INFORMATION:"
 Get-CimInstance -ClassName Win32_OperatingSystem | Select-Object -Property Build*,OSType
 
 Write-Host -ForegroundColor Cyan "DISK INFORMATION"
-Get-PhysicalDisk
+Write-Output $disk
 Write-Output "========================="
-# Display list of all volumes in Windows
-Get-Volume
+Write-Output $volume
 
 Write-Host -ForegroundColor Magenta "All information produced. Close PowerShell when ready..."
 [void][System.Console]::ReadKey($FALSE)

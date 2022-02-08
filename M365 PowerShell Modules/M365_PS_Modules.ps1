@@ -3,7 +3,7 @@
     This script installs the M365 Powershell Module Services.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.3
+    Version: 1.0.4
     Date: 01.12.22
     Type: Public
 .NOTES
@@ -12,8 +12,11 @@
 .LINK
     Source: https://o365reports.com/2019/11/01/install-all-office-365-powershell-modules/
 #>
+
 Write-Host -ForegroundColor Cyan "Checking for latest M365 Powershell modules..."
+
 # To be able to execute scripts, if not already performed
+Write-Host -ForegroundColor Yellow "Finding PowerShellGet Module..."
 if (-not(Get-InstalledModule -Name PowerShellGet -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Red "PowerShellGet Not Found. Installing PowerShellGet..."
     Set-ExecutionPolicy RemoteSigned
@@ -25,6 +28,7 @@ if (-not(Get-InstalledModule -Name PowerShellGet -ErrorAction SilentlyContinue))
 
 
 # Installs Exchange Powershell Module
+Write-Host -ForegroundColor Yellow "Finding Exchange PowerShell Module..."
 $exo = "ExchangeOnlineManagement"
 if (-not(Get-InstalledModule -Name $exo -MinimumVersion 2.0.5 -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Red "${exo} Not Found. Installing ${exo}..."
@@ -36,6 +40,7 @@ if (-not(Get-InstalledModule -Name $exo -MinimumVersion 2.0.5 -ErrorAction Silen
 
 
 # Installs SharePoint Online Powershell Module
+Write-Host -ForegroundColor Yellow "Finding SharePoint Online PowerShell Module..."
 $sop = "Microsoft.Online.SharePoint.PowerShell"
 if (-not(Get-InstalledModule -Name $sop -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Red "${sop} Not Found. Installing ${sop}..."
@@ -46,6 +51,7 @@ if (-not(Get-InstalledModule -Name $sop -ErrorAction SilentlyContinue)) {
 }
 
 # Install SharePoint PNP Powershell Module
+Write-Host -ForegroundColor Yellow "Finding SharePoint PNP PowerShell Module..."
 $pnp = "PnP.PowerShell"
 if (-not(Get-InstalledModule -Name $pnp -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Red "${pnp} Not Found. Installing ${pnp}..."
@@ -56,6 +62,7 @@ if (-not(Get-InstalledModule -Name $pnp -ErrorAction SilentlyContinue)) {
 }
 
 # Install AzureAD V1 Powershell Module
+Write-Host -ForegroundColor Yellow "Finding AzureAD V1 PowerShell Module..."
 $mso = "MSOnline"
 if (-not(Get-InstalledModule -Name $mso -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Red "${mso} Not Found. Installing ${mso}..."
@@ -66,6 +73,7 @@ if (-not(Get-InstalledModule -Name $mso -ErrorAction SilentlyContinue)) {
 }
 
 # Install AzureAD V2 PowerShell Module
+Write-Host -ForegroundColor Yellow "Finding AzureAD V2 PowerShell Module..."
 $aad = "AzureAD"
 if (-not(Get-InstalledModule -Name $aad -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Red "${aad} Not Found. Installing ${aad}..."
@@ -76,6 +84,7 @@ if (-not(Get-InstalledModule -Name $aad -ErrorAction SilentlyContinue)) {
 }
 
 # Install Microsoft Intune PowerShell Module
+Write-Host -ForegroundColor Yellow "Finding Microsoft Intune PowerShell Module..."
 $mgi = "Microsoft.Graph.Intune"
 if (-not(Get-InstalledModule -Name $mgi -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Red "${mgi} Not Found. Installing ${mgi}..."
@@ -86,7 +95,8 @@ if (-not(Get-InstalledModule -Name $mgi -ErrorAction SilentlyContinue)) {
 }
 
 # Install Autopilot Diagnostics
-$gad = "Microsoft.Graph.Intune"
+$gad = "Get-Autopilot Diagnostics"
+Write-Host -ForegroundColor Yellow "Finding Autopilot Diagnostics script..."
 if (-not(Get-InstalledScript -Name $gad -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Red "${gad} Not Found. Installing ${gad}..."
     Install-Script -Name $gad -Force -Confirm:$False
@@ -96,6 +106,7 @@ if (-not(Get-InstalledScript -Name $gad -ErrorAction SilentlyContinue)) {
 }
 
 # Install Teams PowerShell Module
+Write-Host -ForegroundColor Yellow "Finding Microsoft Teams Module..."
 $mst = "MicrosoftTeams"
 if (-not(Get-InstalledModule -Name $mst -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Red "${mst} Not Found. Installing ${mst}..."

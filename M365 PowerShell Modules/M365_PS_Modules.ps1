@@ -3,7 +3,7 @@
     This script installs the M365 Powershell Module Services.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.4
+    Version: 1.0.5
     Date: 01.12.22
     Type: Public
 .NOTES
@@ -52,8 +52,8 @@ if (-not(Get-InstalledModule -Name $sop -ErrorAction SilentlyContinue)) {
 
 # Install SharePoint PNP Powershell Module
 Write-Host -ForegroundColor Yellow "Finding SharePoint PNP PowerShell Module..."
-$pnp = "PnP.PowerShell"
-if (-not(Get-InstalledModule -Name $pnp -ErrorAction SilentlyContinue)) {
+$pnp = "Install-Module SharePointPnPPowerShellOnline"
+if (-not(Get-InstalledModule -Name $pnp -SkipPublisherCheck -AllowClobber -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Red "${pnp} Not Found. Installing ${pnp}..."
     Install-Module -Name $pnp -Force -Confirm:$False
     Write-Host -ForegroundColor Green "${pnp} Installed!"
@@ -95,7 +95,7 @@ if (-not(Get-InstalledModule -Name $mgi -ErrorAction SilentlyContinue)) {
 }
 
 # Install Autopilot Diagnostics
-$gad = "Get-Autopilot Diagnostics"
+$gad = "Get-AutopilotDiagnostics"
 Write-Host -ForegroundColor Yellow "Finding Autopilot Diagnostics script..."
 if (-not(Get-InstalledScript -Name $gad -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Red "${gad} Not Found. Installing ${gad}..."

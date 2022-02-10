@@ -12,8 +12,11 @@
 
 #>
 
+# Imports ADSync Module
 Import-Module ADSync
 
+# Shows current schedule settings for ADSync
 Get-ADSyncScheduler
 
+# Runs a delta sync on AAD Connect
 Start-ADSyncSyncCycle -PolicyType Delta

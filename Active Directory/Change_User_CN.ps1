@@ -13,7 +13,7 @@
 #>
 
 # Asks for username (SamAccountName attribute) of ADObject
-$username = Read-Host -Prompt "Enter username of ADObject"
+$username = Read-Host -Prompt "Enter username (SamAccountName attribute) of ADObject"
 
 # Pulls ADUser information primarily objectGUID and displayName
 $information = Get-ADUser $username -Properties *

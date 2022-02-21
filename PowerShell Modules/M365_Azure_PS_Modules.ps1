@@ -3,7 +3,7 @@
     This script installs the M365 and Azure Powershell Module Services.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.3.2
+    Version: 1.3.3
     Date: 01.12.22
     Type: Public
 .NOTES
@@ -12,7 +12,18 @@
     Source: https://o365reports.com/2019/11/01/install-all-office-365-powershell-modules/
 #>
 
+# Display intro to script
+function Write-Intro {
+Write-Host ""
+Write-Host -ForegroundColor Cyan "========================================================="
+Write-Host -ForegroundColor Cyan "                 M365/Azure Powershell Modules           "
+Write-Host -ForegroundColor Cyan "========================================================="
+Write-Host ""
 Write-Host -ForegroundColor Cyan "Checking for latest M365 and Azure Powershell modules..."
+Write-Host ""
+}
+
+Write-Intro;
 
 # To be able to execute scripts, if not already performed
 Write-Host -ForegroundColor Yellow "Finding PowerShellGet Module..."
@@ -125,6 +136,7 @@ if (-not(Get-InstalledModule -Name $arm -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Green "${arm} Installed!"
 }
 
+Write-Host ""
 Write-Host -ForegroundColor Cyan "All latest M365 and Azure Powershell modules have been installed. You may close this session."
 
 [void][System.Console]::ReadKey($FALSE)

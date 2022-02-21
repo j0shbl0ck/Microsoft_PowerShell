@@ -3,7 +3,7 @@
     This script installs the M365 and Azure Powershell Module Services.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.3.4
+    Version: 1.3.5
     Date: 01.12.22
     Type: Public
 .NOTES
@@ -135,6 +135,29 @@ if (-not(Get-InstalledModule -Name $arm -ErrorAction SilentlyContinue)) {
 } else {
     Write-Host -ForegroundColor Green "${arm} Installed!"
 }
+
+# Install Azure CLI PowerShell Module
+Write-Host -ForegroundColor Yellow "Finding Azure CLI Module..."
+$arm = "AzureRM"
+if (-not(Get-InstalledModule -Name $arm -ErrorAction SilentlyContinue)) {
+    Write-Host -ForegroundColor Red "${arm} Not Found. Installing ${arm}..."
+    Install-Module -Name $arm -Force -AllowClobber -Confirm:$False
+    Write-Host -ForegroundColor Green "${arm} Installed!"
+} else {
+    Write-Host -ForegroundColor Green "${arm} Installed!"
+}
+
+# Install Azure Az PowerShell Module
+Write-Host -ForegroundColor Yellow "Finding Azure Az Module..."
+$az = "Az"
+if (-not(Get-InstalledModule -Name $az -ErrorAction SilentlyContinue)) {
+    Write-Host -ForegroundColor Red "${az} Not Found. Installing ${az}..."
+    Install-Module -Name $az -Force -AllowClobber -Confirm:$False
+    Write-Host -ForegroundColor Green "${az} Installed!"
+} else {
+    Write-Host -ForegroundColor Green "${az} Installed!"
+}
+
 
 Write-Host ""
 Write-Host -ForegroundColor Cyan "All latest M365 and Azure Powershell modules have been installed. You may close this session."

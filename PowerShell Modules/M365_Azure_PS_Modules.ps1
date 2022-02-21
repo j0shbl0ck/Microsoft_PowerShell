@@ -3,7 +3,7 @@
     This script installs the M365 and Azure Powershell Module Services.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.3.5
+    Version: 1.3.6
     Date: 01.12.22
     Type: Public
 .NOTES
@@ -150,13 +150,32 @@ if (-not(Get-InstalledModule -Name $arm -ErrorAction SilentlyContinue)) {
 # Install Azure Az PowerShell Module
 Write-Host -ForegroundColor Yellow "Finding Azure Az Module..."
 $az = "Az"
-if (-not(Get-InstalledModule -Name $az -ErrorAction SilentlyContinue)) {
-    Write-Host -ForegroundColor Red "${az} Not Found. Installing ${az}..."
-    Install-Module -Name $az -Force -AllowClobber -Confirm:$False
-    Write-Host -ForegroundColor Green "${az} Installed!"
+$arm = "AzureRM"
+if (Get-InstalledModule -Name $az -ErrorAction SilentlyContinue)) {
+    Write-Host -ForegroundColor Red "${az} Found. Requires uninstall to install Azure Az Module..."
+    $confirmation = Read-Host "Do you want to uninstall AzureRM Module? [y/n]"
+    while($confirmation -ne "y")
+    {
+        if ($confirmation -eq 'n') {exit}
+        $confirmation = Read-Host "Do you want to uninstall AzureRM Module? [y/n]"
+    }
+    {
+        if ($confirmation -eq 'y')
+        Write-Host -ForegroundColor Red "Uninstalling AzureRM Module..."
+        Uninstall-Module -AzureRM -AllVersions
+    }
+    Write-Host -ForegroundColor Green "${az} Uninstalled!"
 } else {
-    Write-Host -ForegroundColor Green "${az} Installed!"
+    $az = "Az"
+    if (-not(Get-InstalledModule -Name $az -ErrorAction SilentlyContinue)) {
+        Write-Host -ForegroundColor Red "${az} Not Found. Installing ${az}..."
+        Install-Module -Name $az -Force -AllowClobber -Confirm:$False
+        Write-Host -ForegroundColor Green "${az} Installed!"
+    } else {
+        Write-Host -ForegroundColor Green "${az} Installed!"
+    }
 }
+
 
 
 Write-Host ""

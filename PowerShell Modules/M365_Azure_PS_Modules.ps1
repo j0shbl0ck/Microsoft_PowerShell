@@ -118,7 +118,7 @@ if (-not(Get-InstalledScript -Name $gad -ErrorAction SilentlyContinue)) {
 Write-Host -ForegroundColor Yellow "Finding Azure CLI Module..."
 $arm = "AzureRM"
 if (-not(Get-InstalledModule -Name $arm -ErrorAction SilentlyContinue)) {
-    Write-Host -ForegroundColor Red "${arm} Not Found. Installing ${mst}..."
+    Write-Host -ForegroundColor Red "${arm} Not Found. Installing ${arm}..."
     Install-Module -Name $arm -Force -AllowClobber -Confirm:$False
     Write-Host -ForegroundColor Green "${arm} Installed!"
 } else {

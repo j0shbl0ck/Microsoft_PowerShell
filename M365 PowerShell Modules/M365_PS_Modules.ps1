@@ -3,7 +3,7 @@
     This script installs the M365 Powershell Module Services.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.3.0
+    Version: 1.3.1
     Date: 01.12.22
     Type: Public
 .NOTES
@@ -12,7 +12,7 @@
     Source: https://o365reports.com/2019/11/01/install-all-office-365-powershell-modules/
 #>
 
-Write-Host -ForegroundColor Cyan "Checking for latest M365 Powershell modules..."
+Write-Host -ForegroundColor Cyan "Checking for latest M365 and Azure Powershell modules..."
 
 # To be able to execute scripts, if not already performed
 Write-Host -ForegroundColor Yellow "Finding PowerShellGet Module..."
@@ -46,6 +46,17 @@ if (-not(Get-InstalledModule -Name $sop -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Green "${sop} Installed!"
 } else {
     Write-Host -ForegroundColor Green "${sop} Installed!"
+}
+
+# Install Teams PowerShell Module
+Write-Host -ForegroundColor Yellow "Finding Microsoft Teams Module..."
+$mst = "MicrosoftTeams"
+if (-not(Get-InstalledModule -Name $mst -ErrorAction SilentlyContinue)) {
+    Write-Host -ForegroundColor Red "${mst} Not Found. Installing ${mst}..."
+    Install-Module -Name $mst -Force -AllowClobber -Confirm:$False
+    Write-Host -ForegroundColor Green "${mst} Installed!"
+} else {
+    Write-Host -ForegroundColor Green "${mst} Installed!"
 }
 
 # Install SharePoint PNP Powershell Module
@@ -103,17 +114,17 @@ if (-not(Get-InstalledScript -Name $gad -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Green "${mgi} Installed!"
 }
 
-# Install Teams PowerShell Module
-Write-Host -ForegroundColor Yellow "Finding Microsoft Teams Module..."
-$mst = "MicrosoftTeams"
-if (-not(Get-InstalledModule -Name $mst -ErrorAction SilentlyContinue)) {
-    Write-Host -ForegroundColor Red "${mst} Not Found. Installing ${mst}..."
-    Install-Module -Name $mst -Force -AllowClobber -Confirm:$False
-    Write-Host -ForegroundColor Green "${mst} Installed!"
+# Install Azure CLI PowerShell Module
+Write-Host -ForegroundColor Yellow "Finding Azure CLI Module..."
+$arm = "AzureRM"
+if (-not(Get-InstalledModule -Name $arm -ErrorAction SilentlyContinue)) {
+    Write-Host -ForegroundColor Red "${arm} Not Found. Installing ${mst}..."
+    Install-Module -Name $arm -Force -AllowClobber -Confirm:$False
+    Write-Host -ForegroundColor Green "${arm} Installed!"
 } else {
-    Write-Host -ForegroundColor Green "${mst} Installed!"
+    Write-Host -ForegroundColor Green "${arm} Installed!"
 }
 
-Write-Host -ForegroundColor Cyan "All latest M365 Powershell modules have been installed. You may close this session."
+Write-Host -ForegroundColor Cyan "All latest M365 and Azure Powershell modules have been installed. You may close this session."
 
 [void][System.Console]::ReadKey($FALSE)

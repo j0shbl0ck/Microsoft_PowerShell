@@ -3,7 +3,7 @@
     This script installs the M365 and Azure Powershell Module Services.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.3.3
+    Version: 1.3.4
     Date: 01.12.22
     Type: Public
 .NOTES
@@ -16,7 +16,7 @@
 function Write-Intro {
 Write-Host ""
 Write-Host -ForegroundColor Cyan "========================================================="
-Write-Host -ForegroundColor Cyan "                 M365/Azure Powershell Modules           "
+Write-Host -ForegroundColor Cyan "               M365/Azure Powershell Modules             "
 Write-Host -ForegroundColor Cyan "========================================================="
 Write-Host ""
 Write-Host -ForegroundColor Cyan "Checking for latest M365 and Azure Powershell modules..."

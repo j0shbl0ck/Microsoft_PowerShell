@@ -3,7 +3,7 @@
     This script installs the M365 and Azure Powershell Module Services.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.3.1
+    Version: 1.3.2
     Date: 01.12.22
     Type: Public
 .NOTES

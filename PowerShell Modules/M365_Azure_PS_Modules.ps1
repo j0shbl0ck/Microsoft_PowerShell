@@ -145,8 +145,12 @@ if (Get-InstalledModule -Name $arm -ErrorAction SilentlyContinue) {
     $confirmation = Read-Host "Do you want to uninstall AzureRM Module? [y/n]"
     while($confirmation -ne "y")
     {
-        if ($confirmation -eq 'n') {exit}
+        if ($confirmation -eq 'n') {
+            break
+            Write-Host -ForegroundColor Red "Denied uninstall of AzureRM Module. Continuing..."
+        }
         $confirmation = Read-Host "Do you want to uninstall AzureRM Module? [y/n]"
+        break
     }
     if ($confirmation -eq 'y') {
     Write-Host -ForegroundColor Red "Uninstalling AzureRM Module..."

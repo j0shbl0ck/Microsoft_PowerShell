@@ -3,7 +3,7 @@
     This script installs the M365 and Azure Powershell Module Services.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.3.7
+    Version: 1.3.8
     Date: 01.12.22
     Type: Public
 .NOTES
@@ -141,24 +141,30 @@ Write-Host -ForegroundColor Yellow "Finding Azure Az Module..."
 $az = "Az"
 $arm = "AzureRM"
 if (Get-InstalledModule -Name $arm -ErrorAction SilentlyContinue) {
-    Write-Host -ForegroundColor Red "${arm} Found. Requires uninstall to install Azure Az Module..."
-    $confirmation = Read-Host "Do you want to uninstall AzureRM Module? [y/n]"
-    while($confirmation -ne "y")
-    {
-        if ($confirmation -eq 'n') {
-            break
-            Write-Host -ForegroundColor Red "Denied uninstall of AzureRM Module. Continuing..."
-        }
+        Write-Host -ForegroundColor Red "${arm} Found. Requires uninstall to install Azure Az Module..."
         $confirmation = Read-Host "Do you want to uninstall AzureRM Module? [y/n]"
-        break
-    }
-    if ($confirmation -eq 'y') {
-    Write-Host -ForegroundColor Red "Uninstalling AzureRM Module..."
-    Uninstall-Module -AzureRM -AllVersions
-    Write-Host -ForegroundColor Green "${az} Uninstalled!"
-    } else {}
-} 
-else {
+        while($confirmation -ne "y")
+        {
+            if ($confirmation -eq 'n') {
+                break
+                Write-Host -ForegroundColor Red "Denied uninstall of AzureRM Module. Continuing..."
+            }
+            $confirmation = Read-Host "Do you want to uninstall AzureRM Module? [y/n]"
+            break
+        }
+            if ($confirmation -eq 'y') {
+            Write-Host -ForegroundColor Red "Uninstalling AzureRM Module..."
+            Uninstall-Module -Name $arm -AllVersions
+            Write-Host -ForegroundColor Green "${arm} Uninstalled!"
+            if (-not(Get-InstalledModule -Name $az -ErrorAction SilentlyContinue)) {
+                Write-Host -ForegroundColor Red "${az} Not Found. Installing ${az}..."
+                Install-Module -Name $az -Force -AllowClobber -Confirm:$False
+                Write-Host -ForegroundColor Green "${az} Installed!"
+            } else {
+                Write-Host -ForegroundColor Green "${az} Installed!"
+            }
+        }
+}else {
     $az = "Az"
     if (-not(Get-InstalledModule -Name $az -ErrorAction SilentlyContinue)) {
         Write-Host -ForegroundColor Red "${az} Not Found. Installing ${az}..."
@@ -170,8 +176,7 @@ else {
 }
 
 
-
 Write-Host ""
 Write-Host -ForegroundColor Cyan "All latest M365 and Azure Powershell modules have been installed. You may close this session."
 
-[void][System.Console]::ReadKey($FALSE)
+Pause

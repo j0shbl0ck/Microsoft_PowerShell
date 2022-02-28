@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    This script allows you to view calendar permissions through Exchange Online PowerShell
+    This script allows you to change calendar permissions through Exchange Online PowerShell
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
     Version: 1.1.2

@@ -3,7 +3,7 @@
     This script allows you to view calendar permissions on O365
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.1.0
+    Version: 1.1.1
     Date: 01.06.22
     Type: Public
 .NOTES
@@ -29,7 +29,7 @@ Write-Host '======= Calendar Rights Other Users Have to Main User  =======' -For
 Get-EXOMailboxFolderPermission -Identity ${mainuser}:\calendar
 
 # To view access rights of a user's other calendars. For example, user has a calendar named "time off". Uncomment below.
-#Get-MailboxFolderPermission -Identity "username:\calendar\time off"
+#Get-MailboxFolderPermission -Identity "${mainuser}:\calendar\time off"
 
 # View calender's shared with user. 
 Write-Host '======= Calendars Main User Has Rights To =======' -ForegroundColor Yellow

@@ -3,7 +3,7 @@
     This script disables Active Directory syncing with Azure. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.0
+    Version: 1.0.1
     Date: 01.12.22
     Type: Public
 .NOTES
@@ -24,7 +24,7 @@ Set-MsolDirSyncEnabled -EnableDirSync $false
 # Comment script line above, and uncomment script line below to turn Directory Syncing to on.
 #Set-MsolDirSyncEnabled -EnableDirSync $true
 
-Write-Ouput = "====== New Status ======"
+Write-Host = "====== New Status ======"
 # Checks again on the current status of the on-prem syncing
 (Get-MsolCompanyInformation).DirectorySynchronizationEnabled
 

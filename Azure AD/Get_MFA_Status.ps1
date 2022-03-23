@@ -3,7 +3,7 @@
     This script pulls information on whether a user has MFA enabled or not. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.2
+    Version: 1.0.3
     Date: 03.23.22
     Type: Public
 .NOTES
@@ -12,7 +12,7 @@
     Source: https://dailysysadmin.com/KB/Article/3725/use-powershell-to-get-the-mfa-enabled-or-disabled-status-of-office-365-and-azure-users-and-type-of-mfa-used/
 #>
 
-start-process powershell '-noexit -command "[console]::windowwidth=100; [console]::windowheight=50; [console]::bufferwidth=[console]::windowwidth"'
+start-process powershell '-noexit -command "[console]::windowwidth=150; [console]::windowheight=100; [console]::bufferwidth=[console]::windowwidth"'
 
 Connect-MsolService
 

@@ -3,7 +3,7 @@
     This script pulls information on whether a user has MFA enabled or not. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.4
+    Version: 1.0.5
     Date: 03.23.22
     Type: Public
 .NOTES

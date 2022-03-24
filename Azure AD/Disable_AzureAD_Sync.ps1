@@ -12,7 +12,7 @@
     Source: https://blogs.eyonic.com/how-to-disable-active-directory-syncing-with-azure/ 
 #>
 
-# Connect to O365
+# Connect to Microsoft Online Services
 Connect-MsolService
 
 # Checks the current status of the on-prem syncing

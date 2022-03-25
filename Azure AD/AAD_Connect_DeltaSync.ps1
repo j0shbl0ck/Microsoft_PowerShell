@@ -23,3 +23,6 @@ Get-ADSyncSchedule
 
 # Runs a delta sync on AAD Connect
 Start-ADSyncSyncCycle -PolicyType Delta
+
+## Remote PowerShell Connection to Azure AD Connect Server (Uncomment below to use)
+#Exit-PSSession

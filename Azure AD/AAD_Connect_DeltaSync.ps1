@@ -3,7 +3,7 @@
     This script performs a delta sync on Azure AD Connect. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.2
+    Version: 1.0.3
     Date: 02.10.22
     Type: Public
 .NOTES

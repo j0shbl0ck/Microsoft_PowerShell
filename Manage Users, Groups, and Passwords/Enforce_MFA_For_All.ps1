@@ -3,7 +3,7 @@
     This script enforces MFA for all users within the tenant
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.0
+    Version: 1.0.1
     Date: 03.29.22
     Type: Public
 .NOTES
@@ -15,6 +15,8 @@
 # Connect MSOnline
 $cred = New-Object System.Management.Automation.PSCredential("infinitech@basilmcrae.com", "wmGmEWqx3JpQpX_rJdXLQB8Cm6sw1XYS")
 Connect-MsolService 
+
+# Make status to "Enforced"
 $st = New-Object -TypeName Microsoft.Online.Administration.StrongAuthenticationRequirement
 $st.RelyingParty = "*"
 $st.State = "Enforced" 

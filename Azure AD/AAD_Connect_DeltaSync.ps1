@@ -3,7 +3,7 @@
     This script performs a delta sync on Azure AD Connect. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.4
+    Version: 1.0.5
     Date: 02.10.22
     Type: Public
 .NOTES
@@ -14,16 +14,16 @@
 
 ==== Remote PowerShell Connection ====
 
-# Imports ADSync Module
-Import-Module ADSync
+## Imports ADSync Module
+#Import-Module ADSync
 
 ## Remote PowerShell Connection to Azure AD Connect Server (Uncomment below to use)
 #Enter-PSSession [ADConnect Server]
 
-# Shows current schedule settings for ADSync
+## Shows current schedule settings for ADSync
 #Get-ADSyncSchedule
 
-# Runs a delta sync on AAD Connect
+## Runs a delta sync on AAD Connect
 #Start-ADSyncSyncCycle -PolicyType Delta
 
 ## Remote PowerShell Connection to Azure AD Connect Server (Uncomment below to use)

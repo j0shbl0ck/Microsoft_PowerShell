@@ -3,7 +3,7 @@
     This script pulls information on whether a user has MFA enabled or not. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.7
+    Version: 1.0.8
     Date: 03.23.22
     Type: Public
 .NOTES
@@ -19,7 +19,7 @@ Connect-MsolService
 Get-MsolUser -All | 
     Select-Object DisplayName,UserPrincipalName,
     @{N="MFA Status"; E={ if( $_.StrongAuthenticationRequirements.State -ne $null){ $_.StrongAuthenticationRequirements.State} else { "Disabled"}}},
-    @{N="MFA Method"; E={ if( $_.StrongAuthenticationMethods.IsDefault -eq $true) {($_.StrongAuthenticationMethods | Where-Object IsDefault -eq $True).MethodType} else { "Disabled"}}} | 
+    @{N="MFA Method"; E={ if( $_.StrongAuthenticationMethods.IsDefault -eq $true) {($_.StrongAuthenticationMethods | Where-Object IsDefault -eq $True).MethodType} else { "None"}}} | 
     Sort-Object DisplayName |
     Format-Table -AutoSize
 

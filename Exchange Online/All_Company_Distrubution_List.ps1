@@ -3,7 +3,7 @@
     This script gets every user excluding unlicensed and external then adds them to an all company list.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.1
+    Version: 1.0.2
     Date: 04.14.22
     Type: Public
 .EXAMPLE
@@ -25,16 +25,15 @@ Connect-ExchangeOnline
 Connect-MsolService
 
 # Create all company distrubition list.
-New-DistributionList -Name "AllCompany" -Type "Distribution" 
+New-DistributionGroup -Name "AllCompany" -Type "Distribution" 
 
 # Get all users excluding unlicensed and external
-Get-MsolUser -All | 
+$user = Get-MsolUser -All | 
     Where-Object {($_.UserPrincipalName -notlike "*EXT*") -and ($_.isLicensed -eq $true)} |
-    Select-Object DisplayName,UserPrincipalName |
-    Sort-Object DisplayName
+    Select-Object UserPrincipalName
 
 
 # For each user add to all company list.
 $user | ForEach-Object {
-    Add-DistributionListMember -DistributionList "AllCompany" -Member $_.UserPrincipalName
+    Add-DistributionGroupMember -Identity "AllCompany" -Member $_.UserPrincipalName
 }

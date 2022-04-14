@@ -3,14 +3,13 @@
     This script gets every user excluding unlicensed and external then adds them to an all company list.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.2
+    Version: 1.0.3
     Date: 04.14.22
     Type: Public
 .EXAMPLE
 .NOTES
-    You will need to have AzureAD PowerShell module [ Install-Module -Name AzureAD ]
+    You will need to have MSOnline PowerShell module [ Install-Module -Name MSOnline ]
     You will need to have Exchange Online module [ Install-Module -Name ExchangeOnlineManagement -RequiredVersion 2.0.5 ]
-    Username can vary on whether authenticating against domain or Azure AD. flast or firstlast@domain.com
 .LINK
     https://social.technet.microsoft.com/Forums/ie/en-US/a48b455e-0114-424f-8b0f-a8c0b88dfb0f/exchange-powershell-loop-through-all-usersmailboxes-and-run-an-exchange-command-on-the-mailbox?forum=winserverpowershell
     https://medium.com/@writeabednego/bulk-create-and-add-members-to-distribution-lists-and-shared-mailboxes-using-powershell-89f5ef6e1362

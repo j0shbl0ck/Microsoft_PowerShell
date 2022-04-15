@@ -3,7 +3,7 @@
     This script pulls information on where Azure AD Connect is installed
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.1
+    Version: 1.0.2
     Date: 03.23.22
     Type: Public
 .NOTES
@@ -14,7 +14,6 @@
 
 # Enter global admin credentials
 Connect-MsolService
-
 
 # Retrives AD Connect Hostname
 $hostname = (Get-MsolCompanyInformation).DirSyncClientMachineName
@@ -29,6 +28,5 @@ if ($null -eq $hostname) {
 
 # End MS Online session
 [Microsoft.Online.Administration.Automation.ConnectMsolService]::ClearUserSessionState()
-
 Pause 
 Write-Host "Exiting..."

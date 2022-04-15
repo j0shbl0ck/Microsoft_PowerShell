@@ -3,7 +3,7 @@
     This script shows the identity of the mailbox recipent. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.1
+    Version: 1.0.2
     Date: 01.13.22
     Type: Public
 .NOTES
@@ -14,13 +14,10 @@
 #>
 
 # ======= VARIABLES ======= #
-$gadmin = Read-Host -Prompt 'Input Global/Exchange Admin UPN (globaladmin@domain.com)' 
+Connect-ExchangeOnline
 $mainuser = Read-Host -Prompt 'Input User (enduser@domain.com) to view inbox identity of'
 #$seconduser = seconduser@domain.com
 # ======= VARIABLES ======= #
-
-# Connect to Exchange Online via Azure AD
-Connect-ExchangeOnline -UserPrincipalName $gadmin 
 
 # Retrives mailbox type and user connected with it. 
 Get-EXORecipient -Identity $mainuser -ErrorAction Stop

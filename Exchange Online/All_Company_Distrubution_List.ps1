@@ -3,7 +3,7 @@
     This script gets every user excluding unlicensed and external then adds them to an all company list.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.5
+    Version: 1.0.6
     Date: 04.14.22
     Type: Public
 .EXAMPLE
@@ -25,32 +25,67 @@ Connect-ExchangeOnline
 # Connect to Microsoft Online
 Connect-MsolService
 
-# Create all company distrubition list.
-New-DistributionGroup -Name "AllCompany" -Type "Distribution" 
-Write-Host ""
-Write-Host "Primary Smtp Address can be changed online if current domain name not desired." -ForegroundColor Yellow
+# Ask user if they want to create or update distribution list
+Write-Host "Would you like to create or update the all company distribution list?"
+Write-Host "Enter 'create' or 'update' to continue."
+$createUpdate = Read-Host
 
-# Get all users excluding unlicensed and external
-$user = Get-MsolUser -All | 
-    Where-Object {($_.UserPrincipalName -notlike "*EXT*") -and ($_.isLicensed -eq $true)} |
-    Select-Object UserPrincipalName
+# if user wants to create distribution list
+if ($createUpdate -eq "create")
+{
+    # Create all company distrubition list.
+    New-DistributionGroup -Name "AllCompany" -Type "Distribution" 
+    Write-Host ""
+    Write-Host "Primary Smtp Address can be changed online if current domain name not desired." -ForegroundColor Yellow
+
+    # Get all users excluding unlicensed and external
+    $user = Get-MsolUser -All | 
+        Where-Object {($_.UserPrincipalName -notlike "*EXT*") -and ($_.isLicensed -eq $true)} |
+        Select-Object UserPrincipalName
 
 
-# For each user add to all company list.
-$user | ForEach-Object {
-    Add-DistributionGroupMember -Identity "AllCompany" -Member $_.UserPrincipalName
+    # For each user add to all company list.
+    $user | ForEach-Object {
+        Add-DistributionGroupMember -Identity "AllCompany" -Member $_.UserPrincipalName
+    }
+
+    Write-Host "All members of company list below:" -ForegroundColor Cyan
+
+    # Show members of all company list.
+    Get-DistributionGroupMember -Identity "AllCompany" | 
+        Select-Object DisplayName, PrimarySmtpAddress |
+        Sort-Object DisplayName, PrimarySmtpAddress |
+        Format-Table -AutoSize 
+
+    # In green, show success
+    Write-Host "Distribution group created successfully" -ForegroundColor Green
+
 }
 
-Write-Host "All members of company list below:" -ForegroundColor Cyan
+# if user wants to update distribution list
+if ($createUpdate -eq "update")
+{
+    # Get all users excluding unlicensed and external
+    $user = Get-MsolUser -All | 
+        Where-Object {($_.UserPrincipalName -notlike "*EXT*") -and ($_.isLicensed -eq $true)} |
+        Select-Object UserPrincipalName
 
-# Show members of all company list.
-Get-DistributionGroupMember -Identity "AllCompany" | 
-    Select-Object DisplayName, PrimarySmtpAddress |
-    Sort-Object DisplayName, PrimarySmtpAddress |
-    Format-Table -AutoSize 
+    # For each user add to all company list.
+    $user | ForEach-Object {
+        Update-DistributionGroupMember -Identity "AllCompany" -Member $_.UserPrincipalName
+    }
 
-# In green, show success
-Write-Host "Distribution group created successfully" -ForegroundColor Green
+    Write-Host "All members of company list below:" -ForegroundColor Cyan
+
+    # Show members of all company list.
+    Get-DistributionGroupMember -Identity "AllCompany" | 
+        Select-Object DisplayName, PrimarySmtpAddress |
+        Sort-Object DisplayName, PrimarySmtpAddress |
+        Format-Table -AutoSize 
+
+    # In green, show success
+    Write-Host "Distribution group updated successfully" -ForegroundColor Green
+}
 
 # Pause script
 Pause

@@ -3,7 +3,7 @@
     This script gets every user excluding unlicensed and external then adds them to an all company list.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.9
+    Version: 1.1.0
     Date: 04.14.22
     Type: Public
 .EXAMPLE
@@ -88,9 +88,11 @@ else if ($createUpdate -eq "update")
     Write-Host "Distribution group updated successfully" -ForegroundColor Green
 }
 
-else (
+# if user does not enter create or update
+else
+{
     Write-Host "Please enter 'create' or 'update' to continue." -ForegroundColor Red
-)
+}
 
 # Pause script
 Pause

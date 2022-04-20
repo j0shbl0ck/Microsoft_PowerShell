@@ -3,7 +3,7 @@
     This script gets every user excluding unlicensed and external then adds them to an all company list.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.1.1
+    Version: 1.1.2
     Date: 04.14.22
     Type: Public
 .EXAMPLE
@@ -19,11 +19,14 @@
 
 
 # Connect to Exchange Online via Azure AD with Global/Exchange admin.
-Import-Module ExchangeOnlineManagement
+Write-Host -ForegroundColor Yellow -NoNewLine 'Connecting to Exchange Online...'
 Connect-ExchangeOnline
+Write-Host -ForegroundColor Green -NoNewLine 'Connected to Exchange Online.'
 
 # Connect to Microsoft Online
+Write-Host -ForegroundColor Yellow -NoNewLine 'Connecting to Microsoft Online...'
 Connect-MsolService
+Write-Host -ForegroundColor Green -NoNewLine 'Connected to Microsoft Online.'
 
 # Ask user if they want to create or update distribution list
 Write-Host "Would you like to create or update the all company distribution list?"

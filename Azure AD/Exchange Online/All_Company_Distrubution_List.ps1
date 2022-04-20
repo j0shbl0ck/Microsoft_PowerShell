@@ -3,7 +3,7 @@
     This script gets every user excluding unlicensed and external then adds them to an all company list.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.6
+    Version: 1.0.7
     Date: 04.14.22
     Type: Public
 .EXAMPLE
@@ -34,7 +34,7 @@ $createUpdate = Read-Host
 if ($createUpdate -eq "create")
 {
     # Create all company distrubition list.
-    New-DistributionGroup -Name "AllCompany" -Type "Distribution" 
+    New-DistributionGroup -Name "All Company" -Type "Distribution" 
     Write-Host ""
     Write-Host "Primary Smtp Address can be changed online if current domain name not desired." -ForegroundColor Yellow
 
@@ -46,13 +46,13 @@ if ($createUpdate -eq "create")
 
     # For each user add to all company list.
     $user | ForEach-Object {
-        Add-DistributionGroupMember -Identity "AllCompany" -Member $_.UserPrincipalName
+        Add-DistributionGroupMember -Identity "All Company" -Member $_.UserPrincipalName
     }
 
     Write-Host "All members of company list below:" -ForegroundColor Cyan
 
     # Show members of all company list.
-    Get-DistributionGroupMember -Identity "AllCompany" | 
+    Get-DistributionGroupMember -Identity "All Company" | 
         Select-Object DisplayName, PrimarySmtpAddress |
         Sort-Object DisplayName, PrimarySmtpAddress |
         Format-Table -AutoSize 

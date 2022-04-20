@@ -3,7 +3,7 @@
     This script gets every user excluding unlicensed and external then adds them to an all company list.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.8
+    Version: 1.0.9
     Date: 04.14.22
     Type: Public
 .EXAMPLE
@@ -66,13 +66,14 @@ if ($createUpdate -eq "create")
 else if ($createUpdate -eq "update")
 {
     # Get all users excluding unlicensed and external
-    $user = Get-MsolUser -All | 
+    $users = Get-MsolUser -All | 
         Where-Object {($_.UserPrincipalName -notlike "*EXT*") -and ($_.isLicensed -eq $true)} |
         Select-Object UserPrincipalName
 
     # For each user add to all company list.
-    $user | ForEach-Object {
-        Update-DistributionGroupMember -Identity "All Company" -Member $_.UserPrincipalName -Confirm:$false
+    foreach ($user in $users)
+    {
+        Update-DistributionGroupMember -Identity "All Company" -Member $user.UserPrincipalName -Confirm:$false
     }
 
     Write-Host "All members of company list below:" -ForegroundColor Cyan

@@ -3,7 +3,7 @@
     This script gets every user excluding unlicensed and external then adds them to an all company list.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.1.0
+    Version: 1.1.1
     Date: 04.14.22
     Type: Public
 .EXAMPLE
@@ -63,7 +63,7 @@ if ($createUpdate -eq "create")
 }
 
 # if user wants to update distribution list
-else if ($createUpdate -eq "update")
+elseif ($createUpdate -eq "update")
 {
     # Get all users excluding unlicensed and external
     $users = Get-MsolUser -All | 

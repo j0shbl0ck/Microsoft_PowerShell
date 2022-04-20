@@ -85,6 +85,7 @@ elseif ($createUpdate -eq "update")
     $badusers = Get-MsolUser -All | 
         Where-Object {($_.UserPrincipalName -like "*EXT*") -and ($_.isLicensed -eq $false)} |
         Select-Object UserPrincipalName
+        
     foreach ($buser in $badusers)
     {
         Remove-DistributionGroupMember -Identity "All Company" -Member $buser.UserPrincipalName -Confirm:$false -ErrorAction SilentlyContinue

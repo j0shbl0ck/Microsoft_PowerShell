@@ -3,7 +3,7 @@
     This script gets every user excluding unlicensed and external then adds them to an all company list.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.1.3
+    Version: 1.1.4
     Date: 04.14.22
     Type: Public
 .EXAMPLE
@@ -22,15 +22,16 @@
 Write-Host -ForegroundColor Yellow 'Connecting to Exchange Online...'
 Connect-ExchangeOnline
 Write-Host -ForegroundColor Green 'Connected to Exchange Online.'
+Write-host ""
 
 # Connect to Microsoft Online
 Write-Host -ForegroundColor Yellow 'Connecting to Microsoft Online...'
 Connect-MsolService
 Write-Host -ForegroundColor Green 'Connected to Microsoft Online.'
+Write-host ""
 
 # Ask user if they want to create or update distribution list
-Write-Host "Would you like to create or update the all company distribution list?"
-Write-Host "Enter 'create' or 'update' to continue."
+Write-Host "Would you like to create or update the all company distribution list? Enter 'create' or 'update' to continue:"
 $createUpdate = Read-Host
 
 # if user wants to create distribution list
@@ -76,7 +77,7 @@ elseif ($createUpdate -eq "update")
     # For each user add to all company list.
     foreach ($user in $users)
     {
-        Add-DistributionGroupMember -Identity "All Company" -Member $user.UserPrincipalName -Confirm:$false
+        Add-DistributionGroupMember -Identity "All Company" -Member $user.UserPrincipalName -Confirm:$false -ErrorAction SilentlyContinue
     }
 
     Write-Host "All members of company list below:" -ForegroundColor Cyan
@@ -101,7 +102,9 @@ else
 Pause
 
 # In purple, show script end
+Write-Host ""
 Write-Host "Script ended" -ForegroundColor Magenta
+Write-Host ""
 
 # Disconnect from Exchange Online
 Disconnect-ExchangeOnline -Confirm:$false

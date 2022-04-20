@@ -3,7 +3,7 @@
     This script gets every user excluding unlicensed and external then adds them to an all company list.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.1.4
+    Version: 1.1.5
     Date: 04.14.22
     Type: Public
 .EXAMPLE
@@ -53,6 +53,7 @@ if ($createUpdate -eq "create")
         Add-DistributionGroupMember -Identity "All Company" -Member $_.UserPrincipalName
     }
 
+    Write-Host ""
     Write-Host "All members of company list below:" -ForegroundColor Cyan
 
     # Show members of all company list.
@@ -70,16 +71,26 @@ if ($createUpdate -eq "create")
 elseif ($createUpdate -eq "update")
 {
     # Get all users excluding unlicensed and external
-    $users = Get-MsolUser -All | 
+    $goodusers = Get-MsolUser -All | 
         Where-Object {($_.UserPrincipalName -notlike "*EXT*") -and ($_.isLicensed -eq $true)} |
         Select-Object UserPrincipalName
 
-    # For each user add to all company list.
-    foreach ($user in $users)
+    # For each good user add to all company list.
+    foreach ($guser in $goodusers)
     {
-        Add-DistributionGroupMember -Identity "All Company" -Member $user.UserPrincipalName -Confirm:$false -ErrorAction SilentlyContinue
+        Add-DistributionGroupMember -Identity "All Company" -Member $guser.UserPrincipalName -Confirm:$false -ErrorAction SilentlyContinue
     }
 
+    # For each bad user remove from all company list.
+    $badusers = Get-MsolUser -All | 
+        Where-Object {($_.UserPrincipalName -like "*EXT*") -and ($_.isLicensed -eq $false)} |
+        Select-Object UserPrincipalName
+    foreach ($buser in $badusers)
+    {
+        Remove-DistributionGroupMember -Identity "All Company" -Member $buser.UserPrincipalName -Confirm:$false -ErrorAction SilentlyContinue
+    }
+
+    Write-Host ""
     Write-Host "All members of company list below:" -ForegroundColor Cyan
 
     # Show members of all company list.
@@ -90,6 +101,7 @@ elseif ($createUpdate -eq "update")
 
     # In green, show success
     Write-Host "Distribution group updated successfully" -ForegroundColor Green
+    Write-Host ""
 }
 
 # if user does not enter create or update

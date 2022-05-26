@@ -3,7 +3,7 @@
     This script installs the M365 and Azure Powershell Module Services.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.3.8
+    Version: 1.3.9
     Date: 01.12.22
     Type: Public
 .NOTES
@@ -112,6 +112,17 @@ if (-not(Get-InstalledModule -Name $mgi -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Green "${mgi} Installed!"
 } else {
     Write-Host -ForegroundColor Green "${mgi} Installed!"
+}
+
+# Install Microsoft Graph PowerShell Module
+Write-Host -ForegroundColor Yellow "Finding Microsoft Graph PowerShell Module..."
+$mgp = "Microsoft.Graph"
+if (-not(Get-InstalledModule -Name $mgp -ErrorAction SilentlyContinue)) {
+    Write-Host -ForegroundColor Red "${mgp} Not Found. Installing ${mgi}..."
+    Install-Module -Name $mgp -Force -Confirm:$False
+    Write-Host -ForegroundColor Green "${mgp} Installed!"
+} else {
+    Write-Host -ForegroundColor Green "${mgp} Installed!"
 }
 
 # Install Autopilot Diagnostics

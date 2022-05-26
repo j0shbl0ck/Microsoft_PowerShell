@@ -197,6 +197,17 @@ if (Get-InstalledModule -Name $arm -ErrorAction SilentlyContinue) {
     }
 }
 
+# Install AIPService PowerShell Module
+$aip = "AIPService"
+Write-Host -ForegroundColor Yellow "Finding AIPService PowerShell Module..."
+if (-not(Get-InstalledScript -Name $aip -ErrorAction SilentlyContinue)) {
+    Write-Host -ForegroundColor Red "${aip} Not Found. Installing ${aip}..."
+    Install-Script -Name $gad -Force -Confirm:$False
+    Write-Host -ForegroundColor Green "${aip} Installed!"
+} else {
+    Write-Host -ForegroundColor Green "${aip} Installed!"
+}
+
 
 Write-Host ""
 Write-Host -ForegroundColor Cyan "All latest M365 and Azure Powershell modules have been installed. You may close this session."

@@ -3,7 +3,7 @@
     This script installs the M365 and Azure Powershell Module Services.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.4.0
+    Version: 1.4.1
     Date: 01.12.22
     Type: Public
 .NOTES
@@ -198,15 +198,46 @@ if (Get-InstalledModule -Name $arm -ErrorAction SilentlyContinue) {
 }
 
 # Install AIPService PowerShell Module
-$aip = "AIPService"
 Write-Host -ForegroundColor Yellow "Finding AIPService PowerShell Module..."
-if (-not(Get-InstalledScript -Name $aip -ErrorAction SilentlyContinue)) {
-    Write-Host -ForegroundColor Red "${aip} Not Found. Installing ${aip}..."
-    Install-Script -Name $gad -Force -Confirm:$False
-    Write-Host -ForegroundColor Green "${aip} Installed!"
-} else {
-    Write-Host -ForegroundColor Green "${aip} Installed!"
+$aip = "AIPService"
+$aadrm = "AADRM"
+if (Get-InstalledModule -Name $aadrm -ErrorAction SilentlyContinue) {
+        Write-Host -ForegroundColor Red "${aadrm} Found. Requires uninstall to install AIPService PowerShell Module..."
+        $confirmation = Read-Host "Do you want to uninstall AADRM Module? [y/n]"
+        while($confirmation -ne "y")
+        {
+            if ($confirmation -eq 'n') {
+                break
+                Write-Host -ForegroundColor Red "Denied uninstall of AADRM Module. Continuing..."
+            }
+            $confirmation = Read-Host "Do you want to uninstall AADRM Module? [y/n]"
+            break
+        }
+            if ($confirmation -eq 'y') {
+            Write-Host -ForegroundColor Red "Uninstalling AADRM Module..."
+            Uninstall-Module -Name $aadrm -AllVersions
+            Write-Host -ForegroundColor Green "${aadrm} Uninstalled!"
+            if (-not(Get-InstalledModule -Name $aip -ErrorAction SilentlyContinue)) {
+                Write-Host -ForegroundColor Red "${aip} Not Found. Installing ${az}..."
+                Install-Module -Name $az -Force -AllowClobber -Confirm:$False
+                Write-Host -ForegroundColor Green "${aip} Installed!"
+            } else {
+                Write-Host -ForegroundColor Green "${aip} Installed!"
+            }
+        }
+}else {
+    $aip = "AIPService"
+    if (-not(Get-InstalledModule -Name $aip -ErrorAction SilentlyContinue)) {
+        Write-Host -ForegroundColor Red "${aip} Not Found. Installing ${aip}..."
+        Install-Module -Name $aip -Force -AllowClobber -Confirm:$False
+        Write-Host -ForegroundColor Green "${aip} Installed!"
+    } else {
+        Write-Host -ForegroundColor Green "${aip} Installed!"
+    }
 }
+
+
+
 
 
 Write-Host ""

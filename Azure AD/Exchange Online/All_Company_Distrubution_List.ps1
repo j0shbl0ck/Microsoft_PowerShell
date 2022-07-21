@@ -17,6 +17,7 @@
     https://medium.com/@writeabednego/bulk-create-and-add-members-to-distribution-lists-and-shared-mailboxes-using-powershell-89f5ef6e1362
 #>
 
++++++THIS SCRIPT IS UNDER DEVELOPMENT+++++
 
 # Connect to Exchange Online via Azure AD with Global/Exchange admin.
 Write-Host -ForegroundColor Yellow 'Connecting to Exchange Online...'

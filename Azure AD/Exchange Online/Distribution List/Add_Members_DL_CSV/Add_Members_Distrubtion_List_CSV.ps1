@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 07.21.22
     Type: Public
-    Version: 1.0.5
+    Version: 1.0.6
 .LINK
     https://github.com/j0shbl0ck
     https://social.technet.microsoft.com/wiki/contents/articles/54249.365-add-members-in-distribution-list-using-powershell-and-csv-list-file.aspx
@@ -48,7 +48,7 @@ Write-host ""
 
 # Get the distribution list members
 Write-Host -ForegroundColor Yellow 'Getting distribution list members...'
-Get-DistributionGroupMember -Identity $distList
+Get-DistributionGroupMember -Identity $distList | Format-Table -AutoSize
 Write-Host -ForegroundColor Green 'Distribution list members retrieved!'
 
 # Disconnect from Exchange Online

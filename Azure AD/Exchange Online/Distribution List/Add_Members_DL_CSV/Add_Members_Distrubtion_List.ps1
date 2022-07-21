@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 07.21.22
     Type: Public
-    Version: 1.0.0
+    Version: 1.0.1
 .LINK
     https://github.com/j0shbl0ck
     https://social.technet.microsoft.com/wiki/contents/articles/54249.365-add-members-in-distribution-list-using-powershell-and-csv-list-file.aspx
@@ -38,7 +38,7 @@ Write-host ""
 
 # Perform the add members operation
 Write-Host -ForegroundColor Yellow 'Adding members to distribution list...'
-Import-CSV $filePath | ForEach-Object {Add-DistributionListMember -Identity $distList -Member $_.Name}
+Import-CSV $filePath | ForEach-Object {Add-DistributionGroupMember -Identity $distList -Member $_.Name}
 Write-Host -ForegroundColor Green 'Members added to distribution list.'
 Write-host ""
 

@@ -21,7 +21,7 @@ Write-host ""
 
 # Ask user for file path to .CSV
 Write-Host -ForegroundColor Yellow 'Please enter the path to the .CSV file:'
-$filePath = Read-Host -ForegroundColor White
+$filePath = Read-Host
 Write-Host -ForegroundColor Green 'File path entered.'
 Write-host ""
 
@@ -32,7 +32,7 @@ Write-host ""
 
 # Ask user for Distribution List email address
 Write-Host -ForegroundColor Yellow 'Please enter the email address of the Distribution List:'
-$distList = Read-Host -ForegroundColor White
+$distList = Read-Host
 Write-Host -ForegroundColor Green 'Distribution List email address entered.'
 Write-host ""
 

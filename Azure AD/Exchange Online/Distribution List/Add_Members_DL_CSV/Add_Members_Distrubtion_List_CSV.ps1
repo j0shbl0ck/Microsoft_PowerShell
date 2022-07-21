@@ -13,20 +13,27 @@
 
 
 # Connect to Exchange Online via Azure AD with Global/Exchange admin.
-Write-Host -ForegroundColor Yellow 'Connecting to Exchange Online...'
+Write-Host -ForegroundColor Cyan 'Connecting to Exchange Online...'
 Connect-ExchangeOnline
-Write-Host -ForegroundColor Green 'Connected to Exchange Online.'
+Write-Host -ForegroundColor Green 'Connected to Exchange Online!'
 Write-host ""
 
 # Ask user for file path to .CSV
 Write-Host -ForegroundColor Yellow 'Please enter the path (no quotes around path) to the .CSV file:'
 $filePath = Read-Host
-Write-Host -ForegroundColor Green 'File path entered.'
+Write-Host -ForegroundColor Green 'File path found!'
 Write-host ""
+# Check if file exists
+if (!(Test-Path $filePath)) {
+    Write-Host -ForegroundColor Red 'File does not exist. Please try again.'
+    $filePath = Read-Host
+    Write-Host -ForegroundColor Green 'File path found!'
+    Write-host ""
+}
 
 # Import .CSV file
 Write-Host -ForegroundColor Yellow 'Importing .CSV file...'
-Write-Host -ForegroundColor Green 'Import complete.'
+Write-Host -ForegroundColor Green 'Import complete!'
 Write-host ""
 
 # Ask user for Distribution List email address
@@ -38,17 +45,13 @@ Write-host ""
 # Perform the add members operation
 Write-Host -ForegroundColor Yellow 'Adding members to distribution list...'
 Import-CSV $filePath | ForEach-Object {Add-DistributionGroupMember -Identity $distList -Member $_.Name}
-Write-Host -ForegroundColor Green 'Members added to distribution list.'
+Write-Host -ForegroundColor Green 'Members successfully added!'
 Write-host ""
 
 # Get the distribution list members
 Write-Host -ForegroundColor Yellow 'Getting distribution list members...'
 Get-DistributionGroupMember -Identity $distList
-
-# Give user a chance to see the results
-Write-Host -ForegroundColor Yellow 'Press any key to exit...'
-Read-Host
-Write-Host -ForegroundColor Green 'Exiting...'
+Write-Host -ForegroundColor Green 'Distribution list members retrieved!'
 
 # Disconnect from Exchange Online
 Write-Host -ForegroundColor Yellow 'Disconnecting from Exchange Online...'

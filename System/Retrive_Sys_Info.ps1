@@ -3,7 +3,7 @@
     This script allows you view system information of the device.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.4
+    Version: 1.0.5
     Date: 02.07.22
     Type: Public
 .NOTES
@@ -36,12 +36,12 @@ Get-CimInstance -ClassName Win32_OperatingSystem | Select-Object -Property Build
 Write-Host -ForegroundColor Cyan "DISK INFORMATION"
 Get-CimInstance -ClassName Win32_LogicalDisk | Where-Object{$_.DriveType -eq '3'} `
 | Select-Object DeviceID, VolumeName, `
-@{N='TotalSize(GB)'; E={[Math]::Round(($_.Size)/1GB,2)}}, `
-@{N='FreeSpace(GB)'; E={[Math]::Round(($_.FreeSpace)/1GB,2)}} | Format-Table -Autosize 
+@{N='FreeSpace(GB)'; E={[Math]::Round(($_.FreeSpace)/1GB,2)}}, `
+@{N='TotalSize(GB)'; E={[Math]::Round(($_.Size)/1GB,2)}} | Format-Table -Autosize 
 
 Write-Host -ForegroundColor Cyan "SYSTEM PROCESSOR:"
 Get-CimInstance -ClassName Win32_ComputerSystem | Select-Object -Property SystemType | Format-Table -AutoSize
 
 Write-Host -ForegroundColor Cyan "NETWORK INFORMATION:"
-Get-NetIPConfiguration | Select-Object -Property InterfaceAlias,InterfaceDescription,NetProfile.Name,IPv4Address | Format-Table
+Get-NetIPConfiguration | Select-Object -Property InterfaceAlias,InterfaceDescription,IPv4Address | Format-Table
 

@@ -3,7 +3,7 @@
     This script installs the M365 and Azure Powershell Module Services.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.4.1
+    Version: 1.4.2
     Date: 01.12.22
     Type: Public
 .NOTES
@@ -40,7 +40,7 @@ if (-not(Get-InstalledModule -Name PowerShellGet -ErrorAction SilentlyContinue))
 # Installs Exchange Powershell Module
 Write-Host -ForegroundColor Yellow "Finding Exchange PowerShell Module..."
 $exo = "ExchangeOnlineManagement"
-if (-not(Get-InstalledModule -Name $exo -MinimumVersion 2.0.5 -ErrorAction SilentlyContinue)) {
+if (-not(Get-InstalledModule -Name $exo -MinimumVersion 2.0.6 -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Red "${exo} Not Found. Installing ${exo}..."
     Install-Module -Name ExchangeOnlineManagement -RequiredVersion 2.0.5 -Force -Confirm:$False
     Write-Host -ForegroundColor Green "${exo} Installed!"

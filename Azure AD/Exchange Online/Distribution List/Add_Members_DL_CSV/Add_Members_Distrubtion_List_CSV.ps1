@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 07.21.22
     Type: Public
-    Version: 1.0.2
+    Version: 1.0.3
 .LINK
     https://github.com/j0shbl0ck
     https://social.technet.microsoft.com/wiki/contents/articles/54249.365-add-members-in-distribution-list-using-powershell-and-csv-list-file.aspx

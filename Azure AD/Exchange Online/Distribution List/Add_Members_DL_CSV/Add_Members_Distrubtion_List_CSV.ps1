@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 07.21.22
     Type: Public
-    Version: 1.0.4
+    Version: 1.0.5
 .LINK
     https://github.com/j0shbl0ck
     https://social.technet.microsoft.com/wiki/contents/articles/54249.365-add-members-in-distribution-list-using-powershell-and-csv-list-file.aspx
@@ -21,8 +21,6 @@ Write-host ""
 # Ask user for file path to .CSV
 Write-Host -ForegroundColor Yellow 'Please enter the path (no quotes around path) to the .CSV file:'
 $filePath = Read-Host
-Write-Host -ForegroundColor Green 'File path found!'
-Write-host ""
 # Check if file exists
 if (!(Test-Path $filePath)) {
     Write-Host -ForegroundColor Red 'File does not exist. Please try again.'

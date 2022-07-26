@@ -3,7 +3,7 @@
     This script creates a localadmin account on the device. Use .\ to login into system.
     Author: Josh Block
 .NOTES
-    Version: 1.0.1
+    Version: 1.0.2
     Date: 07.25.22
     Type: Public
 .LINK
@@ -26,9 +26,9 @@ $FullName = Read-Host "Enter the full name for the user account: "
 $Description = Read-Host "Enter a description for the user account: "
 
 # Get local groups and ask user which one the user should be added to
-Get-LocalGroup
+Get-LocalGroup | Format-Table -AutoSize
 $localgroup = Read-Host "Enter the name of the local group the user should be added to: "
-
+Write-Host ""
 
 Function Create_LocalAdmin
 {

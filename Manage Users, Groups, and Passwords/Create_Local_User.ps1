@@ -3,7 +3,7 @@
     This script creates a localadmin account on the device. Use .\ to login into system.
     Author: Josh Block
 .NOTES
-    Version: 1.0.2
+    Version: 1.0.3
     Date: 07.25.22
     Type: Public
 .LINK
@@ -13,7 +13,7 @@
 ## Run this script in PowerShell ISE as admin to properly edit the script.
 
 # Ask user for username
-$ExpectedLocalUser = Read-Host "Enter a username for the user account: "
+$ExpectedLocalUser = $(Write-Host "Enter a username for the user account: " -ForegroundColor yellow -NoNewLine; Read-Host) 
 
 # Ask user for password
 $Password = Read-Host "Enter a password for the user account: "
@@ -26,7 +26,7 @@ $FullName = Read-Host "Enter the full name for the user account: "
 $Description = Read-Host "Enter a description for the user account: "
 
 # Get local groups and ask user which one the user should be added to
-Get-LocalGroup | Format-Table -AutoSize
+Get-LocalGroup | Format-Table -AutoSize 
 $localgroup = Read-Host "Enter the name of the local group the user should be added to: "
 Write-Host ""
 
@@ -57,5 +57,4 @@ Catch
     Create_LocalAdmin
 
 }
-
 

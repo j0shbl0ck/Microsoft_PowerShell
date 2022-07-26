@@ -10,6 +10,9 @@
     https://github.com/j0shbl0ck
 #>
 
+==== ⚠️⚠️ SCRIPT UNDER DEVELOPMENT ⚠️⚠️ ====
+==== Needing to fix logic of entire output of script ====
+
 ## Run this script in PowerShell ISE as admin to properly edit the script.
 
 # Ask user for username

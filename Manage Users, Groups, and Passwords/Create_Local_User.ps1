@@ -3,7 +3,7 @@
     This script creates a localadmin account on the device. Use .\ to login into system.
     Author: Josh Block
 .NOTES
-    Version: 1.0.4
+    Version: 1.0.5
     Date: 07.25.22
     Type: Public
 .LINK
@@ -59,4 +59,15 @@ Catch
     Create_LocalAdmin
 
 }
+
+# Ask user if they would like to view user account in Local Users and Groups
+$viewuser = $(Write-Host "Would you like to view the user account in Local Users and Groups? (y/n): " -ForegroundColor Cyan -NoNewLine; Read-Host)
+if ($viewuser -eq "y")
+{
+    Start-Process lusrmgr -Verb runas
+} else {
+    Write-Host -ForegroundColor Green "User account created successfully."
+}
+
+
 

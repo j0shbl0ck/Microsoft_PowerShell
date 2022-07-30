@@ -3,7 +3,7 @@
     This script creates a localadmin account on the device. Use .\ to login into system.
     Author: Josh Block
 .NOTES
-    Version: 1.0.5
+    Version: 1.0.6
     Date: 07.25.22
     Type: Public
 .LINK
@@ -17,6 +17,22 @@
 
 # Ask user for username
 $ExpectedLocalUser = $(Write-Host "Enter a username for the user account: " -ForegroundColor yellow -NoNewLine; Read-Host) 
+
+# check if user exists
+$ExpectedLocalUserExists = (Get-LocalUser $ExpectedLocalUser)
+# if user exists, ask user if they want to overwrite the user
+if ($ExpectedLocalUserExists) {
+    $OverwriteUser = $(Write-Host "User already exists. Overwrite user? (y/n): " -ForegroundColor yellow -NoNewLine; Read-Host)
+    if ($OverwriteUser -eq "y") {
+        # delete user
+        $ExpectedLocalUserExists.Delete()
+    } else 
+    # if user does not enter y or
+    {
+        # exit script
+        exit
+    }
+}
 
 # Ask user for password
 $Password = $(Write-Host "Enter a password for the user account: " -ForegroundColor yellow -NoNewLine; Read-Host)

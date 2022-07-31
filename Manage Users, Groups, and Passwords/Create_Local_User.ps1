@@ -3,7 +3,7 @@
     This script creates a localadmin account on the device. Use .\ to login into system.
     Author: Josh Block
 .NOTES
-    Version: 1.0.7
+    Version: 1.0.8
     Date: 07.25.22
     Type: Public
 .LINK
@@ -39,7 +39,7 @@ try {
             foreach ($LocalGroup in Get-LocalGroup) {
                 if (Get-LocalGroupMember $LocalGroup -Member $USERNAME -ErrorAction SilentlyContinue)
                 {
-                $LocalGroup.Name
+                    $LocalGroup.Name | Format-Table -AutoSize 
                 }
             }
             break
@@ -93,7 +93,7 @@ if (!$ObjLocalUser) {
         foreach ($LocalGroup in Get-LocalGroup) {
             if (Get-LocalGroupMember $LocalGroup -Member $USERNAME -ErrorAction SilentlyContinue)
             {
-            $LocalGroup.Name
+            $LocalGroup.Name | Format-Table -AutoSize 
             }
         }
         

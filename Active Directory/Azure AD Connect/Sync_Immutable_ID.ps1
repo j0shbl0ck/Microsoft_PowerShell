@@ -21,5 +21,5 @@ $ImmutableID
 
 Connect-MsolService
 $AzureUser = Read-Host "Provide Azure AD user name"
-Get-MsolUser -UserPrincipalName jsmith@contoso.com | FL immutableId
+Get-MsolUser -UserPrincipalName $AzureUser | FL immutableId
 

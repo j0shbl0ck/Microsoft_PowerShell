@@ -3,6 +3,8 @@
 .LINK
 https://poweraddict.net/get-immutable-id-of-ad-object/
 https://messageops.com/step-by-step-guide-to-hard-match-a-user-on-office-365-or-azure-ad/
+.NOTES
+Ensure MSOnline module is installed.
 
 # Cloud user has no source anchor attached to it.
 # AD user does have a source anchor attached to it.

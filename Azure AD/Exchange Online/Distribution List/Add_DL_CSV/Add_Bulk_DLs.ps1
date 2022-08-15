@@ -35,13 +35,6 @@ Write-Host -ForegroundColor Yellow 'Importing .CSV file...'
 Write-Host -ForegroundColor Green 'Import complete.'
 Write-host ""
 
----------
-
-# Ask user for Distribution List email address
-Write-Host -ForegroundColor Yellow 'Please enter the email address (no quotes around email) of the Distribution List:'
-$distList = Read-Host
-Write-Host -ForegroundColor Green 'Distribution List email address entered.'
-Write-host ""
 
 # Perform the create distrubution list operation
 Write-Host -ForegroundColor Yellow 'Creating distribution lists...'

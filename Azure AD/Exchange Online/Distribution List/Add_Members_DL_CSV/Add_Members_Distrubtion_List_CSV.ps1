@@ -5,12 +5,13 @@
     Author: Josh Block
     Date: 07.21.22
     Type: Public
-    Version: 1.0.8
+    Version: 1.0.9
 .LINK
     https://github.com/j0shbl0ck
     https://social.technet.microsoft.com/wiki/contents/articles/54249.365-add-members-in-distribution-list-using-powershell-and-csv-list-file.aspx
 #>
 
+Clear-Host
 
 # Connect to Exchange Online via Azure AD with Global/Exchange admin.
 Write-Host -ForegroundColor Cyan 'Connecting to Exchange Online...'

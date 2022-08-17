@@ -18,10 +18,9 @@ Clear-Host
 # Import Active Directory module
 Import-Module ActiveDirectory  -ErrorAction Stop
 
-# Get all users in the OU
-Write-Warning "This clears Exchange server attributes for all users in the OU." -WarningAction Inquire
 # Ask user for OU to search
 $OU = Read-Host -Prompt "Enter the OU (Example: OU=SALES,DC=SHELLPRO,DC=LOCAL) for Exchange attribute removal: "
+Write-Warning "This clears Exchange server attributes for all users in the OU." -WarningAction Inquire
 
 # For each user in specified OU, remove Exchange attributes
 Get-ADUser -Filter * -SearchBase $OU | Set-ADUser -Clear msExchMailboxAuditEnable,

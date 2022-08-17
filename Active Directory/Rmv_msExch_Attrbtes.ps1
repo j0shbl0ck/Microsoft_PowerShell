@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 08.16.22
     Type: Public
-    Version: 1.0.5
+    Version: 1.0.6
 .LINK
     https://github.com/j0shbl0ck
     https://shellgeek.com/powershell-set-aduser-to-modify-active-directory-users-attributes/#:~:text=If%20you%20want%20to%20clear%20attribute%20value%20for,and%20pass%20the%20output%20to%20the%20second%20command
@@ -19,7 +19,7 @@ Clear-Host
 Import-Module ActiveDirectory  -ErrorAction Stop
 
 # Ask user for OU to search
-$OU = Read-Host -Prompt "Enter the OU (Example: OU=SALES,DC=SHELLPRO,DC=LOCAL) for Exchange attribute removal: "
+$OU = Read-Host -Prompt "`r`nEnter the OU (Example: OU=SALES,DC=SHELLPRO,DC=LOCAL) for Exchange attribute removal `r`n"
 Write-Warning "This clears Exchange server attributes for all users in the OU." -WarningAction Inquire
 
 # For each user in specified OU, remove Exchange attributes
@@ -48,6 +48,8 @@ Get-ADUser -Filter * -SearchBase $OU | Set-ADUser -Clear msExchMailboxAuditEnabl
     msExchMailboxSecurityDescriptor,
     msExchBlockedSendersHash,
     msExchMailboxMoveFlags
+
+Write-Host "Exchange server attributes cleared for all users in $OU. `r`n" | Get-ADUser -Filter * -SearchBase $OU | Select-object Name | Format-Table -AutoSize
 
 
 

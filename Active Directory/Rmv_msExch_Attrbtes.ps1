@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 08.16.22
     Type: Public
-    Version: 1.0.2
+    Version: 1.0.3
 .LINK
     https://github.com/j0shbl0ck
     https://shellgeek.com/powershell-set-aduser-to-modify-active-directory-users-attributes/#:~:text=If%20you%20want%20to%20clear%20attribute%20value%20for,and%20pass%20the%20output%20to%20the%20second%20command
@@ -18,27 +18,28 @@ Clear-Host
 # Ask user for OU to search
 $OU = Read-Host -Prompt "Enter the OU (Example: OU=SALES,DC=SHELLPRO,DC=LOCAL) to search: "
 
+# Exchange Attributes to clear
+$emptyvalues = "msExchMailboxAuditEnable,
+msExchAddressBookFlags,
+msExchALObjectVersion,
+msExchDelegateListLink,
+msExchHomeServerName,
+msExchMailboxGuid,
+msExchMobileMailboxFlags,
+msExchPoliciesIncluded,
+msExchRBACPolicyLink,
+msExchRecipientDisplayType,
+msExchRecipientTypeDetails,
+msExchSafeRecipientsHash,
+msExchSafeSendersHash,
+msExchTextMessagingState,
+msExchUMDtmfMap,
+msExchUserAccountControl,
+msExchUserCulture,
+msExchVersion,
+msExchWhenMailboxCreated"
+
 # for each user in certain OU, remove Exchange attributes
-Get-ADUser -Filter * -SearchBase $OU | ForEach-Object {
-    Set-AdUser -clear 
-    "msExchMailboxAuditEnable",
-    "msExchAddressBookFlags",
-    "msExchALObjectVersion",
-    "msExchDelegateListLink",
-    "msExchHomeServerName",
-    "msExchMailboxGuid",
-    "msExchMobileMailboxFlags",
-    "msExchPoliciesIncluded",
-    "msExchRBACPolicyLink",
-    "msExchRecipientDisplayType",
-    "msExchRecipientTypeDetails",
-    "msExchSafeRecipientsHash",
-    "msExchSafeSendersHash",
-    "msExchTextMessagingState",
-    "msExchUMDtmfMap",
-    "msExchUserAccountControl",
-    "msExchUserCulture",
-    "msExchVersion",
-    "msExchWhenMailboxCreated"
-}
+Get-ADUser -Filter * -SearchBase $OU | Set-AdUser -clear $emptyvalues
+
 

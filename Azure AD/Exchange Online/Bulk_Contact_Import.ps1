@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 08.18.22
     Type: Public
-    Version: 1.0.1
+    Version: 1.0.2
 .LINK
     https://github.com/j0shbl0ck
     https://m365scripts.com/exchange-online/bulk-import-contacts-office-365-powershell/#:~:text=Multiple%20contacts%20can%20be%20added,file%20with%20the%20contact%20info.
@@ -35,15 +35,6 @@ Write-Host -ForegroundColor Yellow 'Importing .CSV file...'
 Write-Host -ForegroundColor Green 'Import complete.'
 Write-host ""
 
-Import-CSV $filePath | ForEach-Object {       
-    Write-Progress -Activity "Creating contact $ExternalEmailAddress in Office 365..."     
-    New-MailContact -Name $_.Name -DisplayName $_.Name -ExternalEmailAddress $_.ExternalEmailAddress | Out-Null 
-    If($?)      
-    {      
-     Write-Host $ExternalEmailAddress Successfully created -ForegroundColor Green     
-    }      
-    Else      
-    {      
-     Write-Host $ExternalEmailAddress - Error occurred -ForegroundColor Red     
-    }      
-}
+Import-CSV $filePath | ForEach-Object {         
+    New-MailContact -Name $_.Name -DisplayName $_.Name -ExternalEmailAddress $_.ExternalEmailAddress    
+}  

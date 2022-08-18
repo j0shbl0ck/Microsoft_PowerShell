@@ -9,6 +9,7 @@
 .LINK
     https://github.com/j0shbl0ck
     https://m365scripts.com/exchange-online/bulk-import-contacts-office-365-powershell/#:~:text=Multiple%20contacts%20can%20be%20added,file%20with%20the%20contact%20info.
+    https://docs.microsoft.com/en-us/microsoft-365/compliance/bulk-import-external-contacts?view=o365-worldwide
 #>
 
 Clear-Host

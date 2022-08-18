@@ -35,11 +35,9 @@ Write-Host -ForegroundColor Yellow 'Importing .CSV file...'
 Write-Host -ForegroundColor Green 'Import complete.'
 Write-host ""
 
-Import-CSV $filePath | ForEach-Object {      
-    $Name=$_Name  
-    $ExternalEmailAddress=$_.ExternalEmailAddress    
+Import-CSV $filePath | ForEach-Object {       
     Write-Progress -Activity "Creating contact $ExternalEmailAddress in Office 365..."     
-    New-MailContact -Name $Name -ExternalEmailAddress $ExternalEmailAddress | Out-Null 
+    New-MailContact -Name $_.Name -DisplayName $_.Name -ExternalEmailAddress $_.ExternalEmailAddress | Out-Null 
     If($?)      
     {      
      Write-Host $ExternalEmailAddress Successfully created -ForegroundColor Green     

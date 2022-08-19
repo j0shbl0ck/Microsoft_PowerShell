@@ -3,7 +3,7 @@
     This script changes the CN of the ADObject
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.1
+    Version: 1.0.2
     Date: 01.19.22
     Type: Public
 .NOTES
@@ -11,6 +11,8 @@
 .LINK
     Source: https://www.reddit.com/r/PowerShell/comments/5588qa/changing_display_name_in_aduc/
 #>
+
+Clear-Host
 
 # Asks for username (SamAccountName attribute) of ADObject
 $username = Read-Host -Prompt "Enter username (SamAccountName attribute) of ADObject"

@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    This script changes the CN of the ADObject
+    This script changes the CN of the ADObject to what the users' displayName is. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
     Version: 1.0.2

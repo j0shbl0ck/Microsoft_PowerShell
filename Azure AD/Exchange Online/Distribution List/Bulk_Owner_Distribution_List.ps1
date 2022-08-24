@@ -1,14 +1,16 @@
 
 <#
 .SYNOPSIS
-    This adds owners to every distrubition list in the tenant. 
+    This adds owner(s) to every distrubition list in the tenant. 
 .NOTES
     Author: Josh Block
     Date: 08.24.22
     Type: Public
-    Version: 1.0.1
+    Version: 1.0.2
 .LINK
     https://github.com/j0shbl0ck
+    https://o365info.com/manage-distribution-group-using-powershell-in-office-365-creating-and-managing-distribution-groups-part-2-5/
+    https://docs.microsoft.com/en-us/powershell/module/exchange/set-distributiongroup?view=exchange-ps
 #>
 
 Clear-Host
@@ -26,7 +28,7 @@ $groups = Get-DistributionGroup
 ForEach ($group in $groups) 
 {
     Write-Host -ForegroundColor Cyan 'Adding owners to distribution list: ' $group.name
-    Set-DistributionGroup -Identity $group.name -ManagedBy  @{Add='bob','brad'}
+    Set-DistributionGroup -Identity $group.name -ManagedBy  @{Add='user@contoso.com','usertwo@contoso.com'}
 }
 
 # Disconnect from Exchange Online

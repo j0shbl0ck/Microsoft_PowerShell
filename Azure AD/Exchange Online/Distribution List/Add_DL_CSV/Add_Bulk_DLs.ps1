@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 08.15.22
     Type: Public
-    Version: 1.0.0
+    Version: 1.0.1
 .LINK
     https://github.com/j0shbl0ck
     https://social.technet.microsoft.com/wiki/contents/articles/54249.365-add-members-in-distribution-list-using-powershell-and-csv-list-file.aspx
@@ -35,9 +35,18 @@ Write-Host -ForegroundColor Yellow 'Importing .CSV file...'
 Write-Host -ForegroundColor Green 'Import complete.'
 Write-host ""
 
+# Set Distribution List CSV variable
+$groups = Import-CSV $filePath
 
 # Perform the create distrubution list operation
-Write-Host -ForegroundColor Yellow 'Creating distribution lists...'
-Import-CSV $filePath | ForEach-Object {New-DistributionGroup -Name $_.Name -Alias $_.Alias -PrimarySmtpAddress $_.Email -DisplayName $_.Name}
-Write-host ""
+ForEach ($group in $groups){
+    Write-Host -ForegroundColor Yellow 'Creating Distribution List: ' $_.Email
+    New-DistributionGroup -Name $_.Name -Alias $_.Alias -PrimarySmtpAddress $_.Email -DisplayName $_.Name
+    Write-Host -ForegroundColor Green 'Distribution List: ' + $group.Name + ' created.'
+}
 
+# Disconnect from Exchange Online
+Write-Host -ForegroundColor Yellow 'Disconnecting from Exchange Online...'
+Disconnect-ExchangeOnline -Confirm:$false
+Write-Host -ForegroundColor Green 'Done.'
+Write-host ""

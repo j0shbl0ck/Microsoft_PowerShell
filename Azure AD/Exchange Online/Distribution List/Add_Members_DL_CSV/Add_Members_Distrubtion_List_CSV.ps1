@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 07.21.22
     Type: Public
-    Version: 1.1.9
+    Version: 1.2.0
 .LINK
     https://github.com/j0shbl0ck
     https://social.technet.microsoft.com/wiki/contents/articles/54249.365-add-members-in-distribution-list-using-powershell-and-csv-list-file.aspx
@@ -31,6 +31,7 @@ do {
 } until ($validatefile -eq $True)
 
 # Import .CSV file
+$members = Import-CSV $filePath
 Write-Host -ForegroundColor Yellow 'Importing .CSV file...'
 Write-Host -ForegroundColor Green 'Import complete.'
 Write-host ""
@@ -41,10 +42,14 @@ $distList = Read-Host
 Write-Host -ForegroundColor Green 'Distribution List email address entered.'
 Write-host ""
 
-# Perform the add members operation
-Write-Host -ForegroundColor Yellow 'Adding members to distribution list...'
-Import-CSV $filePath | ForEach-Object {Add-DistributionGroupMember -Identity $distList -Member $_.Name}
-Write-host ""
+# Perform the add members to distrubution list operation
+ForEach ($member in $members){
+    Write-Host ""
+    Write-Host -ForegroundColor Yellow 'Importing member: ' $member.Name
+    Add-DistributionGroupMember -Identity $distList -Member $member.ExternalEmailAddress -Confirm:$false
+    Write-Host -ForegroundColor Green 'Member added:' $member.Name
+    Write-Host ""
+}
 
 # Get the distribution list members
 Write-Host -ForegroundColor Green 'Successfully added distribution list members:'
@@ -55,6 +60,3 @@ Write-Host -ForegroundColor Yellow 'Disconnecting from Exchange Online...'
 Disconnect-ExchangeOnline -Confirm:$false
 Write-Host -ForegroundColor Green 'Done.'
 Write-host ""
-
-
-

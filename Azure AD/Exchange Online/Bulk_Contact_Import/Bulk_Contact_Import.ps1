@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 08.18.22
     Type: Public
-    Version: 1.0.5
+    Version: 1.0.6
 .LINK
     https://github.com/j0shbl0ck
     https://m365scripts.com/exchange-online/bulk-import-contacts-office-365-powershell/#:~:text=Multiple%20contacts%20can%20be%20added,file%20with%20the%20contact%20info.
@@ -40,7 +40,7 @@ Write-host ""
 # Perform the create distrubution list operation
 ForEach ($contact in $contacts){
     Write-Host -ForegroundColor Yellow 'Importing Contact: ' $contact.Name
-    New-MailContact -Name $contact.Name -DisplayName $_.Name -ExternalEmailAddress $contact.ExternalEmailAddress -Confirm:$false
+    New-MailContact -Name $contact.Name -DisplayName $contact.Name -ExternalEmailAddress $contact.ExternalEmailAddress -Confirm:$false
     Write-Host -ForegroundColor Green 'Contact created:' $contact.Name
 }
 

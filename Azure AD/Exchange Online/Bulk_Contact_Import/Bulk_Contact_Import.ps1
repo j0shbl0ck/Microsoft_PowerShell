@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 08.18.22
     Type: Public
-    Version: 1.0.6
+    Version: 1.0.7
 .LINK
     https://github.com/j0shbl0ck
     https://m365scripts.com/exchange-online/bulk-import-contacts-office-365-powershell/#:~:text=Multiple%20contacts%20can%20be%20added,file%20with%20the%20contact%20info.
@@ -20,7 +20,7 @@ Connect-ExchangeOnline
 Write-host ""
 
 # Ask user for file path to .CSV
-Write-Host -ForegroundColor Yellow 'Please enter the path (no quotes around path) to the .CSV file:'
+Write-Host -ForegroundColor Cyan 'Please enter the path (no quotes around path) to the .CSV file:'
 # Check if file exists if not ask user to try again
 do {
     $filePath = Read-Host
@@ -39,6 +39,7 @@ Write-host ""
 
 # Perform the create distrubution list operation
 ForEach ($contact in $contacts){
+    Write-Host ""
     Write-Host -ForegroundColor Yellow 'Importing Contact: ' $contact.Name
     New-MailContact -Name $contact.Name -DisplayName $contact.Name -ExternalEmailAddress $contact.ExternalEmailAddress -Confirm:$false
     Write-Host -ForegroundColor Green 'Contact created:' $contact.Name

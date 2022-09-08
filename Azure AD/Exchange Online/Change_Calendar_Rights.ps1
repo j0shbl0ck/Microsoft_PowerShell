@@ -3,7 +3,7 @@
     This script allows you to change calendar permissions through Exchange Online PowerShell
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.1.5
+    Version: 1.1.6
     Date: 01.17.22
     Type: Public
 .EXAMPLE
@@ -14,16 +14,16 @@
     Username can vary on whether authenticating against domain or Azure AD. flast or firstlast@domain.com
 #>
 
-# ======= VARIABLES ======= #
-$mainuser = Read-Host -Prompt 'Input User (enduser@domain.com) to change calendar permissions of'
-$seconduser = Read-Host -Prompt 'Input user email (seconduser@domain.com) of who you are giving access rights to'
-
-# ======= VARIABLES ======= #
+# ======= EXCHANGE CONNECTION ======= #
 
 # Connect to Exchange Online via Azure AD with Global/Exchange admin.
 Import-Module ExchangeOnlineManagement
 Connect-ExchangeOnline
 Clear-Host
+
+# ======= USER VARIABLES ======= #
+$mainuser = Read-Host -Prompt 'Input User (enduser@domain.com) to change calendar permissions of'
+$seconduser = Read-Host -Prompt 'Input user email (seconduser@domain.com) of who you are giving access rights to'
 
 # Displays Outlook calendar permission levels and access roles.
 function Write-Role {
@@ -51,8 +51,9 @@ Write-Role;
 $role = Read-Host -Prompt 'Input access role you wish to give second user to main users calendar'
     try {
         Write-Host -ForegroundColor Cyan "Allowing $seconduser the role of $role to $mainuser calendar..."
-        Remove-MailboxFolderPermission -Identity ${mainuser}:\calendar -user $seconduser -Confirm:$false  -ErrorAction Continue
-        Get-MailboxFolderPermission -Identity ${mainuser}:\calendar -user $seconduser -AccessRights $role -ErrorAction Continue
+        Set-MailboxFolderPermission -Identity ${mainuser}:\calendar -user $seconduser -AccessRights $role -ErrorAction Continue
+        #Remove-MailboxFolderPermission -Identity ${mainuser}:\calendar -user $seconduser -Confirm:$false  -ErrorAction Continue
+        #Get-MailboxFolderPermission -Identity ${mainuser}:\calendar -user $seconduser -AccessRights $role -ErrorAction Continue
         
         ## Use this if it is a specified calendar created by main user
         #Remove-MailboxFolderPermission -Identity ${mainuser}:\calendar\HXBS -user $seconduser -Confirm:$false

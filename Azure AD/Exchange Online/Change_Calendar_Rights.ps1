@@ -3,7 +3,7 @@
     This script allows you to change calendar permissions through Exchange Online PowerShell
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.1.4
+    Version: 1.1.5
     Date: 01.17.22
     Type: Public
 .EXAMPLE
@@ -23,6 +23,7 @@ $seconduser = Read-Host -Prompt 'Input user email (seconduser@domain.com) of who
 # Connect to Exchange Online via Azure AD with Global/Exchange admin.
 Import-Module ExchangeOnlineManagement
 Connect-ExchangeOnline
+Clear-Host
 
 # Displays Outlook calendar permission levels and access roles.
 function Write-Role {

@@ -3,7 +3,7 @@
     This script allows you to change calendar permissions through Exchange Online PowerShell
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.1.3
+    Version: 1.1.4
     Date: 01.17.22
     Type: Public
 .EXAMPLE
@@ -50,7 +50,7 @@ Write-Role;
 $role = Read-Host -Prompt 'Input access role you wish to give second user to main users calendar'
     try {
         Write-Host -ForegroundColor Cyan "Allowing $seconduser the role of $role to $mainuser calendar..."
-        Remove-MailboxFolderPermission -Identity ${mainuser}:\calendar\HXBS -user $seconduser -Confirm:$false  -ErrorAction Continue
+        Remove-MailboxFolderPermission -Identity ${mainuser}:\calendar -user $seconduser -Confirm:$false  -ErrorAction Continue
         Get-MailboxFolderPermission -Identity ${mainuser}:\calendar -user $seconduser -AccessRights $role -ErrorAction Continue
         
         ## Use this if it is a specified calendar created by main user

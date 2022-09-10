@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    This creates a new Contact Admin role in Exchange Admin to assign to a role group. 
+    This creates two custom Contact roles in Exchange Admin to assign to a role group. 
 .NOTES
     Author: Josh Block
     Date: 09.09.22

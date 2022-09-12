@@ -10,6 +10,7 @@
     You may need to resize the console window varying on email address length.
 .LINK
     Source: https://dailysysadmin.com/KB/Article/3725/use-powershell-to-get-the-mfa-enabled-or-disabled-status-of-office-365-and-azure-users-and-type-of-mfa-used/
+    Source: https://www.alitajran.com/export-office-365-users-mfa-status-with-powershell/
 #>
 
 Clear-Host

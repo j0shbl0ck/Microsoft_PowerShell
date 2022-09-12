@@ -24,7 +24,7 @@ $report = [System.Collections.Generic.List[Object]]::new()
 
 # Finds user count in Azure Active Directory
 Write-Host -ForegroundColor Yellow "Retrieving user count from Azure AD..."
-Write-Host -ForegroundColor Green $User.Count "users found.`n"
+Write-Host -ForegroundColor Green $Users.Count "users found.`n"
 
 # Retrieve the MFA status for each user
 

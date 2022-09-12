@@ -3,7 +3,7 @@
     This script pulls information on whether a user has MFA enabled or not. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.1.1
+    Version: 1.1.2
     Date: 03.23.22
     Type: Public
 .NOTES
@@ -18,6 +18,12 @@ Clear-Host
 Connect-MsolService
 
 # Retrives MFA status and method per user
+Write-Host -ForegroundColor Yellow "Retrieving user count from Azure AD..."
+
+## VARIABLES ##
+$UserCount = Get-MsolUser -All | ? { $_.UserType -ne "Guest" }
+$mfareport = [System.Collections.Generic.List[Object]]::new()
+
 Get-MsolUser | 
     Where-Object {$_.UserPrincipalName -notlike "*EXT*"} |
     Select-Object DisplayName,UserPrincipalName,

@@ -30,5 +30,23 @@ Get-MsolUser |
 #Get-MsolUser -all | Select-Object DisplayName,UserPrincipalName,@{N="MFA Status"; E={ if( $_.StrongAuthenticationMethods.IsDefault -eq $true) {($_.StrongAuthenticationMethods | Where-Object IsDefault -eq $True).MethodType} else { "Disabled"}}} | Format-Table -AutoSize | Where-Object MFAStatus -eq "Disabled" | Set-MsolUser -UserPrincipalName $_.UserPrincipalName -StrongAuthenticationMethods @()
 #Set-MsolUser -UserPrincipalName username@your_tenant.onmicrosoft.com -StrongAuthenticationMethods @()
 
-# End MS Online session
-Pause 
+<# # Ask if they want to export to CSV
+$export = Read-Host "Do you want to export to CSV? (y/n)"
+# if else statement
+if ($export -eq "y") {
+    # Export to CSV
+    Get-MsolUser | 
+        Where-Object {$_.UserPrincipalName -notlike "*EXT*"} |
+        Select-Object DisplayName,UserPrincipalName,
+        @{N="MFA Status"; E={ if( $_.StrongAuthenticationRequirements.State -ne $null){ $_.StrongAuthenticationRequirements.State} else { "Disabled"}}},
+        @{N="MFA Method"; E={ if( $_.StrongAuthenticationMethods.IsDefault -eq $true) {($_.StrongAuthenticationMethods | Where-Object IsDefault -eq $True).MethodType} else { "None"}}} | 
+        Sort-Object DisplayName |
+        Export-Csv -Path "C:\Users\username\Desktop\mfa_status.csv" -NoTypeInformation
+} elseif ($export -eq "n") {
+    Disconnect-MsolService -Confirm:$false
+    exit
+} else {
+    # Invalid input
+    Write-Host "Invalid input. Please try again."
+} #>
+

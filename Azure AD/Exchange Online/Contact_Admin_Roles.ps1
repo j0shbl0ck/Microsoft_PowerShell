@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 09.09.22
     Type: Public
-    Version: 1.0.3
+    Version: 1.0.4
 .LINK
     https://github.com/j0shbl0ck
     https://practical365.com/exchange-server-role-based-access-control-in-action/#:~:text=The%20easiest%20way%20to%20create%20a%20custom%20role,Next%2C%20click%20the%20icon%20to%20add%20a%20role.
@@ -39,6 +39,10 @@ Write-Host -ForegroundColor Green "Contact Modifier created successfully!`n"
 # Assign proper management roles to the Contact Modifier role.
 Write-Host -ForegroundColor Yellow "Re-assigning management roles to Contact Modifier..."
 Get-ManagementRoleEntry "Contact Modifier\*" | Where-Object {$_.Name -notlike '*MailContact'} | ForEach-Object {Remove-ManagementRoleEntry -Identity "$($_.id)\$($_.name)" -Confirm:$False} 
+Add-ManagementRoleEntry  -Identity "Contact Modifier\Set-Contact"
+Add-ManagementRoleEntry  -Identity "Contact Modifier\Get-Contact"
+Add-ManagementRoleEntry  -Identity "Contact Modifier\Get-Recipient"
+
 Write-Host -ForegroundColor Green "Management roles assigned successfully!`n"
 
 # Show the new roles.

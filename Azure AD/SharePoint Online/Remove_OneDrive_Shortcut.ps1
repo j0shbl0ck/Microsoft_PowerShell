@@ -10,3 +10,11 @@
     https://github.com/j0shbl0ck
     https://www.sharepointdiary.com/2021/05/how-to-remove-add-shortcut-to-onedrive-in-sharepoint-online.html
 #>
+
+# ask user for sharepoint url
+$siteUrl = Read-Host "Enter the SharePoint site URL"
+
+# Connect to SharePoint Online
+Connect-SPOService -Url $siteUrl
+ 
+Set-SPOTenant -DisableAddShortCutsToOneDrive $True

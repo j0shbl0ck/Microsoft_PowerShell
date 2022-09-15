@@ -13,11 +13,11 @@
 
 Clear-Host
 
-# Connect to SharePoint Online
-Connect-SPOService -Url $siteUrl
-
 # ask user for sharepoint url
 $siteUrl = Read-Host "Enter the tenant admin SharePoint site URL (https://contoso-admin.sharepoint.com/) "
+
+# Connect to SharePoint Online
+Connect-SPOService -Url $siteUrl
 
 # set DisableAddShortCutsToOneDrive to true
 Set-SPOTenant -DisableAddShortCutsToOneDrive $True

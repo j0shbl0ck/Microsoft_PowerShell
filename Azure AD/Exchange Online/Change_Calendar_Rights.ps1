@@ -3,7 +3,7 @@
     This script allows you to change calendar permissions through Exchange Online PowerShell
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.1.9
+    Version: 1.2.0
     Date: 01.17.22
     Type: Public
 .EXAMPLE
@@ -76,7 +76,7 @@ $role = Read-Host -Prompt 'Input access role you wish to give second user to mai
 
         Pause
     }
-    Write-Host -ForegroundColor Cyan "Complete!`n"
+    Write-Host -ForegroundColor Green "Complete!`n"
 
     # Shows other user rights to $mainuser
     Write-Host -ForegroundColor Yellow "======= Calendar Rights Other Users Have to $mainuser =======" 

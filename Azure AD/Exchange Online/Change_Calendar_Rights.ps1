@@ -3,7 +3,7 @@
     This script allows you to change calendar permissions through Exchange Online PowerShell
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.1.7
+    Version: 1.1.8
     Date: 01.17.22
     Type: Public
 .EXAMPLE
@@ -77,7 +77,7 @@ $role = Read-Host -Prompt 'Input access role you wish to give second user to mai
         Pause
        }
     catch [System.Exception] {
-        Write-Warning -Message "User not found in mailbox. Adding user to mailbox with specified role."
+        Write-Warning -Message "${seconduser} has no previous roles to mailbox. Adding ${seconduser} to mailbox with specified role."
         Add-MailboxFolderPermission -Identity ${mainuser}:\calendar -user $seconduser -AccessRights $role -ErrorAction Stop
 
         Pause
@@ -90,8 +90,7 @@ $role = Read-Host -Prompt 'Input access role you wish to give second user to mai
 
         Pause
     }
-    $Error[0].Exception.GetType().FullName
-    Write-Host -ForegroundColor Cyan "Complete!"
+    Write-Host -ForegroundColor Cyan "Complete!`n"
 
     # Shows other user rights to $mainuser
     Write-Host -ForegroundColor Yellow "======= Calendar Rights Other Users Have to $mainuser =======" 

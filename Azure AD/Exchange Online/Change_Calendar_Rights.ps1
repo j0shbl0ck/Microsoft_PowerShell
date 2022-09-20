@@ -3,7 +3,7 @@
     This script allows you to change calendar permissions through Exchange Online PowerShell
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.1.8
+    Version: 1.1.9
     Date: 01.17.22
     Type: Public
 .EXAMPLE
@@ -52,27 +52,13 @@ $role = Read-Host -Prompt 'Input access role you wish to give second user to mai
     try {
         Write-Host -ForegroundColor Cyan "Allowing $seconduser the role of $role to $mainuser calendar..."
         Set-MailboxFolderPermission -Identity ${mainuser}:\calendar -user $seconduser -AccessRights $role -ErrorAction Stop
-        #Remove-MailboxFolderPermission -Identity ${mainuser}:\calendar -user $seconduser -Confirm:$false  -ErrorAction Continue
-        #Get-MailboxFolderPermission -Identity ${mainuser}:\calendar -user $seconduser -AccessRights $role -ErrorAction Continue
         
         ## Use this if it is a specified calendar created by main user
         #Remove-MailboxFolderPermission -Identity ${mainuser}:\calendar\HXBS -user $seconduser -Confirm:$false
 
-        ## Use this to catch error if user is not added into mailbox
-        #Add-MailboxFolderPermission -Identity ${mainuser}:\calendar -user $seconduser -AccessRights $role -ErrorAction Stop
-        #Write-Host 'User not found in mailbox. Adding user to mailbox with specified role.'
         
-        ## Use this if you need to also view events marked as private.
+        ## Use this if you need to also view events marked as private and accept calendar invites on their behalf.
         #Add-MailboxFolderPermission -Identity ${mainuser}:\calendar -user $seconduser -AccessRights role -SharingPermissionFlags Delegate,CanViewPrivateItems -ErrorAction Stop
-
-<#         Write-Host -ForegroundColor Cyan "Complete!"
-
-        # Shows other user rights to $mainuser
-        Write-Host -ForegroundColor Yellow "======= Calendar Rights Other Users Have to $mainuser =======" 
-        Get-EXOMailboxFolderPermission -Identity ${mainuser}:\calendar
-
-        Write-Host 'Terminating Exchange Online PS Session...' -ForegroundColor Green
-        Disconnect-ExchangeOnline -Confirm:$false #>
 
         Pause
        }

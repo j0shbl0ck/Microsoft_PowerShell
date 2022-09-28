@@ -3,7 +3,7 @@
     This script pulls information how many users are currently licensed and how many groups (M365,shared,Distri,Mail-Enab) are active. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.2
+    Version: 1.0.3
     Date: 09.28.22
     Type: Public
 .NOTES
@@ -18,17 +18,32 @@
 ## Connect to Microsoft Services
 Connect-Graph -Scopes User.Read.All, Organization.Read.All
 Connect-AzureAD
+Connect-ExchangeOnline
+Clear-Host
 
 ## Get number of licensed users
-Write-Host -ForegroundColor Yellow "Finding licensed users..."
-Get-MgUser -Filter 'assignedLicenses/$count ne 0' -ConsistencyLevel eventual -CountVariable licensedUserCount -All -Select UserPrincipalName,DisplayName,AssignedLicenses | Format-Table -Property UserPrincipalName,DisplayName,AssignedLicenses
-Write-Host -ForegroundColor Green "`nFound $licensedUserCount licensed users."
+function getLicensedUsers {
+    Write-Host -ForegroundColor Yellow "Finding licensed users..."
+    Get-MgUser -Filter 'assignedLicenses/$count ne 0' -ConsistencyLevel eventual -CountVariable licensedUserCount -All -Select UserPrincipalName,DisplayName,AssignedLicenses | Format-Table -Property UserPrincipalName,DisplayName,AssignedLicenses
+    Write-Host -ForegroundColor Green "`nFound $licensedUserCount licensed users." 
+}
+
+function getM365Groups {
+    Write-Host -ForegroundColor Yellow "Finding M365 groups..."
+    $m365GroupCount = (Get-UnifiedGroup).Count
+    Get-UnifiedGroup | Format-List DisplayName,EmailAddresses
+    Write-Host -ForegroundColor Green "Found $m365GroupCount M365 groups.`n" 
+}
 
 
+# run functions
+getLicensedUsers
+getM365Groups
 
 
 <# ## Export results to TXT file
 Write-Host -ForegroundColor Yellow "Exporting results to file..."
 $desktop = [Environment]::GetFolderPath("Desktop")
 $licensedUsersExport = $desktop + "\licensedUsers.txt"
+getM365Groups | Out-File $licensedUsersExport
 Write-Host "Report is in $licensedUsersExport" #>

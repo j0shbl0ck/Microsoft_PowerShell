@@ -1,0 +1,13 @@
+<#
+.SYNOPSIS
+    This script pulls information how many users are currently licensed and how many groups (M365,shared,Distri,Mail-Enab) are active. 
+.DESCRIPTION
+    Author: j0shbl0ck https://github.com/j0shbl0ck
+    Version: 1.0.0
+    Date: 09.28.22
+    Type: Public
+.NOTES
+    
+.LINK
+    Source:
+#>

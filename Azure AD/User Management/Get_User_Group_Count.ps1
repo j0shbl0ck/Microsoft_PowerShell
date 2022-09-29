@@ -3,7 +3,7 @@
     This script pulls information how many users are currently licensed and how many groups (M365,shared,Distri,Mail-Enab) are active. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.9
+    Version: 1.1.0
     Date: 09.28.22
     Type: Public
 .NOTES
@@ -29,15 +29,13 @@ New-Item -ItemType Directory -Path $folder
 Write-Host -ForegroundColor Green "Folder created: $folder"
 
 
-
-
 ## Get number of licensed users
 Write-Host -ForegroundColor Yellow "Finding user mailboxes mailboxes..."
 $userMailCount = (Get-EXOMailbox -RecipientTypeDetails UserMailbox -ResultSize Unlimited).Count
 Write-Host -ForegroundColor Green "Found $userMailCount shared mailboxes.`n"
 function getUserMail { 
     Get-EXOMailbox -RecipientTypeDetails UserMailbox -ResultSize Unlimited | Select-Object PrimarySmtpAddress,DisplayName | Format-Table -AutoSize
-}
+} getUserMail
 
 ## Get number of M365 groups
 Write-Host -ForegroundColor Yellow "Finding M365 groups..."
@@ -45,7 +43,7 @@ $m365GroupCount = (Get-UnifiedGroup).Count
 Write-Host -ForegroundColor Green "Found $m365GroupCount M365 groups.`n" 
 function getM365Groups {
     Get-UnifiedGroup | Format-List DisplayName,EmailAddresses
-}
+} getM365Groups
 
 ## Get number of distribution lists
 Write-Host -ForegroundColor Yellow "Finding distribution lists..."
@@ -53,7 +51,7 @@ $distriListCount = (Get-DistributionGroup).Count
 Write-Host -ForegroundColor Green "Found $distriListCount distribution lists.`n" 
 function getDistriLists {
     Get-DistributionGroup | Format-List DisplayName,EmailAddresses
-}
+} getDistriLists
 
 ## Get number of shared mailboxes
 Write-Host -ForegroundColor Yellow "Finding shared mailboxes..."
@@ -61,7 +59,7 @@ $sharedMailCount = (Get-EXOMailbox -RecipientTypeDetails SharedMailbox -ResultSi
 Write-Host -ForegroundColor Green "Found $sharedMailCount shared mailboxes.`n"
 function getSharedMail { 
     Get-EXOMailbox -RecipientTypeDetails SharedMailbox -ResultSize Unlimited | Select-Object PrimarySmtpAddress,DisplayName | Format-Table -AutoSize
-}
+} getSharedMail
 
 ## Get number of room mailboxes
 Write-Host -ForegroundColor Yellow "Finding room mailboxes..."
@@ -69,15 +67,8 @@ $roomMailCount = (Get-EXOMailbox -RecipientTypeDetails RoomMailbox -ResultSize U
 Write-Host -ForegroundColor Green "Found $roomMailCount room mailboxes.`n" 
 function getRoomMail {
     Get-EXOMailbox -RecipientTypeDetails RoomMailbox -ResultSize Unlimited | Select-Object PrimarySmtpAddress,DisplayName | Format-Table -AutoSize
-}
+} getRoomMail
 
-
-# run functions
-getLicensedUsers
-getM365Groups
-getDistriLists
-getSharedMail
-getRoomMail
 
 
 ## Export results to TXT file in created folder

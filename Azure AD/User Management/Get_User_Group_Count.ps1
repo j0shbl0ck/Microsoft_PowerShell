@@ -3,7 +3,7 @@
     This script pulls information how many users are currently licensed and how many groups (M365,shared,Distri,Mail-Enab) are active. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.5
+    Version: 1.0.6
     Date: 09.28.22
     Type: Public
 .NOTES
@@ -21,6 +21,12 @@ Connect-AzureAD
 Connect-ExchangeOnline
 Clear-Host
 
+<# ## Create folder on desktop to store reports
+$desktop = [Environment]::GetFolderPath("Desktop")
+$folder = $desktop + "\User_Group_Count"
+New-Item -ItemType Directory -Path $folder #>
+
+
 ## Get number of licensed users
 function getLicensedUsers {
     Write-Host -ForegroundColor Yellow "Finding licensed users..."
@@ -29,6 +35,7 @@ function getLicensedUsers {
     Write-Host -ForegroundColor Green "Found $licensedUserCount licensed users.`n" 
 }
 
+## Get number of M365 groups
 function getM365Groups {
     Write-Host -ForegroundColor Yellow "Finding M365 groups..."
     $m365GroupCount = (Get-UnifiedGroup).Count
@@ -36,6 +43,7 @@ function getM365Groups {
     Write-Host -ForegroundColor Green "Found $m365GroupCount M365 groups.`n" 
 }
 
+## Get number of distribution lists
 function getDistriLists {
     Write-Host -ForegroundColor Yellow "Finding distribution lists..."
     $distriListCount = (Get-DistributionGroup).Count
@@ -43,6 +51,7 @@ function getDistriLists {
     Write-Host -ForegroundColor Green "Found $distriListCount distribution lists.`n" 
 }
 
+## Get number of shared mailboxes
 function getSharedMail {
     Write-Host -ForegroundColor Yellow "Finding shared mailboxes..."
     $sharedMailCount = (Get-EXOMailbox -RecipientTypeDetails SharedMailbox -ResultSize Unlimited).Count

@@ -3,7 +3,7 @@
     This script pulls information how many users are currently licensed and how many groups (M365,shared,Distri,Mail-Enab) are active. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.7
+    Version: 1.0.8
     Date: 09.28.22
     Type: Public
 .NOTES
@@ -56,7 +56,7 @@ function getSharedMail {
     Write-Host -ForegroundColor Yellow "Finding shared mailboxes..."
     $sharedMailCount = (Get-EXOMailbox -RecipientTypeDetails SharedMailbox -ResultSize Unlimited).Count
     Write-Host -ForegroundColor Green "Found $sharedMailCount shared mailboxes.`n" 
-    Get-EXOMailbox -RecipientTypeDetails SharedMailbox -ResultSize Unlimited | Select-Object PrimarySmtpAddress,DisplayName
+    Get-EXOMailbox -RecipientTypeDetails SharedMailbox -ResultSize Unlimited | Select-Object PrimarySmtpAddress,DisplayName | Format-Table -AutoSize
 }
 
 ## Get number of room mailboxes
@@ -64,7 +64,7 @@ function getRoomMail {
     Write-Host -ForegroundColor Yellow "Finding room mailboxes..."
     $roomMailCount = (Get-EXOMailbox -RecipientTypeDetails RoomMailbox -ResultSize Unlimited).Count
     Write-Host -ForegroundColor Green "Found $roomMailCount room mailboxes.`n" 
-    Get-EXOMailbox -RecipientTypeDetails RoomMailbox -ResultSize Unlimited | Select-Object PrimarySmtpAddress,DisplayName
+    Get-EXOMailbox -RecipientTypeDetails RoomMailbox -ResultSize Unlimited | Select-Object PrimarySmtpAddress,DisplayName | Format-Table -AutoSize
 }
 
 
@@ -73,6 +73,7 @@ getLicensedUsers
 getM365Groups
 getDistriLists
 getSharedMail
+getRoomMail
 
 
 <# ## Export results to TXT file

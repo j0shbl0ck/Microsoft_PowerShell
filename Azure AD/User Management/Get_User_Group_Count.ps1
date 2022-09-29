@@ -3,7 +3,7 @@
     This script pulls information how many users are currently licensed and how many groups (M365,shared,Distri,Room) are active. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.1.1
+    Version: 1.1.2
     Date: 09.28.22
     Type: Public
 .NOTES
@@ -32,6 +32,7 @@ Write-Host -ForegroundColor Green "Folder created: $folder"
 Write-Host -ForegroundColor Yellow "Finding user mailboxes mailboxes..."
 $userMailCount = (Get-EXOMailbox -RecipientTypeDetails UserMailbox -ResultSize Unlimited).Count
 Write-Host -ForegroundColor Green "Found $userMailCount shared mailboxes.`n"
+Write-Output "Found $userMailCount user mailboxes.`n" >> "$folder\userMailExport.txt"
 function getUserMail { 
     Get-EXOMailbox -RecipientTypeDetails UserMailbox -ResultSize Unlimited | Select-Object PrimarySmtpAddress,DisplayName | Format-Table -AutoSize
 } getUserMail
@@ -39,7 +40,8 @@ function getUserMail {
 ## Get number of M365 groups
 Write-Host -ForegroundColor Yellow "Finding M365 groups..."
 $m365GroupCount = (Get-UnifiedGroup).Count
-Write-Host -ForegroundColor Green "Found $m365GroupCount M365 groups.`n" 
+Write-Host -ForegroundColor Green "Found $m365GroupCount M365 groups.`n"
+Write-Output "Found $m365GroupCount M365 groups.`n" >> "$folder\m365GroupExport.txt"
 function getM365Groups {
     Get-UnifiedGroup | Format-List DisplayName,EmailAddresses
 } getM365Groups
@@ -47,7 +49,8 @@ function getM365Groups {
 ## Get number of distribution lists
 Write-Host -ForegroundColor Yellow "Finding distribution lists..."
 $distriListCount = (Get-DistributionGroup).Count
-Write-Host -ForegroundColor Green "Found $distriListCount distribution lists.`n" 
+Write-Host -ForegroundColor Green "Found $distriListCount distribution lists.`n"
+Write-Output "Found $distriListCount distribution lists.`n" >> "$folder\distriListExport.txt"
 function getDistriLists {
     Get-DistributionGroup | Format-List DisplayName,EmailAddresses
 } getDistriLists
@@ -56,6 +59,7 @@ function getDistriLists {
 Write-Host -ForegroundColor Yellow "Finding shared mailboxes..."
 $sharedMailCount = (Get-EXOMailbox -RecipientTypeDetails SharedMailbox -ResultSize Unlimited).Count
 Write-Host -ForegroundColor Green "Found $sharedMailCount shared mailboxes.`n"
+Write-Output "Found $sharedMailCount shared mailboxes.`n" >> "$folder\sharedMailExport.txt"
 function getSharedMail { 
     Get-EXOMailbox -RecipientTypeDetails SharedMailbox -ResultSize Unlimited | Select-Object PrimarySmtpAddress,DisplayName | Format-Table -AutoSize
 } getSharedMail
@@ -63,16 +67,17 @@ function getSharedMail {
 ## Get number of room mailboxes
 Write-Host -ForegroundColor Yellow "Finding room mailboxes..."
 $roomMailCount = (Get-EXOMailbox -RecipientTypeDetails RoomMailbox -ResultSize Unlimited).Count
-Write-Host -ForegroundColor Green "Found $roomMailCount room mailboxes.`n" 
+Write-Host -ForegroundColor Green "Found $roomMailCount room mailboxes.`n"
+Write-Output "Found $roomMailCount room mailboxes.`n" >> "$folder\roomMailExport.txt" 
 function getRoomMail {
     Get-EXOMailbox -RecipientTypeDetails RoomMailbox -ResultSize Unlimited | Select-Object PrimarySmtpAddress,DisplayName | Format-Table -AutoSize
 } getRoomMail
 
 ## Export results to TXT file in created folder
 Write-Host -ForegroundColor Yellow "Exporting results to file..."
-getUserMail | Out-File "$folder\userMailExport.txt"
-getM365Groups | Out-File "$folder\m365GroupExport.txt"
-getDistriLists | Out-File "$folder\distriListExport.txt"
-getSharedMail | Out-File "$folder\sharedMailExport.txt"
-getRoomMail | Out-File "$folder\roomMailExport.txt"
-Write-Host "Report is in $user_group_export"
+getUserMail | Out-File "$folder\userMailExport.txt" -Append
+getM365Groups | Out-File "$folder\m365GroupExport.txt" -Append
+getDistriLists | Out-File "$folder\distriListExport.txt" -Append
+getSharedMail | Out-File "$folder\sharedMailExport.txt" -Append
+getRoomMail | Out-File "$folder\roomMailExport.txt" -Append
+Write-Host "Report is in $folder"

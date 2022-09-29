@@ -3,7 +3,7 @@
     This script pulls information how many users are currently licensed and how many groups (M365,shared,Distri,Mail-Enab) are active. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.6
+    Version: 1.0.7
     Date: 09.28.22
     Type: Public
 .NOTES
@@ -39,24 +39,32 @@ function getLicensedUsers {
 function getM365Groups {
     Write-Host -ForegroundColor Yellow "Finding M365 groups..."
     $m365GroupCount = (Get-UnifiedGroup).Count
-    Get-UnifiedGroup | Format-List DisplayName,EmailAddresses
     Write-Host -ForegroundColor Green "Found $m365GroupCount M365 groups.`n" 
+    Get-UnifiedGroup | Format-List DisplayName,EmailAddresses
 }
 
 ## Get number of distribution lists
 function getDistriLists {
     Write-Host -ForegroundColor Yellow "Finding distribution lists..."
     $distriListCount = (Get-DistributionGroup).Count
-    Get-DistributionGroup | Format-List DisplayName,EmailAddresses
     Write-Host -ForegroundColor Green "Found $distriListCount distribution lists.`n" 
+    Get-DistributionGroup | Format-List DisplayName,EmailAddresses
 }
 
 ## Get number of shared mailboxes
 function getSharedMail {
     Write-Host -ForegroundColor Yellow "Finding shared mailboxes..."
     $sharedMailCount = (Get-EXOMailbox -RecipientTypeDetails SharedMailbox -ResultSize Unlimited).Count
-    Get-EXOMailbox -RecipientTypeDetails SharedMailbox -ResultSize Unlimited | Select-Object PrimarySmtpAddress,DisplayName
     Write-Host -ForegroundColor Green "Found $sharedMailCount shared mailboxes.`n" 
+    Get-EXOMailbox -RecipientTypeDetails SharedMailbox -ResultSize Unlimited | Select-Object PrimarySmtpAddress,DisplayName
+}
+
+## Get number of room mailboxes
+function getRoomMail {
+    Write-Host -ForegroundColor Yellow "Finding room mailboxes..."
+    $roomMailCount = (Get-EXOMailbox -RecipientTypeDetails RoomMailbox -ResultSize Unlimited).Count
+    Write-Host -ForegroundColor Green "Found $roomMailCount room mailboxes.`n" 
+    Get-EXOMailbox -RecipientTypeDetails RoomMailbox -ResultSize Unlimited | Select-Object PrimarySmtpAddress,DisplayName
 }
 
 

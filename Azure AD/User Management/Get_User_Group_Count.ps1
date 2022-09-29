@@ -1,18 +1,16 @@
 <#
 .SYNOPSIS
-    This script pulls information how many users are currently licensed and how many groups (M365,shared,Distri,Room) are active. 
+    This script pulls information how many user mailboxes are active and how many groups (M365,shared,Distri,Room) are active. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.1.3
+    Version: 1.1.4
     Date: 09.28.22
     Type: Public
 .NOTES
-    You will need to have Microsoft Graph Module installed.
+    You will need to have Azure AD and Exchange Online module installed.
 .LINK
     Source: https://www.tecklyfe.com/get-a-count-of-azure-ad-active-directory-users/
     Source: https://learn.microsoft.com/en-us/microsoft-365/enterprise/view-licensed-and-unlicensed-users-with-microsoft-365-powershell?view=o365-worldwide
-
-
 #>
 
 ## Connect to Microsoft Services

@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-    This script pulls information how many users are currently licensed and how many groups (M365,shared,Distri,Mail-Enab) are active. 
+    This script pulls information how many users are currently licensed and how many groups (M365,shared,Distri,Room) are active. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.1.0
+    Version: 1.1.1
     Date: 09.28.22
     Type: Public
 .NOTES
@@ -27,7 +27,6 @@ $desktop = [Environment]::GetFolderPath("Desktop")
 $folder = $desktop + "\User_Group_Count"
 New-Item -ItemType Directory -Path $folder 
 Write-Host -ForegroundColor Green "Folder created: $folder"
-
 
 ## Get number of licensed users
 Write-Host -ForegroundColor Yellow "Finding user mailboxes mailboxes..."
@@ -69,10 +68,11 @@ function getRoomMail {
     Get-EXOMailbox -RecipientTypeDetails RoomMailbox -ResultSize Unlimited | Select-Object PrimarySmtpAddress,DisplayName | Format-Table -AutoSize
 } getRoomMail
 
-
-
 ## Export results to TXT file in created folder
 Write-Host -ForegroundColor Yellow "Exporting results to file..."
-$user_group_export = $folder + "\userGroupExport.txt"
-getM365Groups | Out-File $user_group_export
+getUserMail | Out-File "$folder\userMailExport.txt"
+getM365Groups | Out-File "$folder\m365GroupExport.txt"
+getDistriLists | Out-File "$folder\distriListExport.txt"
+getSharedMail | Out-File "$folder\sharedMailExport.txt"
+getRoomMail | Out-File "$folder\roomMailExport.txt"
 Write-Host "Report is in $user_group_export"

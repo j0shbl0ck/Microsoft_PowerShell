@@ -3,7 +3,7 @@
     This script pulls information how many users are currently licensed and how many groups (M365,shared,Distri,Mail-Enab) are active. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.4
+    Version: 1.0.5
     Date: 09.28.22
     Type: Public
 .NOTES
@@ -25,6 +25,7 @@ Clear-Host
 function getLicensedUsers {
     Write-Host -ForegroundColor Yellow "Finding licensed users..."
     Get-MgUser -Filter 'assignedLicenses/$count ne 0' -ConsistencyLevel eventual -CountVariable licensedUserCount -All -Select UserPrincipalName,DisplayName,AssignedLicenses | Format-Table -Property UserPrincipalName,DisplayName,AssignedLicenses
+    #Get-EXOMailbox -RecipientTypeDetails UserMailbox -ResultSize Unlimited
     Write-Host -ForegroundColor Green "Found $licensedUserCount licensed users.`n" 
 }
 
@@ -42,11 +43,19 @@ function getDistriLists {
     Write-Host -ForegroundColor Green "Found $distriListCount distribution lists.`n" 
 }
 
+function getSharedMail {
+    Write-Host -ForegroundColor Yellow "Finding shared mailboxes..."
+    $sharedMailCount = (Get-EXOMailbox -RecipientTypeDetails SharedMailbox -ResultSize Unlimited).Count
+    Get-EXOMailbox -RecipientTypeDetails SharedMailbox -ResultSize Unlimited | Select-Object PrimarySmtpAddress,DisplayName
+    Write-Host -ForegroundColor Green "Found $sharedMailCount shared mailboxes.`n" 
+}
+
 
 # run functions
 getLicensedUsers
 getM365Groups
 getDistriLists
+getSharedMail
 
 
 <# ## Export results to TXT file

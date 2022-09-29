@@ -3,7 +3,7 @@
     This script pulls information how many user mailboxes are active and how many groups (M365,shared,Distri,Room) are active. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.1.4
+    Version: 1.1.5
     Date: 09.28.22
     Type: Public
 .NOTES
@@ -29,7 +29,7 @@ Write-Host -ForegroundColor Green "Folder created: $folder`n"
 ## Get number of licensed users
 Write-Host -ForegroundColor Yellow "Finding user mailboxes mailboxes..."
 $userMailCount = (Get-EXOMailbox -RecipientTypeDetails UserMailbox -ResultSize Unlimited).Count
-Write-Host -ForegroundColor Green "Found $userMailCount shared mailboxes.`n"
+Write-Host -ForegroundColor Green "Found $userMailCount user mailboxes.`n"
 Write-Output "Found $userMailCount user mailboxes.`n" >> "$folder\userMailExport.txt"
 function getUserMail { 
     Get-EXOMailbox -RecipientTypeDetails UserMailbox -ResultSize Unlimited | Select-Object PrimarySmtpAddress,DisplayName | Format-Table -AutoSize
@@ -79,3 +79,7 @@ getDistriLists | Out-File "$folder\distriListExport.txt" -Append
 getSharedMail | Out-File "$folder\sharedMailExport.txt" -Append
 getRoomMail | Out-File "$folder\roomMailExport.txt" -Append
 Write-Host -ForegroundColor Green "Report is in $folder"
+
+## Disconnect from Microsoft Services
+Disconnect-ExchangeOnline -Confirm:$false
+Disconnect-AzureAD -Confirm:$false

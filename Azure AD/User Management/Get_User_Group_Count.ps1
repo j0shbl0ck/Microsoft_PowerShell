@@ -3,7 +3,7 @@
     This script pulls information how many user mailboxes are active and how many groups (M365,shared,Distri,Room) are active. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.1.5
+    Version: 1.1.6
     Date: 09.28.22
     Type: Public
 .NOTES
@@ -79,6 +79,8 @@ getDistriLists | Out-File "$folder\distriListExport.txt" -Append
 getSharedMail | Out-File "$folder\sharedMailExport.txt" -Append
 getRoomMail | Out-File "$folder\roomMailExport.txt" -Append
 Write-Host -ForegroundColor Green "Report is in $folder"
+
+Pause
 
 ## Disconnect from Microsoft Services
 Disconnect-ExchangeOnline -Confirm:$false

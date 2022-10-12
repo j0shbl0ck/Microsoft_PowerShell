@@ -1,16 +1,18 @@
 ﻿<#
-    .NOTES
-    =============================================================================
+.SYNOPSIS
+    This script is made set the password of an AzureAD user to never expire. 
+.DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.7
+    Version: 1.0.8
     Date: 01.04.22
     Type: Public
+.NOTES
+    You will need to have AzureAD PowerShell module
+.LINK
     Source: https://docs.microsoft.com/en-us/microsoft-365/admin/add-users/set-password-to-never-expire?view=o365-worldwide
-    Description: This script is made set the password of an AzureAD user to never expire. 
-    =============================================================================
-    .ADDITIONAL NOTES
-        You will need to have AzureAD PowerShell module
 #>
+
+Clear-Host
 
 # ======= VARIABLES ======= #
 # Enter Global Admin UPN and password
@@ -21,7 +23,7 @@ $User_UPN = Read-Host -Prompt 'Input User (enduser@domain.com) to disable passwo
 Start-Sleep -s 5
 
 # This sets the password of one user to never expire
-Write-Host 'Disabling password experiation...' -ForegroundColor Yellow
+Write-Host 'Disabling password expiration...' -ForegroundColor Yellow
 Set-AzureADUser -ObjectId $User_UPN -PasswordPolicies DisablePasswordExpiration
 
 #This shows a confirmation of whether the password is set to never expire

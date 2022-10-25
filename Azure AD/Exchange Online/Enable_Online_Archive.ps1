@@ -1,11 +1,11 @@
 <#
 .SYNOPSIS
-    This forcefully beings the cycle of archiving email out of the primary mailbox for those using Exchange Online Archiving.
+    This enables online archiving and forcefully beings the cycle of archiving email out of the primary mailbox for those using Exchange Online Archiving.
 .NOTES
     Author: Josh Block
     Date: 10.25.22
     Type: Public
-    Version: 1.0.0
+    Version: 1.0.1
 .LINK
     https://github.com/j0shbl0ck
     https://learn.microsoft.com/en-us/microsoft-365/compliance/enable-archive-mailboxes?source=recommendations&view=o365-worldwide
@@ -25,6 +25,9 @@ Write-host ""
 $mainuser = Read-Host -Prompt 'Input user (username@domain.com) to view inbox identity of'
 #$seconduser = seconduser@domain.com
 # ======= VARIABLES ======= #
+
+# Enables the archive mailbox for a single user.
+Enable-Mailbox -Identity $mainuser -Archive
 
 # Retrives mailbox type and user connected with it. 
 Start-ManagedFolderAssistant -Identity $mainuser -ErrorAction Stop

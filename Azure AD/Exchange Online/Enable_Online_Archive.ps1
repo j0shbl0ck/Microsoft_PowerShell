@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 10.25.22
     Type: Public
-    Version: 1.0.1
+    Version: 1.0.2
 .LINK
     https://github.com/j0shbl0ck
     https://learn.microsoft.com/en-us/microsoft-365/compliance/enable-archive-mailboxes?source=recommendations&view=o365-worldwide
@@ -27,7 +27,7 @@ $mainuser = Read-Host -Prompt 'Input user (username@domain.com) to view inbox id
 # ======= VARIABLES ======= #
 
 # Enables the archive mailbox for a single user.
-Enable-Mailbox -Identity $mainuser -Archive
+Enable-Mailbox -Identity $mainuser -Archive -ErrorAction SilentlyContinue
 
 # Retrives mailbox type and user connected with it. 
 Start-ManagedFolderAssistant -Identity $mainuser -ErrorAction Stop

@@ -13,6 +13,7 @@
 .LINK
     Source: https://o365reports.com/2022/04/19/list-all-the-distribution-groups-a-user-is-member-of-using-powershell/
     Source: https://social.technet.microsoft.com/Forums/ie/en-US/08bb68fd-5116-427c-869b-3f8686d5d904/list-of-all-distribution-lists-that-one-user-is-a-member-of-powershell
+    Source: https://community.spiceworks.com/topic/2304588-list-of-all-distribution-lists-that-users-is-a-member-of-in-exch-onprem-online
 #>
 
 Clear-Host
@@ -20,10 +21,6 @@ Clear-Host
 # ======= VARIABLES ======= #
 $gadmin = Read-Host -Prompt 'Input Global/Exchange Admin UPN (globaladmin@domain.com)' 
 $UserPrincipalName = Read-Host -Prompt 'Input User (enduser@domain.com) to look up what distribution lists they are a member of'
-$emailAddress = $UserPrincipalName.email
-$mailbox = Get-Mailbox -Identity $emailAddress
-$DN=$mailbox.DistinguishedName
-$Filter = "Members -like '$DN'"
 # ======= VARIABLES ======= #
 
 # Connect to Exchange Online via Azure AD
@@ -32,20 +29,13 @@ Write-Host Connecting to Exchange Online...
 Connect-ExchangeOnline -UserPrincipalName $gadmin 
 
 # Get all Distribution Groups to search through filtering by the user
-$distrigroups = Get-DistributionGroup -ResultSize Unlimited -Filter $Filter
-$DLGroupCount = $distrigroups | Measure-Object | Select-Object count
+$distrigroups = Get-DistributionGroup -ResultSize Unlimited
 
-# Loop through each Distribution Group
-If($DLGroupCount.count -ne 0) {    
-        $DLsCount=$DLGroupCount.count
-        $DLsName=$distrigroups.Name
-        $DLsEmailAddress=$distrigroups.PrimarySmtpAddress
+foreach ($distrigroup in $distrigroups) {
+    $members = $distrigroup.PrimarySmtpAddress
+    foreach ($member in $members) {
+        if ($member -eq $UserPrincipalName) {
+            $distrigroup.Name
+        }
+    }
 }
-Else {
-        $DLsName="-"
-        $DlsEmailAddress="-"
-        $DLsCount='0'
-}
-$Result = New-Object PsObject -Property @{'User Principal Name' = $UserPrincipalName;'No of DLs that user is a member'=$DLsCount;'DLs Name'=$DLsName -join ',';'DLs Email Adddress'=$DLsEmailAddress -join ',';}
-$Result | Select-Object 'User Principal Name','No Of DLs That User Is A Member','DLs Name','DLs Email Adddress' 
-$Global:ProcessedUserCount++ #>

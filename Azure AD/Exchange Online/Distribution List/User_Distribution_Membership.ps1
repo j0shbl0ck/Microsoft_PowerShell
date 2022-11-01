@@ -46,6 +46,6 @@ If($DLGroupCount.count -ne 0)
         $DlsEmailAddress="-"
         $DLsCount='0'
     }
-$Result=New-Object PsObject -Property @{'User Principal Name'=$UserPrincipalName;'No of DLs that user is a member'=$DLsCount;'DLs Name'=$DLsName -join ',';'DLs Email Adddress'=$DLsEmailAddress -join ',';} -Format 
+$Result=New-Object PsObject -Property @{'User Principal Name'=$UserPrincipalName;'No of DLs that user is a member'=$DLsCount;'DLs Name'=$DLsName -join ',';'DLs Email Adddress'=$DLsEmailAddress -join ',';}
 $Result|Select-Object 'User Principal Name','No Of DLs That User Is A Member','DLs Name','DLs Email Adddress' 
 $Global:ProcessedUserCount++

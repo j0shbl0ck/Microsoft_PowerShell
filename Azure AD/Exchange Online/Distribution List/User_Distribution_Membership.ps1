@@ -32,7 +32,7 @@ Connect-ExchangeOnline -UserPrincipalName $gadmin
 $distrigroups = Get-DistributionGroup -ResultSize Unlimited
 
 foreach ($distrigroup in $distrigroups) {
-    $members = Get-DistributionGroupMember
+    $members = Get-DistributionGroupMember -Identity $distrigroup
     foreach ($member in $members) {
         if ($member -eq $UserPrincipalName) {
             Write-Host $distrigroup.PrimarySmtpAddress

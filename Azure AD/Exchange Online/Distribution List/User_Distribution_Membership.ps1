@@ -32,7 +32,7 @@ Connect-ExchangeOnline -UserPrincipalName $gadmin
 $distrigroups = Get-DistributionGroup -ResultSize Unlimited
 
 foreach ($distrigroup in $distrigroups) {
-    Get-DistributionGroupMember -Identity $distrigroup.Identity -ResultSize Unlimited | Where-Object {$_.PrimarySmtpAddress -eq $UserPrincipalName} | Select-Object Name
+    Get-DistributionGroupMember -Identity $distrigroup.Identity -ResultSize Unlimited | Where-Object {$_.PrimarySmtpAddress -eq $UserPrincipalName} | Select-Object $distrigroup.Name
 }
 <#     $members = $distrigroup.PrimarySmtpAddress
     foreach ($member in $members) {

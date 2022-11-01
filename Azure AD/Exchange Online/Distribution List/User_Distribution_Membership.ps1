@@ -33,16 +33,16 @@ $distrigroups = Get-DistributionGroup -ResultSize Unlimited
 
 foreach ($distrigroup in $distrigroups) {
     # get email address of distribution group
-    $distrigroupemail = $distrigroup.PrimarySmtpAddress
+    $distrigroupname = $distrigroup.Name
+    
     # get members of distribution group
-    $members = Get-DistributionGroupMember -Identity $distrigroup -ResultSize Unlimited | Select-Object PrimarySmtpAddress -ErrorAction SilentlyContinue
+    $members = Get-DistributionGroupMember -Identity $distrigroup -ResultSize Unlimited | Select-Object PrimarySmtpAddress
     # loop through members of distribution group
     foreach ($member in $members) {
         # if the member is the user we are looking for
         if ($member.PrimarySmtpAddress -eq $UserPrincipalName) {
             # write the distribution group email address to the screen
-            $distrigroupemail
+            $distrigroupname
         }
     }
 }
-# show the distribution lists that the user is a member of

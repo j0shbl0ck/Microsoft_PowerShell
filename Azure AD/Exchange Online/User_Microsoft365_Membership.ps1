@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Looks up what unified groups a user is a member of. 
+    Looks up what unified groups (Microsoft 365 Groups) a user is a member of. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
     Version: 1.0.1
@@ -43,8 +43,8 @@ foreach ($unifigroup in $unifigroups) {
                 $Result= @()
                 $UGEmail = $unifigroup.PrimarySmtpAddress
                 $UGName = $unifigroup.DisplayName
-                $Result=New-Object PsObject -Property @{'DL Email Name'=$UGName;'DL Email Address'=$UGEmail;} 
-                $Result | Select-Object 'DL Email Name','DL Email Address' | Format-Table -AutoSize
+                $Result=New-Object PsObject -Property @{'M365 Group Email Name'=$UGName;'M365 Group Email Address'=$UGEmail;} 
+                $Result | Select-Object 'M365 Group Email Name','M365 Group Email Address' | Format-Table -AutoSize
             }
             else {
                 # continue script

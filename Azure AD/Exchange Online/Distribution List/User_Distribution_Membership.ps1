@@ -35,7 +35,7 @@ foreach ($distrigroup in $distrigroups) {
     $members = Get-DistributionGroupMember -Identity $distrigroup
     foreach ($member in $members) {
         if ($member -eq $UserPrincipalName) {
-            Write-Host $distrigroup.PrimarySmtpAddress
+            Write-Host "I got it"
         }
     }
 }

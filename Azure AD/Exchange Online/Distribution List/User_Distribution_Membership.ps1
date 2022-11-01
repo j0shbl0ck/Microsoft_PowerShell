@@ -3,7 +3,7 @@
     Looks up what distribution lists a user is a member of. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.
+    Version: 1.0.2
     Date: 11.01.22
     Type: Public
 .NOTES
@@ -32,7 +32,6 @@ Connect-ExchangeOnline -UserPrincipalName $gadmin
 # Get all Distribution Groups to search through filtering by the user
 $distrigroups = Get-DistributionGroup -ResultSize Unlimited -Filter $Filter
 $GroupCount=$distrigroups | Measure-Object | Select-Object count
-Write-Progress -Activity "Find Distribution Lists that user is a member" -Status "Processed User Count: $Global:ProcessedUserCount" -CurrentOperation "Currently Processing in  $UserPrincipalName"
 
 # Loop through each Distribution Group
 If($GroupCount.count -ne 0)
@@ -47,6 +46,6 @@ If($GroupCount.count -ne 0)
         $DlsEmailAddress="-"
         $DLsCount='0'
     }
-$Result=New-Object PsObject -Property @{'User Principal Name'=$UserPrincipalName;'User Display Name'=$UserDisplayName;'No of DLs that user is a member'=$DLsCount;'DLs Name'=$DLsName -join ',';'DLs Email Adddress'=$DLsEmailAddress -join ',';} 
-$Result|Select-Object 'User Principal Name','User Display Name','No Of DLs That User Is A Member','DLs Name','DLs Email Adddress'
+$Result=New-Object PsObject -Property @{'User Principal Name'=$UserPrincipalName;'No of DLs that user is a member'=$DLsCount;'DLs Name'=$DLsName -join ',';'DLs Email Adddress'=$DLsEmailAddress -join ',';} 
+$Result|Select-Object 'User Principal Name','No Of DLs That User Is A Member','DLs Name','DLs Email Adddress'
 $Global:ProcessedUserCount++

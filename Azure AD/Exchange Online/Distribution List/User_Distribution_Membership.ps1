@@ -21,7 +21,6 @@ Clear-Host
 # ======= VARIABLES ======= #
 $gadmin = Read-Host -Prompt 'Input Global/Exchange Admin UPN (globaladmin@domain.com)' 
 $UserPrincipalName = Read-Host -Prompt 'Input User (enduser@domain.com) to look up what distribution lists they are a member of'
-
 # ======= VARIABLES ======= #
 
 # Connect to Exchange Online via Azure AD
@@ -36,17 +35,18 @@ foreach ($distrigroup in $distrigroups) {
     # get members of distribution group
     $members = Get-DistributionGroupMember -Identity $distrigroup -ResultSize Unlimited | Select-Object PrimarySmtpAddress
     # loop through members of distribution group
-<#     foreach ($member in $members) {
-        # if the member is the user we are looking for #>
-        if ($members.PrimarySmtpAddress -eq $UserPrincipalName) {
+    foreach ($member in $members) {
+        # if the member is the user we are looking for
+        if ($member.PrimarySmtpAddress -eq $UserPrincipalName) {
             # write the distribution group email address to the screen
             $Result= @()
             $DLEmail = $distrigroup.PrimarySmtpAddress
             $DLName = $distrigroup.DisplayName
             $Result=New-Object PsObject -Property @{'DL Email Name'=$DLName;'DL Email Address'=$DLEmail;} 
-            $Result | Select-Object 'DL Email Name','DL Email Address'
+            $Result | Select-Object 'DL Email Name','DL Email Address' | Format-Table -AutoSize
         }
         else {
-            Write-Host "User is not a member of $distrigroup"
+            # continue script
         }
+    }
 }

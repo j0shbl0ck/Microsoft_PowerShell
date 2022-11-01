@@ -32,12 +32,14 @@ Connect-ExchangeOnline -UserPrincipalName $gadmin
 $distrigroups = Get-DistributionGroup -ResultSize Unlimited
 
 foreach ($distrigroup in $distrigroups) {
-    $members = $distrigroup.PrimarySmtpAddress
+    Get-DistributionGroupMember -Identity $distrigroup.Identity -ResultSize Unlimited | Where-Object {$_.PrimarySmtpAddress -eq $UserPrincipalName} | Select-Object Name
+}
+<#     $members = $distrigroup.PrimarySmtpAddress
     foreach ($member in $members) {
         if ($member -eq $UserPrincipalName) {
             Write-Host $distrigroup.Name
         }
-    }
-}
+    } #>
+# }
 
 # show the distribution lists that the user is a member of

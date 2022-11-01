@@ -20,7 +20,10 @@ Clear-Host
 # ======= VARIABLES ======= #
 $gadmin = Read-Host -Prompt 'Input Global/Exchange Admin UPN (globaladmin@domain.com)' 
 $UserPrincipalName = Read-Host -Prompt 'Input User (enduser@domain.com) to look up what distribution lists they are a member of'
-$Filter = "Members -like '$UserPrincipalName'"
+$emailAddress = $UserPrincipalName.email
+$mailbox = Get-Mailbox -Identity $emailAddress
+$DN=$mailbox.DistinguishedName
+$Filter = "Members -like '$DN'"
 # ======= VARIABLES ======= #
 
 # Connect to Exchange Online via Azure AD
@@ -29,11 +32,10 @@ Write-Host Connecting to Exchange Online...
 Connect-ExchangeOnline -UserPrincipalName $gadmin 
 
 # Get all Distribution Groups to search through filtering by the user
-# $distrigroups = 
-Get-DistributionGroup -ResultSize Unlimited -Filter $Filter
-# $DLGroupCount = $distrigroups | Measure-Object | Select-Object count
+$distrigroups = Get-DistributionGroup -ResultSize Unlimited -Filter $Filter
+$DLGroupCount = $distrigroups | Measure-Object | Select-Object count
 
-<# # Loop through each Distribution Group
+# Loop through each Distribution Group
 If($DLGroupCount.count -ne 0) {    
         $DLsCount=$DLGroupCount.count
         $DLsName=$distrigroups.Name

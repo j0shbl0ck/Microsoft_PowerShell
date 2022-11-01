@@ -20,7 +20,7 @@ Clear-Host
 # ======= VARIABLES ======= #
 $gadmin = Read-Host -Prompt 'Input Global/Exchange Admin UPN (globaladmin@domain.com)' 
 $UserPrincipalName = Read-Host -Prompt 'Input User (enduser@domain.com) to view calendar permissions of'
-$Filter = "Members -Like ""$UserPrincipalName"""
+$Filter = "Members -eq '$UserPrincipalName'"
 #$seconduser = seconduser@domain.com
 # ======= VARIABLES ======= #
 
@@ -31,21 +31,19 @@ Connect-ExchangeOnline -UserPrincipalName $gadmin
 
 # Get all Distribution Groups to search through filtering by the user
 $distrigroups = Get-DistributionGroup -ResultSize Unlimited -Filter $Filter
-$DLGroupCount=$distrigroups | Measure-Object | Select-Object count
+$DLGroupCount = $distrigroups | Measure-Object | Select-Object count
 
 # Loop through each Distribution Group
-If($DLGroupCount.count -ne 0)
-    {    
+If($DLGroupCount.count -ne 0) {    
         $DLsCount=$DLGroupCount.count
         $DLsName=$distrigroups.Name
         $DLsEmailAddress=$distrigroups.PrimarySmtpAddress
-    }
-    Else
-    {
+}
+Else {
         $DLsName="-"
         $DlsEmailAddress="-"
         $DLsCount='0'
-    }
-$Result=New-Object PsObject -Property @{'User Principal Name'=$UserPrincipalName;'No of DLs that user is a member'=$DLsCount;'DLs Name'=$DLsName -join ',';'DLs Email Adddress'=$DLsEmailAddress -join ',';}
-$Result|Select-Object 'User Principal Name','No Of DLs That User Is A Member','DLs Name','DLs Email Adddress' 
+}
+$Result = New-Object PsObject -Property @{'User Principal Name' = $UserPrincipalName;'No of DLs that user is a member'=$DLsCount;'DLs Name'=$DLsName -join ',';'DLs Email Adddress'=$DLsEmailAddress -join ',';}
+$Result | Select-Object 'User Principal Name','No Of DLs That User Is A Member','DLs Name','DLs Email Adddress' 
 $Global:ProcessedUserCount++

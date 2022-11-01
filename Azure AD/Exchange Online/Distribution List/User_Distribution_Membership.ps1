@@ -3,7 +3,7 @@
     Looks up what distribution lists a user is a member of. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.0
+    Version: 1.0.
     Date: 11.01.22
     Type: Public
 .NOTES

@@ -45,5 +45,8 @@ foreach ($distrigroup in $distrigroups) {
             $Result=New-Object PsObject -Property @{'DL Email Name'=$DLName;'DL Email Address'=$DLEmail;} 
             $Result | Select-Object 'DL Email Name','DL Email Address'
         }
+        else {
+            Write-Host "User is not a member of $distrigroup"
+        }
     }
 }

@@ -20,8 +20,7 @@ Clear-Host
 # ======= VARIABLES ======= #
 $gadmin = Read-Host -Prompt 'Input Global/Exchange Admin UPN (globaladmin@domain.com)' 
 $UserPrincipalName = Read-Host -Prompt 'Input User (enduser@domain.com) to view calendar permissions of'
-$Filter = "Members -eq '$UserPrincipalName'"
-#$seconduser = seconduser@domain.com
+$Filter = "Members -eq $UserPrincipalName"
 # ======= VARIABLES ======= #
 
 # Connect to Exchange Online via Azure AD

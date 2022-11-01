@@ -35,9 +35,9 @@ foreach ($distrigroup in $distrigroups) {
     # get members of distribution group
     $members = Get-DistributionGroupMember -Identity $distrigroup -ResultSize Unlimited | Select-Object PrimarySmtpAddress
     # loop through members of distribution group
-    foreach ($member in $members) {
-        # if the member is the user we are looking for
-        if ($member.PrimarySmtpAddress -eq $UserPrincipalName) {
+<#     foreach ($member in $members) {
+        # if the member is the user we are looking for #>
+        if ($members.PrimarySmtpAddress -eq $UserPrincipalName) {
             # write the distribution group email address to the screen
             $Result= @()
             $DLEmail = $distrigroup.PrimarySmtpAddress
@@ -48,5 +48,4 @@ foreach ($distrigroup in $distrigroups) {
         else {
             Write-Host "User is not a member of $distrigroup"
         }
-    }
 }

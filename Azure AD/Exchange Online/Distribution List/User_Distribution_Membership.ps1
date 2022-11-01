@@ -35,7 +35,7 @@ foreach ($distrigroup in $distrigroups) {
     # get email address of distribution group
     $distrigroupemail = $distrigroup.PrimarySmtpAddress
     # get members of distribution group
-    $members = Get-DistributionGroupMember -Identity $distrigroup -ResultSize Unlimited | Select-Object PrimarySmtpAddress
+    $members = Get-DistributionGroupMember -Identity $distrigroup -ResultSize Unlimited | Select-Object PrimarySmtpAddress -ErrorAction SilentlyContinue
     # loop through members of distribution group
     foreach ($member in $members) {
         # if the member is the user we are looking for

@@ -35,7 +35,9 @@ foreach ($distrigroup in $distrigroups) {
     $members = $distrigroup.PrimarySmtpAddress
     foreach ($member in $members) {
         if ($member -eq $UserPrincipalName) {
-            $distrigroup.Name
+            Write-Host $distrigroup.Name
         }
     }
 }
+
+# show the distribution lists that the user is a member of

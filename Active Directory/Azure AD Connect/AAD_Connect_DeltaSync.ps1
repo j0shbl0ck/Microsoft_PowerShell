@@ -12,7 +12,6 @@
 
 #>
 
-⚠️  Check if Module ADSync is installed on device
 
 # ask user if they are on dc or local machine
 $userlocation = Read-Host -Prompt "Are you on the DC (where AAD Connect is hosted) [y/n]" -AsSecureString -RawInput

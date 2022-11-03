@@ -20,7 +20,7 @@ Clear-Host
 
 # ======= VARIABLES ======= #
 $gadmin = Read-Host -Prompt 'Input Global/Exchange Admin UPN (globaladmin@domain.com)' 
-$UserPrincipalName = Read-Host -Prompt 'Input User (enduser@domain.com) to look up what distribution lists they are a member of'
+$UserPrincipalName = Read-Host -Prompt 'Input User (username@domain.com) to look up what distribution lists they are a member of'
 # ======= VARIABLES ======= #
 
 # Connect to Exchange Online via Azure AD
@@ -28,18 +28,18 @@ Import-Module ExchangeOnlineManagement
 Write-Host Connecting to Exchange Online...
 Connect-ExchangeOnline -UserPrincipalName $gadmin 
 
-# Get all Distribution Groups to search through filtering by the user
+# Get all M365 Groups to search through filtering by the user
 $unifigroups = Get-UnifiedGroup
 
 foreach ($unifigroup in $unifigroups) {
     try {
-        # get members of distribution group 
+        # get members of M365 group 
         $members = Get-UnifiedGroupLinks -Identity $unifigroup -LinkType Members -ErrorAction SilentlyContinue | Select-Object PrimarySmtpAddress
-        # loop through members of distribution group
+        # loop through members of M365 group
         foreach ($member in $members) {
             # if the member is the user we are looking for
             if ($member.PrimarySmtpAddress -eq $UserPrincipalName) {
-                # write the distribution group email address to the screen
+                # write the M365 group email address to the screen
                 $Result= @()
                 $UGEmail = $unifigroup.PrimarySmtpAddress
                 $UGName = $unifigroup.DisplayName

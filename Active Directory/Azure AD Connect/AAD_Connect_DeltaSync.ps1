@@ -12,7 +12,12 @@
 
 #>
 
-#Requires -RunAsAdministrator
+# require admin privileges
+if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+    Write-Host "This script must be run as an administrator." -ForegroundColor Red
+    Pause
+}
+
 Clear-Host
 
 # ask user if they are on dc or local machine

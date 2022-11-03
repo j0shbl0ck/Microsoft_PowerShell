@@ -12,6 +12,12 @@
     Source: https://o365reports.com/2019/11/01/install-all-office-365-powershell-modules/
 #>
 
+# require admin privileges
+if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+    Write-Host "This script must be run as an administrator." -ForegroundColor Red
+    Pause
+}
+
 # Display intro to script
 function Write-Intro {
 Write-Host ""

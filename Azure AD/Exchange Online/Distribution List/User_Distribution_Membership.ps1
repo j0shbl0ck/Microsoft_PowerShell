@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Looks up what distribution lists a user is a member of. 
+    Looks up what distribution groups and mail-enabled security groups a user is a member of. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
     Version: 1.0.2
@@ -28,18 +28,18 @@ Import-Module ExchangeOnlineManagement
 Write-Host Connecting to Exchange Online...
 Connect-ExchangeOnline -UserPrincipalName $gadmin 
 
-# Get all Distribution Groups to search through filtering by the user
+# Get all distribution groups and mail-enabled security groups
 $distrigroups = Get-DistributionGroup
 
 foreach ($distrigroup in $distrigroups) {
     try {
-        # get members of distribution group
+        # get members of distribution group or mail-enabled security group
         $members = Get-DistributionGroupMember -Identity $distrigroup -ErrorAction SilentlyContinue | Select-Object PrimarySmtpAddress
         # loop through members of distribution group
         foreach ($member in $members) {
             # if the member is the user we are looking for
             if ($member.PrimarySmtpAddress -eq $UserPrincipalName) {
-                # write the distribution group email address to the screen
+                # write the distribution group or mail-enabled security group email address to the screen
                 $Result= @()
                 $DLEmail = $distrigroup.PrimarySmtpAddress
                 $DLName = $distrigroup.DisplayName

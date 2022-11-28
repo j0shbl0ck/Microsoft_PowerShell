@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    This script allows custom scripting to in SharePoint site
+    This script allows custom scripting to a SharePoint site
 .NOTES
     Author: Josh Block
     Date: 11.28.22

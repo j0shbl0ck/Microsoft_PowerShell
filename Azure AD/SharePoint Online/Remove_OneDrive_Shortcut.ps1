@@ -3,7 +3,7 @@
     This script removes the "Add shortcuts to My Files" in SharePoint site
 .NOTES
     Author: Josh Block
-    Date: 09.015.22
+    Date: 09.15.22
     Type: Public
     Version: 1.0.3
 .LINK

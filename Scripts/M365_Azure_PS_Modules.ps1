@@ -3,7 +3,7 @@
     This script installs the M365 and Azure Powershell Module Services.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.4.2
+    Version: 1.4.3
     Date: 01.12.22
     Type: Public
 .NOTES
@@ -11,6 +11,8 @@
 .LINK
     Source: https://o365reports.com/2019/11/01/install-all-office-365-powershell-modules/
 #>
+
+Clear-Host
 
 # require admin privileges
 if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {

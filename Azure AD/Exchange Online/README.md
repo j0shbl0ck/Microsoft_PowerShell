@@ -3,8 +3,8 @@
 
 | **Folder 📂** | **Description 📄** |
 | --- | :--- | 
-| `Bulk Contact Import` | This folder contains a script on bulk importing contacts into Exchange Online   |
-| `Distribution List` | This fold contains scripts for managing distribution lists  |
+| **Bulk Contact Import** | This folder contains a script on bulk importing contacts into Exchange Online   |
+| **Distribution List** | This fold contains scripts for managing distribution lists  |
 
 | **Script 📜** | **Description 📄** |
 | --- | :--- | 

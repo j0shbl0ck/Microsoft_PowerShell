@@ -3,7 +3,7 @@
     This script enables or disables the external mail tag.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.2
+    Version: 1.0.1
     Date: 12.27.22
     Type: Public
 .NOTES

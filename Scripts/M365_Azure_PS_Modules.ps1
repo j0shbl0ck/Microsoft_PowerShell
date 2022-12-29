@@ -3,7 +3,7 @@
     This script installs the M365 and Azure Powershell Module Services.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.4.3
+    Version: 1.4.4
     Date: 01.12.22
     Type: Public
 .NOTES
@@ -80,6 +80,7 @@ if (-not(Get-InstalledModule -Name $mst -ErrorAction SilentlyContinue)) {
 
 # Install SharePoint PNP Powershell Module
 Write-Host -ForegroundColor Yellow "Finding SharePoint PNP PowerShell Module..."
+Write-Host -ForegroundColor Yellow "Finding PnP PowerShell Module..."
 $pnp = "SharePointPnPPowerShellOnline"
 if (-not(Get-InstalledModule -Name $pnp -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Red "${pnp} Not Found. Installing ${pnp}..."
@@ -87,6 +88,42 @@ if (-not(Get-InstalledModule -Name $pnp -ErrorAction SilentlyContinue)) {
     Write-Host -ForegroundColor Green "${pnp} Installed!"
 } else {
     Write-Host -ForegroundColor Green "${pnp} Installed!"
+}
+
+# Install PnP PowerShell Module
+Write-Host -ForegroundColor Yellow "Finding PnP PowerShell Module..."
+$pnpps = "PnP.PowerShell"
+$sppnp = "SharePointPnPPowerShellOnline"
+if (Get-InstalledModule -Name $sppnp -ErrorAction SilentlyContinue) {
+        Write-Warning "${sppnp} Found. Requires uninstall to install PnP PowerShell Module...`n"
+        while ($choice -ne 'y' -and $choice -ne 'n') 
+        {
+            $choice = Read-Host -Prompt "Do you want to uninstall SharePoint PnP Module? [y/n]"
+            if ($choice -eq 'y') {
+                Write-Host -ForegroundColor Red "Uninstalling SharePoint PnP Module..."
+                Uninstall-Module -Name $sppnp -AllVersions
+                Write-Host -ForegroundColor Green "${sppnp} Uninstalled!"
+                if (-not(Get-InstalledModule -Name $pnpps -ErrorAction SilentlyContinue)) {
+                    Write-Host -ForegroundColor Red "${pnpps} Not Found. Installing ${az}..."
+                    Install-Module -Name $pnpps -Force -AllowClobber -Confirm:$False
+                    Write-Host -ForegroundColor Green "${pnpps} Installed!"
+                } 
+            } elseif ($choice -eq 'n') {
+                Write-Host -ForegroundColor Red "Denied uninstall of SharePoint PnP Module. Continuing..."
+                break
+            } else {
+                Write-Host -ForegroundColor Red "Invalid input. Please enter 'y' or 'n'"
+            }
+        }
+} else {
+    $pnpps = "PnP.PowerShell"
+    if (-not(Get-InstalledModule -Name $pnpps -ErrorAction SilentlyContinue)) {
+        Write-Host -ForegroundColor Red "${pnpps} Not Found. Installing ${az}..."
+        Install-Module -Name $pnpps -Force -AllowClobber -Confirm:$False
+        Write-Host -ForegroundColor Green "${pnpps} Installed!"
+    } else {
+        Write-Host -ForegroundColor Green "${pnpps} Installed!"
+    }
 }
 
 # Install AzureAD V1 Powershell Module

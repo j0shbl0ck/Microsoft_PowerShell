@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 01.03.23
     Type: Public
-    Version: 1.0.0
+    Version: 1.0.1
 .LINK
     https://github.com/j0shbl0ck
     https://social.technet.microsoft.com/wiki/contents/articles/54249.365-add-members-in-distribution-list-using-powershell-and-csv-list-file.aspx
@@ -45,12 +45,12 @@ while ($choice -ne 'y' -and $choice -ne 'n')
     if ($choice -eq 'y') {
         # ask user for the name of the distribution list
         Write-Host -ForegroundColor Yellow 'What is the name of the Mail-enabled Security group?'
-        $dldisplay = Read-Host
+        $dlname = Read-Host
         # ask user for the email address of the distribution list
         Write-Host -ForegroundColor Yellow 'What is the email address of the Mail-enabled Security group?'
         $dlemail = Read-Host
         # create the distribution list
-        New-DistributionGroup -DisplayName $dldisplay -PrimarySmtpAddress $dlemail -Type "Security"
+        New-DistributionGroup -Name $dlname -PrimarySmtpAddress $dlemail -Type "Security"
         Write-Host -ForegroundColor Green 'Mail-enabled Security group: ' + $dlname + ' created.'
         Write-host ""
         # Perform the create distrubution list operation

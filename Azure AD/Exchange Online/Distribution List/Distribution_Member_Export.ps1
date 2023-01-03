@@ -3,7 +3,7 @@
     Export distrubtion group with members in CSV. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.4
+    Version: 1.0.5
     Date: 01.04.22
     Type: Public
 .NOTES
@@ -14,10 +14,10 @@
     Source: https://www.datarepairtools.com/blog/export-office-365-distribution-group-members-list-to-csv/
 #>
 
+Clear-Host
 
-# ======= VARIABLES ======= #
+# Get Global/Exchange Admin UPN
 $gadmin = Read-Host -Prompt 'Input Global/Exchange Admin UPN (globaladmin@domain.com)' 
-# ======= VARIABLES ======= #
 
 # Connect to Exchange Online via Azure AD
 Connect-ExchangeOnline -UserPrincipalName $gadmin | Clear-Host

@@ -1,11 +1,11 @@
 <#
 .SYNOPSIS
-    This creates multiple distrubution lists via CSV.
+    This imports multiple distrubution lists via CSV.
 .NOTES
     Author: Josh Block
     Date: 08.15.22
     Type: Public
-    Version: 1.0.1
+    Version: 1.0.2
 .LINK
     https://github.com/j0shbl0ck
     https://social.technet.microsoft.com/wiki/contents/articles/54249.365-add-members-in-distribution-list-using-powershell-and-csv-list-file.aspx

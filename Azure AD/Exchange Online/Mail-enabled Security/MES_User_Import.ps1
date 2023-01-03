@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 01.03.23
     Type: Public
-    Version: 1.0.2
+    Version: 1.0.3
 .LINK
     https://github.com/j0shbl0ck
     https://social.technet.microsoft.com/wiki/contents/articles/54249.365-add-members-in-distribution-list-using-powershell-and-csv-list-file.aspx
@@ -43,10 +43,10 @@ $headers = $users | Get-Member -MemberType NoteProperty | Select-Object -ExpandP
 
 # check if the CSV file has the correct headers
 if ($headers -notcontains 'Email') {
-    Write-Host -ForegroundColor Red 'The CSV file does not contain the correct headers. Please correct headers and try again.'
-    Write-Host -ForegroundColor Red 'The headers should be: Name,Email'
+    Write-Warning 'The CSV file does not contain the correct headers. Please correct headers and try again.'
+    Write-Warning 'The headers should be: Name,Email'
     Write-host ""
-    exit
+    Start-Sleep -Seconds 5
 }
 else {
     # Ask user if they want to create a distribution list or already have one

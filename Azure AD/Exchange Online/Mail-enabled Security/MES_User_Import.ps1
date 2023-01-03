@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 01.03.23
     Type: Public
-    Version: 1.0.4
+    Version: 1.0.5
 .LINK
     https://github.com/j0shbl0ck
     https://social.technet.microsoft.com/wiki/contents/articles/54249.365-add-members-in-distribution-list-using-powershell-and-csv-list-file.aspx
@@ -55,10 +55,10 @@ else {
         $choice = Read-Host -Prompt 'Do you want to create the Mail-enabled Security group? (Y/N)'
         if ($choice -eq 'y') {
             # ask user for the name of the distribution list
-            Write-Host -ForegroundColor Yellow 'What is the name of the Mail-enabled Security group?'
+            Write-Host -ForegroundColor Yellow '`nWhat is the name of the Mail-enabled Security group?'
             $dlname = Read-Host
             # ask user for the email address of the distribution list
-            Write-Host -ForegroundColor Yellow 'What is the email address of the Mail-enabled Security group?'
+            Write-Host -ForegroundColor Yellow '`nWhat is the email address of the Mail-enabled Security group?'
             $dlemail = Read-Host
             # create the distribution list
             New-DistributionGroup -Name $dlname -PrimarySmtpAddress $dlemail -Type "Security"
@@ -68,7 +68,7 @@ else {
             Write-Host -ForegroundColor Yellow 'Adding users to Mail-enabled Security group:' $dlname
             ForEach ($user in $users){
                 Add-DistributionGroupMember -Identity "$dlname" -Member $user.Email
-                Write-Host -ForegroundColor Green "User:" $user.Email  'added. n`'
+                Write-Host -ForegroundColor Green "User:" $user.Email  'added.`n'
             }
         } elseif ($choice -eq 'n') {
             # get the email of the distribution list
@@ -78,7 +78,7 @@ else {
             Write-Host -ForegroundColor Yellow 'Adding users to Mail-enabled Security group:' $dlname
             ForEach ($user in $users){
                 Add-DistributionGroupMember -Identity $dlemail2 -Member $user.Email
-                Write-Host -ForegroundColor Green 'User:' $user.Email 'added.n`'
+                Write-Host -ForegroundColor Green 'User:' $user.Email 'added.`n'
             }
         } else {
             Write-Host -ForegroundColor Red "Invalid input. Please type 'y' or 'n'"
@@ -87,7 +87,7 @@ else {
 }
 
 # Disconnect from Exchange Online
-Write-Host -ForegroundColor Yellow 'Disconnecting from Exchange Online...'
+Write-Host -ForegroundColor Yellow "`nDisconnecting from Exchange Online..."
 Disconnect-ExchangeOnline -Confirm:$false
 Write-Host -ForegroundColor Green 'Done.'
 Write-host ""

@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 01.03.23
     Type: Public
-    Version: 1.0.3
+    Version: 1.0.4
 .LINK
     https://github.com/j0shbl0ck
     https://social.technet.microsoft.com/wiki/contents/articles/54249.365-add-members-in-distribution-list-using-powershell-and-csv-list-file.aspx
@@ -62,23 +62,23 @@ else {
             $dlemail = Read-Host
             # create the distribution list
             New-DistributionGroup -Name $dlname -PrimarySmtpAddress $dlemail -Type "Security"
-            Write-Host -ForegroundColor Green 'Mail-enabled Security group: ' + $dlname + ' created.'
+            Write-Host -ForegroundColor Green 'Mail-enabled Security group: ' $dlname ' created.'
             Write-host ""
             # Perform the create distrubution list operation
+            Write-Host -ForegroundColor Yellow 'Adding users to Mail-enabled Security group:' $dlname
             ForEach ($user in $users){
-                Write-Host -ForegroundColor Yellow 'Adding users to Mail-enabled Security group: ' $_.Email
                 Add-DistributionGroupMember -Identity "$dlname" -Member $user.Email
-                Write-Host -ForegroundColor Green 'User: ' + $user.Email + ' added.'
+                Write-Host -ForegroundColor Green "User:" $user.Email  'added. n`'
             }
         } elseif ($choice -eq 'n') {
             # get the email of the distribution list
             Write-Host -ForegroundColor Yellow 'What is the email address of the Mail-enabled Security group?'
             $dlemail2 = Read-Host
             # Perform the create distrubution list operation
+            Write-Host -ForegroundColor Yellow 'Adding users to Mail-enabled Security group:' $dlname
             ForEach ($user in $users){
-                Write-Host -ForegroundColor Yellow 'Adding users to Mail-enabled Security group: ' $_.Email
-                Add-DistributionGroupMember -Identity "$dlemail2" -Member $user.Email
-                Write-Host -ForegroundColor Green 'User: ' + $user.Email + ' added.'
+                Add-DistributionGroupMember -Identity $dlemail2 -Member $user.Email
+                Write-Host -ForegroundColor Green 'User:' $user.Email 'added.n`'
             }
         } else {
             Write-Host -ForegroundColor Red "Invalid input. Please type 'y' or 'n'"

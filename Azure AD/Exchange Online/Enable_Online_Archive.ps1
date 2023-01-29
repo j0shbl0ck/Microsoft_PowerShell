@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 10.25.22
     Type: Public
-    Version: 1.0.2
+    Version: 1.0.3
 .LINK
     https://github.com/j0shbl0ck
     https://learn.microsoft.com/en-us/microsoft-365/compliance/enable-archive-mailboxes?source=recommendations&view=o365-worldwide
@@ -15,19 +15,21 @@
 
 Clear-Host
 
-# Connect to Exchange Online via Azure AD with Global/Exchange admin.
-Write-Host -ForegroundColor Cyan 'Connecting to Exchange Online...'
-Connect-ExchangeOnline
-Write-host ""
+Try {
+    Connect-ExchangeOnline
+    $mainuser = Read-Host -Prompt 'Input user (username@domain.com) to view inbox identity of'
 
-
-# ======= VARIABLES ======= #
-$mainuser = Read-Host -Prompt 'Input user (username@domain.com) to view inbox identity of'
-#$seconduser = seconduser@domain.com
-# ======= VARIABLES ======= #
-
-# Enables the archive mailbox for a single user.
-Enable-Mailbox -Identity $mainuser -Archive -ErrorAction SilentlyContinue
-
-# Retrives mailbox type and user connected with it. 
-Start-ManagedFolderAssistant -Identity $mainuser -ErrorAction Stop
+    $mailbox = Get-Mailbox -Identity $mainuser
+    if ($null -eq $mailbox.ArchiveName) {
+        Enable-Mailbox -Identity $mainuser -Archive
+        Start-ManagedFolderAssistant -Identity $mainuser
+        Write-Host "$mainuser has an archive mailbox enabled."
+    }
+    else {
+        Write-Host "$mainuser already has an archive mailbox."
+        Start-ManagedFolderAssistant -Identity $mainuser
+    }
+}
+Catch {
+    Write-Host "An error occurred: $_"
+}

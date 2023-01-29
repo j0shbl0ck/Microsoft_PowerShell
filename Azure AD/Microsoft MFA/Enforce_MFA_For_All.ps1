@@ -3,7 +3,7 @@
     This script enforces MFA for all users within the tenant
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.2
+    Version: 1.0.3
     Date: 03.29.22
     Type: Public
 .NOTES
@@ -16,9 +16,15 @@
 Connect-MsolService 
 
 # Make status to "Enforced"
-$st = New-Object -TypeName Microsoft.Online.Administration.StrongAuthenticationRequirement
-$st.RelyingParty = "*"
-$st.State = "Enabled" 
-$sta = @($st)
-Get-MsolUser -All | Foreach{ Set-MsolUser -UserPrincipalName $_.UserPrincipalName -StrongAuthenticationRequirements $sta}
+Try {
+    $st = New-Object -TypeName Microsoft.Online.Administration.StrongAuthenticationRequirement
+    $st.RelyingParty = "*"
+    $st.State = "Enabled" 
+    $sta = @($st)
+    Get-MsolUser -All | ForEach-Object{ Set-MsolUser -UserPrincipalName $_.UserPrincipalName -StrongAuthenticationRequirements $sta}
+    Write-Host -ForegroundColor Green "Strong authentication requirements set successfully for all users."
+}
+Catch {
+    Write-Host -ForegroundColor Red "An error occurred: $_"
+}
 

@@ -3,7 +3,7 @@
     This script installs the M365 and Azure Powershell Module Services.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.4.6
+    Version: 1.4.7
     Date: 01.12.22
     Type: Public
 .NOTES
@@ -14,12 +14,16 @@
 
 Clear-Host
 
-# require admin privileges
-if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Write-Warning "This script must be run as an administrator. Closing in 5 seconds..." 
-    Start-Sleep -Seconds 5
-    Break
+# Function to check for admin privileges
+Function Block-Admin {
+    if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+        Write-Warning "This script must be run as an administrator. Closing in 5 seconds..." 
+        Start-Sleep -Seconds 5
+        Break
+    }
 }
+
+Block-Admin;
 
 # Display intro to script
 function Write-Intro {

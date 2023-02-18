@@ -3,7 +3,7 @@
     This script is made set the password of an AzureAD user to never expire. 
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.8
+    Version: 1.0.9
     Date: 01.04.22
     Type: Public
 .NOTES
@@ -14,24 +14,44 @@
 
 Clear-Host
 
-# ======= VARIABLES ======= #
-# Enter Global Admin UPN and password
-Connect-AzureAD 
-$User_UPN = Read-Host -Prompt 'Input User (enduser@domain.com) to disable password expiration'
-# ======= VARIABLES ======= #
-
-Start-Sleep -s 5
-
-# This sets the password of one user to never expire
-Write-Host 'Disabling password expiration...' -ForegroundColor Yellow
-Set-AzureADUser -ObjectId $User_UPN -PasswordPolicies DisablePasswordExpiration
-
-#This shows a confirmation of whether the password is set to never expire
-Write-Host '======= User Password Policy  =======' -ForegroundColor Yellow
-Get-AzureADUser -ObjectId $User_UPN | Select-Object UserprincipalName,@{
-    N="PasswordNeverExpires";E={$_.PasswordPolicies -contains "DisablePasswordExpiration"}
+# Connect to Azure Active Directory and prompt for credentials
+try {
+    Connect-AzureAD -ErrorAction Stop
+} catch {
+    Write-Host "Error: $_" -ForegroundColor Red
+    Exit 1
 }
+
+# Select user to modify
+try {
+    $User_UPN = Read-Host -Prompt 'Input User (enduser@domain.com) to modify'
+    $user = Get-AzureADUser -ObjectId $User_UPN -ErrorAction Stop
+} catch {
+    Write-Host "Error: $_" -ForegroundColor Red
+    Exit 1
+}
+
+# Prompt for password policy option
+$policy = Read-Host -Prompt 'Set password policy (D = DisablePasswordExpiration, E = EnableExpiration)'
+
+# Set password policy
+try {
+    switch ($policy) {
+        'D' { Set-AzureADUser -ObjectId $User_UPN -PasswordPolicies DisablePasswordExpiration -ErrorAction Stop }
+        'E' { Set-AzureADUser -ObjectId $User_UPN -PasswordPolicies None -ErrorAction Stop }
+        default { throw 'Invalid option' }
+    }
+} catch {
+    Write-Host "Error: $_" -ForegroundColor Red
+    Exit 1
+}
+
+# Show confirmation of password policy
+Write-Host '======= User Password Policy  =======' -ForegroundColor Yellow
+$neverExpires = $user.PasswordPolicies -contains "DisablePasswordExpiration"
+Write-Host "User: $($user.UserPrincipalName)"
+Write-Host "PasswordNeverExpires: $neverExpires"
+
 Write-Host 'Complete!' -ForegroundColor Green
 Write-Host 'Script will close automatically in 10 seconds' -ForegroundColor Yellow
-
 Start-Sleep -s 10

@@ -25,10 +25,10 @@ Write-Host -ForegroundColor Yellow 'Please enter the path (no quotes around path
 do {
     $filePath = Read-Host
     $validatefile = Test-Path -Path $filePath
-    if ($validation -eq $False){
+    if (-not $validation){
         Write-Host -ForegroundColor Red 'File does not exist. Please try again.'
     }
-} until ($validatefile -eq $True)
+} until ($validatefile)
 
 # Import .CSV file
 Write-Host -ForegroundColor Yellow 'Importing .CSV file...'

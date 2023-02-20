@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 01.03.23
     Type: Public
-    Version: 1.0.7
+    Version: 1.0.8
 .LINK
     https://github.com/j0shbl0ck
     https://social.technet.microsoft.com/wiki/contents/articles/54249.365-add-members-in-distribution-list-using-powershell-and-csv-list-file.aspx
@@ -25,10 +25,10 @@ Write-Host -ForegroundColor Yellow 'Please enter the path (no quotes around path
 do {
     $filePath = Read-Host
     $validatefile = Test-Path -Path $filePath
-    if (-not $validation){
+    if ($validation -eq $False){
         Write-Host -ForegroundColor Red 'File does not exist. Please try again.'
     }
-} until ($validatefile)
+} until ($validatefile -eq $True)
 
 # Import .CSV file
 Write-Host -ForegroundColor Yellow 'Importing .CSV file...'

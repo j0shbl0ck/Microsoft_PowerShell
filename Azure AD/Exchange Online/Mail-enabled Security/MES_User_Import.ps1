@@ -19,6 +19,8 @@ $gadmin = Read-Host -Prompt 'Input Global/Exchange Admin UPN (globaladmin@domain
 # Connect to Exchange Online via Azure AD
 Connect-ExchangeOnline -UserPrincipalName $gadmin | Clear-Host
 
+https://adamtheautomator.com/powershell-check-if-file-exists/
+
 # Ask user for file path to .CSV
 Write-Host -ForegroundColor Yellow 'Please enter the path (no quotes around path) to the .CSV file:'
 # Check if file exists if not ask user to try again

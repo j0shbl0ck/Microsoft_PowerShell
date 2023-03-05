@@ -3,7 +3,7 @@
     This script installs the M365 and Azure Powershell Module Services.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.4.7
+    Version: 1.4.8
     Date: 01.12.22
     Type: Public
 .NOTES
@@ -53,12 +53,25 @@ if (-not(Get-InstalledModule -Name PowerShellGet -ErrorAction SilentlyContinue))
 # Installs Exchange Powershell Module
 Write-Host -ForegroundColor Yellow "Finding Exchange PowerShell Module..."
 $exo = "ExchangeOnlineManagement"
-if (-not(Get-InstalledModule -Name $exo -MinimumVersion 2.0.6 -ErrorAction SilentlyContinue)) {
-    Write-Host -ForegroundColor Red "${exo} Not Found. Installing ${exo}..."
-    Install-Module -Name ExchangeOnlineManagement -RequiredVersion 2.0.5 -Force -Confirm:$False
+# Check for the latest version of the module
+$latestVersion = (Find-Module -Name $exo -Repository PSGallery | Select-Object -First 1).Version
+# Check if the module is already installed
+$installedModule = Get-InstalledModule -Name $exo -ErrorAction SilentlyContinue
+if (!$installedModule) {
+    # If the module is not installed, install the latest version
+    Write-Host -ForegroundColor Red "${exo} not found. Installing latest version (${latestVersion})..."
+    Install-Module -Name $exo -RequiredVersion $latestVersion -Force -Confirm:$false
+    Write-Host -ForegroundColor Green "${exo} Installed!"
+} elseif ($installedModule.Version -lt $latestVersion) {
+    # If the installed module is an older version, uninstall and install the latest version
+    Write-Host -ForegroundColor Red "Uninstalling ${exo} version $($installedModule.Version)..."
+    Uninstall-Module -Name $exo -RequiredVersion $installedModule.Version -Force -Confirm:$false
+    Write-Host -ForegroundColor Red "Installing latest version (${latestVersion})..."
+    Install-Module -Name $exo -RequiredVersion $latestVersion -Force -Confirm:$false
     Write-Host -ForegroundColor Green "${exo} Installed!"
 } else {
-    Write-Host -ForegroundColor Green "${exo} Installed!"
+    # If the installed module is already up to date, inform the user
+    Write-Host -ForegroundColor Green "${exo} version $($installedModule.Version) already installed."
 }
 
 # Installs SharePoint Online Powershell Module

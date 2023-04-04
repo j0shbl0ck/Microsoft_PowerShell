@@ -1,0 +1,2 @@
+firstname,lastname,username,email,password,company,ou
+Brad,Basler,bbasler,bbasler@domain.com,Panda43@,Company Name Holder,"OU=CNH Users,DC=cnh,DC=local"

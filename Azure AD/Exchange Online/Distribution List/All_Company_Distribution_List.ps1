@@ -3,7 +3,7 @@
     This script gets every user excluding unlicensed, shared, and external then adds them to an all company list.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.1.6
+    Version: 1.1.7
     Date: 04.14.22
     Type: Public
 .EXAMPLE
@@ -54,12 +54,14 @@ if ($createUpdate -eq "create")
     Write-Host "Primary Smtp Address can be changed online if current domain name not desired." -ForegroundColor Yellow
 
     # Get all users excluding unlicensed and external
+    Write-Host "Getting users for all company distribution list..." -ForegroundColor Yellow
     $user = Get-MsolUser -All | 
         Where-Object {($_.UserPrincipalName -notlike "*EXT*") -and ($_.isLicensed -eq $true)} |
         Select-Object UserPrincipalName
 
 
     # For each user add to all company list.
+    Write-Host "Adding users to all company distribution list..." -ForegroundColor Yellow
     $user | ForEach-Object {
         Add-DistributionGroupMember -Identity "All Company" -Member $_.UserPrincipalName
     }

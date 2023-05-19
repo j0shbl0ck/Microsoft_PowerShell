@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-    This script gets every user excluding unlicensed and external then adds them to an all company list.
+    This script gets every user excluding unlicensed, shared, and external then adds them to an all company list.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.1.5
+    Version: 1.1.6
     Date: 04.14.22
     Type: Public
 .EXAMPLE
@@ -17,19 +17,29 @@
     https://medium.com/@writeabednego/bulk-create-and-add-members-to-distribution-lists-and-shared-mailboxes-using-powershell-89f5ef6e1362
 #>
 
-+++++THIS SCRIPT IS UNDER DEVELOPMENT+++++
-
-# Connect to Exchange Online via Azure AD with Global/Exchange admin.
-Write-Host -ForegroundColor Yellow 'Connecting to Exchange Online...'
-Connect-ExchangeOnline
-Write-Host -ForegroundColor Green 'Connected to Exchange Online.'
-Write-host ""
+# Connect to Exchange Online via Azure AD with Global/Exchange Admin Center credentials
+try {
+    Write-Host -ForegroundColor Yellow 'Connecting to Exchange Online...'
+    Connect-ExchangeOnline | Clear-Host
+    Write-Host -ForegroundColor Green 'Connected to Exchange Online.'
+    Write-Host ""
+}
+catch {
+    Write-Host "Failed to connect to Exchange Online. Ending script." -ForegroundColor Red
+    exit
+}
 
 # Connect to Microsoft Online
-Write-Host -ForegroundColor Yellow 'Connecting to Microsoft Online...'
-Connect-MsolService
-Write-Host -ForegroundColor Green 'Connected to Microsoft Online.'
-Write-host ""
+try {
+    Write-Host -ForegroundColor Yellow 'Connecting to Microsoft Online...'
+    Connect-MsolService | Clear-Host
+    Write-Host -ForegroundColor Green 'Connected to Microsoft Online.'
+    Write-Host ""
+}
+catch {
+    Write-Host "Failed to connect to Microsoft Online. Ending script." -ForegroundColor Red
+    exit
+}
 
 # Ask user if they want to create or update distribution list
 Write-Host "Would you like to create or update the all company distribution list? Enter 'create' or 'update' to continue:"
@@ -112,13 +122,10 @@ else
     Write-Host "Please enter 'create' or 'update' to continue." -ForegroundColor Red
 }
 
-# Pause script
-Pause
-
-# In purple, show script end
-Write-Host ""
-Write-Host "Script ended" -ForegroundColor Magenta
-Write-Host ""
 
 # Disconnect from Exchange Online
 Disconnect-ExchangeOnline -Confirm:$false
+
+# Display script end
+Write-Host "`nScript ended" -ForegroundColor Magenta
+$null = Read-Host

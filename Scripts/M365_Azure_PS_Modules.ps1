@@ -3,7 +3,7 @@
     This script installs the M365 and Azure Powershell Module Services.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.4.9
+    Version: 1.5.0
     Date: 01.12.22
     Type: Public
 .NOTES
@@ -39,41 +39,55 @@ Write-Host ""
 Write-Intro;
 
 # To be able to execute scripts, if not already performed
-Write-Host -ForegroundColor Yellow "Finding PowerShellGet Module..."
-
-$powerShellGetModule = Get-InstalledModule -Name PowerShellGet -ErrorAction SilentlyContinue 
-if (-not $powerShellGetModule) {
-    Write-Host -ForegroundColor Red "PowerShellGet Not Found. Installing PowerShellGet..."
-    Set-ExecutionPolicy RemoteSigned
-    Install-Module -Name PowerShellGet -Force -AllowClobber -Confirm:$False
-    Write-Host -ForegroundColor Green "PowerShellGet Installed!"
-} else {
-    Write-Host -ForegroundColor Green "PowerShellGet Installed!"
+function Install-PowerShellGetModule {
+    $moduleName = "PowerShellGet"
+    Write-Host -ForegroundColor Yellow "Finding PowerShellGet Module..."
+    $installedModule = Get-InstalledModule -Name $moduleName -ErrorAction SilentlyContinue
+    if (-not $installedModule) {
+        Write-Host -ForegroundColor Red "$moduleName not found. Installing $moduleName..."
+        Set-ExecutionPolicy RemoteSigned
+        Install-Module -Name $moduleName -Force -AllowClobber -Confirm:$False
+        Write-Host -ForegroundColor Green "$moduleName Installed!"
+    } else {
+        Write-Host -ForegroundColor Green "$moduleName Installed!"
+    }
 }
+
+Install-PowerShellGetModule;
 
 # Installs Exchange Powershell Module
-Write-Host -ForegroundColor Yellow "Finding Exchange PowerShell Module..."
-$exo = "ExchangeOnlineManagement"
-# Check for the latest version of the module
-$latestVersion = (Find-Module -Name $exo -Repository PSGallery | Select-Object -First 1).Version
-# Check if the module is already installed
-$installedModule = Get-InstalledModule -Name $exo -ErrorAction SilentlyContinue
-if (!$installedModule) {
-    # If the module is not installed, install the latest version
-    Write-Host -ForegroundColor Red "${exo} not found. Installing latest version (${latestVersion})..."
-    Install-Module -Name $exo -RequiredVersion $latestVersion -Force -Confirm:$false
-    Write-Host -ForegroundColor Green "${exo} Installed!"
-} elseif ($installedModule.Version -lt $latestVersion) {
-    # If the installed module is an older version, uninstall and install the latest version
-    Write-Host -ForegroundColor Red "Uninstalling ${exo} version $($installedModule.Version)..."
-    Uninstall-Module -Name $exo -RequiredVersion $installedModule.Version -Force -Confirm:$false
-    Write-Host -ForegroundColor Red "Installing latest version (${latestVersion})..."
-    Install-Module -Name $exo -RequiredVersion $latestVersion -Force -Confirm:$false
-    Write-Host -ForegroundColor Green "${exo} Installed!"
-} else {
-    # If the installed module is already up to date, inform the user
-    Write-Host -ForegroundColor Green "${exo} version $($installedModule.Version) already installed."
+function Install-ExchangeModule {
+    $exo = "ExchangeOnlineManagement"   
+    Write-Host -ForegroundColor Yellow "Finding Exchange PowerShell Module..."   
+    try {
+        # Check for the latest version of the module
+        $latestVersion = (Find-Module -Name $exo -Repository PSGallery | Select-Object -First 1).Version     
+        # Check if the module is already installed
+        $installedModule = Get-InstalledModule -Name $exo -ErrorAction SilentlyContinue
+        
+        if (-not $installedModule) {
+            # If the module is not installed, install the latest version
+            Write-Host -ForegroundColor Red "${exo} not found. Installing latest version (${latestVersion})..."
+            Install-Module -Name $exo -RequiredVersion $latestVersion -Force -Confirm:$false
+            Write-Host -ForegroundColor Green "${exo} Installed!"
+        } elseif ($installedModule.Version -lt $latestVersion) {
+            # If the installed module is an older version, uninstall and install the latest version
+            Write-Host -ForegroundColor Red "Uninstalling ${exo} version $($installedModule.Version)..."
+            Uninstall-Module -Name $exo -RequiredVersion $installedModule.Version -Force -Confirm:$false
+            Write-Host -ForegroundColor Red "Installing latest version (${latestVersion})..."
+            Install-Module -Name $exo -RequiredVersion $latestVersion -Force -Confirm:$false
+            Write-Host -ForegroundColor Green "${exo} Installed!"
+        } else {
+            # If the installed module is already up to date, inform the user
+            Write-Host -ForegroundColor Green "${exo} version $($installedModule.Version) already installed."
+        }
+    }
+    catch {
+        Write-Host -ForegroundColor Red "Error occurred during module installation: $($_.Exception.Message)"
+    }
 }
+
+Install-ExchangeModule;
 
 # Installs SharePoint Online Powershell Module
 Write-Host -ForegroundColor Yellow "Finding SharePoint Online PowerShell Module..."

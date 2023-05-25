@@ -3,7 +3,7 @@
     This script installs the M365 and Azure Powershell Module Services.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.5.0
+    Version: 1.5.1
     Date: 01.12.22
     Type: Public
 .NOTES
@@ -42,14 +42,18 @@ Write-Intro;
 function Install-PowerShellGetModule {
     $moduleName = "PowerShellGet"
     Write-Host -ForegroundColor Yellow "Finding PowerShellGet Module..."
-    $installedModule = Get-InstalledModule -Name $moduleName -ErrorAction SilentlyContinue
-    if (-not $installedModule) {
-        Write-Host -ForegroundColor Red "$moduleName not found. Installing $moduleName..."
-        Set-ExecutionPolicy RemoteSigned
-        Install-Module -Name $moduleName -Force -AllowClobber -Confirm:$False
-        Write-Host -ForegroundColor Green "$moduleName Installed!"
-    } else {
-        Write-Host -ForegroundColor Green "$moduleName Installed!"
+    try {
+        $installedModule = Get-InstalledModule -Name $moduleName -ErrorAction SilentlyContinue       
+        if (-not $installedModule) {
+            Write-Host -ForegroundColor Red "$moduleName not found. Installing $moduleName..."
+            Set-ExecutionPolicy RemoteSigned
+            Install-Module -Name $moduleName -Force -AllowClobber -Confirm:$False
+            Write-Host -ForegroundColor Green "$moduleName Installed!"
+        } else {
+            Write-Host -ForegroundColor Green "$moduleName Installed!"
+        }
+    } catch {
+        Write-Host -ForegroundColor Red "Error occurred during PowerShellGet module installation: $($_.Exception.Message)"
     }
 }
 
@@ -90,15 +94,23 @@ function Install-ExchangeModule {
 Install-ExchangeModule;
 
 # Installs SharePoint Online Powershell Module
-Write-Host -ForegroundColor Yellow "Finding SharePoint Online PowerShell Module..."
-$sop = "Microsoft.Online.SharePoint.PowerShell"
-if (-not(Get-InstalledModule -Name $sop -ErrorAction SilentlyContinue)) {
-    Write-Host -ForegroundColor Red "${sop} Not Found. Installing ${sop}..."
-    Install-Module -Name $sop -Force -Confirm:$False
-    Write-Host -ForegroundColor Green "${sop} Installed!"
-} else {
-    Write-Host -ForegroundColor Green "${sop} Installed!"
+function Install-SharePointOnlineModule {
+    $sop = "Microsoft.Online.SharePoint.PowerShell"
+    Write-Host -ForegroundColor Yellow "Finding SharePoint Online PowerShell Module..."
+    try {
+        if (-not (Get-InstalledModule -Name $sop -ErrorAction SilentlyContinue)) {
+            Write-Host -ForegroundColor Red "${sop} not found. Installing ${sop}..."
+            Install-Module -Name $sop -RequiredVersion "16.0.23612.12000" -Force -Confirm:$False
+            Write-Host -ForegroundColor Green "${sop} Installed!"
+        } else {
+            Write-Host -ForegroundColor Green "${sop} Installed!"
+        }
+    } catch {
+        Write-Host -ForegroundColor Red "Error occurred during SharePoint Online module installation: $($_.Exception.Message)"
+    }
 }
+
+Install-SharePointOnlineModule;
 
 # Install Teams PowerShell Module
 Write-Host -ForegroundColor Yellow "Finding Microsoft Teams Module..."

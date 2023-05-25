@@ -113,15 +113,23 @@ function Install-SharePointOnlineModule {
 Install-SharePointOnlineModule;
 
 # Install Teams PowerShell Module
-Write-Host -ForegroundColor Yellow "Finding Microsoft Teams Module..."
-$mst = "MicrosoftTeams"
-if (-not(Get-InstalledModule -Name $mst -ErrorAction SilentlyContinue)) {
-    Write-Host -ForegroundColor Red "${mst} Not Found. Installing ${mst}..."
-    Install-Module -Name $mst -Force -AllowClobber -Confirm:$False
-    Write-Host -ForegroundColor Green "${mst} Installed!"
-} else {
-    Write-Host -ForegroundColor Green "${mst} Installed!"
+function Install-MicrosoftTeamsModule {
+    $mst = "MicrosoftTeams"   
+    Write-Host -ForegroundColor Yellow "Finding Microsoft Teams Module..." 
+    try {
+        if (-not (Get-InstalledModule -Name $mst -ErrorAction SilentlyContinue)) {
+            Write-Host -ForegroundColor Red "${mst} not found. Installing ${mst}..."
+            Install-Module -Name $mst -Force -AllowClobber -Confirm:$False
+            Write-Host -ForegroundColor Green "${mst} Installed!"
+        } else {
+            Write-Host -ForegroundColor Green "${mst} Installed!"
+        }
+    } catch {
+        Write-Host -ForegroundColor Red "Error occurred during Microsoft Teams module installation: $($_.Exception.Message)"
+    }
 }
+
+Install-MicrosoftTeamsModule;
 
 <# # Install SharePoint PNP Powershell Module (Deprecated)
 Write-Host -ForegroundColor Yellow "Finding SharePoint PNP PowerShell Module..."
@@ -136,40 +144,48 @@ if (-not(Get-InstalledModule -Name $pnp -ErrorAction SilentlyContinue)) {
 } #>
 
 # Install PnP PowerShell Module
-Write-Host -ForegroundColor Yellow "Finding PnP PowerShell Module..."
-$pnpps = "PnP.PowerShell"
-$sppnp = "SharePointPnPPowerShellOnline"
-if (Get-InstalledModule -Name $sppnp -ErrorAction SilentlyContinue) {
-        Write-Warning "${sppnp} Found. Requires uninstall to install PnP PowerShell Module...`n"
-        while ($choice -ne 'y' -and $choice -ne 'n') 
-        {
-            $choice = Read-Host -Prompt "Do you want to uninstall SharePoint PnP Module? [y/n]"
-            if ($choice -eq 'y') {
-                Write-Host -ForegroundColor Red "Uninstalling SharePoint PnP Module..."
-                Uninstall-Module -Name $sppnp -AllVersions
-                Write-Host -ForegroundColor Green "${sppnp} Uninstalled!"
-                if (-not(Get-InstalledModule -Name $pnpps -ErrorAction SilentlyContinue)) {
-                    Write-Host -ForegroundColor Red "${pnpps} Not Found. Installing ${az}..."
-                    Install-Module -Name $pnpps -Force -AllowClobber -Confirm:$False
-                    Write-Host -ForegroundColor Green "${pnpps} Installed!"
-                } 
-            } elseif ($choice -eq 'n') {
-                Write-Host -ForegroundColor Red "Denied uninstall of SharePoint PnP Module. Continuing..."
-                break
+function Install-PnPPowerShellModule {
+    $pnpps = "PnP.PowerShell"
+    $sppnp = "SharePointPnPPowerShellOnline"
+    Write-Host -ForegroundColor Yellow "Finding PnP PowerShell Module..."
+    try {
+        if (Get-InstalledModule -Name $sppnp -ErrorAction SilentlyContinue) {
+            Write-Warning "${sppnp} Found. Requires uninstall to install PnP PowerShell Module...`n"
+            $choice = ''       
+            while ($choice -ne 'y' -and $choice -ne 'n') {
+                $choice = Read-Host -Prompt "Do you want to uninstall SharePoint PnP Module? [y/n]"              
+                if ($choice -eq 'y') {
+                    Write-Host -ForegroundColor Red "Uninstalling SharePoint PnP Module..."
+                    Uninstall-Module -Name $sppnp -AllVersions
+                    Write-Host -ForegroundColor Green "${sppnp} Uninstalled!"                   
+                    if (-not (Get-InstalledModule -Name $pnpps -ErrorAction SilentlyContinue)) {
+                        Write-Host -ForegroundColor Red "${pnpps} Not Found. Installing ${pnpps}..."
+                        Install-Module -Name $pnpps -Force -AllowClobber -Confirm:$False
+                        Write-Host -ForegroundColor Green "${pnpps} Installed!"
+                    } 
+                } elseif ($choice -eq 'n') {
+                    Write-Host -ForegroundColor Red "Denied uninstall of SharePoint PnP Module. Continuing..."
+                    break
+                } else {
+                    Write-Host -ForegroundColor Red "Invalid input. Please enter 'y' or 'n'"
+                }
+            }
+        } else {
+            if (-not (Get-InstalledModule -Name $pnpps -ErrorAction SilentlyContinue)) {
+                Write-Host -ForegroundColor Red "${pnpps} Not Found. Installing ${pnpps}..."
+                Install-Module -Name $pnpps -Force -AllowClobber -Confirm:$False
+                Write-Host -ForegroundColor Green "${pnpps} Installed!"
             } else {
-                Write-Host -ForegroundColor Red "Invalid input. Please enter 'y' or 'n'"
+                Write-Host -ForegroundColor Green "${pnpps} Installed!"
             }
         }
-} else {
-    $pnpps = "PnP.PowerShell"
-    if (-not(Get-InstalledModule -Name $pnpps -ErrorAction SilentlyContinue)) {
-        Write-Host -ForegroundColor Red "${pnpps} Not Found. Installing ${az}..."
-        Install-Module -Name $pnpps -Force -AllowClobber -Confirm:$False
-        Write-Host -ForegroundColor Green "${pnpps} Installed!"
-    } else {
-        Write-Host -ForegroundColor Green "${pnpps} Installed!"
+    } catch {
+        Write-Host -ForegroundColor Red "Error occurred during PnP PowerShell module installation: $($_.Exception.Message)"
     }
 }
+
+Install-PnPPowerShellModule;
+
 
 # Install AzureAD V1 Powershell Module
 Write-Host -ForegroundColor Yellow "Finding AzureAD V1 PowerShell Module..."

@@ -188,15 +188,22 @@ Install-PnPPowerShellModule;
 
 
 # Install AzureAD V1 Powershell Module
-Write-Host -ForegroundColor Yellow "Finding AzureAD V1 PowerShell Module..."
-$mso = "MSOnline"
-if (-not(Get-InstalledModule -Name $mso -ErrorAction SilentlyContinue)) {
-    Write-Host -ForegroundColor Red "${mso} Not Found. Installing ${mso}..."
-    Install-Module -Name $mso -Force -Confirm:$False
-    Write-Host -ForegroundColor Green "${mso} Installed!"
-} else {
-    Write-Host -ForegroundColor Green "${mso} Installed!"
+function Install-AzureADModule {
+    $mso = "MSOnline"   
+    Write-Host -ForegroundColor Yellow "Finding AzureAD V1 PowerShell Module..."
+    try {
+        if (-not (Get-InstalledModule -Name $mso -ErrorAction SilentlyContinue)) {
+            Write-Host -ForegroundColor Red "${mso} not found. Installing ${mso}..."
+            Install-Module -Name $mso -Force -Confirm:$False
+            Write-Host -ForegroundColor Green "${mso} Installed!"
+        } else {
+            Write-Host -ForegroundColor Green "${mso} Installed!"
+        }
+    } catch {
+        Write-Host -ForegroundColor Red "Error occurred during AzureAD module installation: $($_.Exception.Message)"
+    }
 }
+
 
 # Install AzureAD V2 PowerShell Module
 Write-Host -ForegroundColor Yellow "Finding AzureAD V2 PowerShell Module..."

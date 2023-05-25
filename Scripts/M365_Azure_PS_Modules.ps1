@@ -3,7 +3,7 @@
     This script installs the M365 and Azure Powershell Module Services.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.4.8
+    Version: 1.4.9
     Date: 01.12.22
     Type: Public
 .NOTES
@@ -40,7 +40,9 @@ Write-Intro;
 
 # To be able to execute scripts, if not already performed
 Write-Host -ForegroundColor Yellow "Finding PowerShellGet Module..."
-if (-not(Get-InstalledModule -Name PowerShellGet -ErrorAction SilentlyContinue)) {
+
+$powerShellGetModule = Get-InstalledModule -Name PowerShellGet -ErrorAction SilentlyContinue 
+if (-not $powerShellGetModule) {
     Write-Host -ForegroundColor Red "PowerShellGet Not Found. Installing PowerShellGet..."
     Set-ExecutionPolicy RemoteSigned
     Install-Module -Name PowerShellGet -Force -AllowClobber -Confirm:$False
@@ -48,7 +50,6 @@ if (-not(Get-InstalledModule -Name PowerShellGet -ErrorAction SilentlyContinue))
 } else {
     Write-Host -ForegroundColor Green "PowerShellGet Installed!"
 }
-
 
 # Installs Exchange Powershell Module
 Write-Host -ForegroundColor Yellow "Finding Exchange PowerShell Module..."

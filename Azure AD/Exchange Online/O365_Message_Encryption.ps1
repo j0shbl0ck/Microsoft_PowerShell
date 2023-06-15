@@ -30,10 +30,6 @@ Set-OMEConfiguration -Identity "OME Configuration" -Confirm:$false -DisclaimerTe
 
 Set-OMEConfiguration -Identity "OME Configuration" -Confirm:$false -EmailText "Encrypted messages sent by organization are secured by, Microsoft Purview Message Encryption" 
 
-Set-OMEConfiguration -Identity "OME Configuration" -Confirm:$false -PortalText "This portal is encrypted." 
-
-Set-OMEConfiguration -Identity "OME Configuration" -Confirm:$false -DisclaimerText "Encryption security disclaimer." 
-
 Set-OMEConfiguration -Identity "OME Configuration" -Confirm:$false -Image ([System.IO.File]::ReadAllBytes("C:\Users\JohnDoe\Untitled.png"))
 
 Set-OMEConfiguration -Identity "OME Configuration" -Confirm:$false -IntroductionText "has sent you a secure email."

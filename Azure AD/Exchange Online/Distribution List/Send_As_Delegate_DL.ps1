@@ -5,14 +5,12 @@
     Author: Josh Block
     Date: 07.10.23
     Type: Public
-    Version: 1.0.1
+    Version: 1.0.2
 .LINK
     https://github.com/j0shbl0ck
     https://forums.powershell.org/t/the-operation-couldnt-be-performed-because-user-matches-multiple-entries/16194
     https://woshub.com/sendas-send-onbehalf-permissions-exchange/
 #>
-
-Clear-Host
 
 # Connect to Exchange Online via Azure AD
 Connect-ExchangeOnline | Clear-Host
@@ -25,7 +23,13 @@ $GUID = Get-DistributionGroup -Identity $DL | Select-Object GUID
 $User = Read-Host -Prompt "Enter the User Email Address to add Send As permissions to the Distribution List"
 
 # Add the Send As permissions to the Distribution List
-Add-RecipientPermission -Identity $GUID -Trustee $User -AccessRights SendAs
+Try {
+    Add-RecipientPermission -Identity $GUID -Trustee $User -AccessRights SendAs
+    Write-Host "Send As permissions successfully added to the Distribution List."
+} Catch {
+    Write-Host "An error occurred while adding Send As permissions to the Distribution List."
+    Write-Host $Error[0].Exception.Message
+}
 
 # Verify the Send As permissions were added to the Distribution List
 Get-RecipientPermission -Identity $GUID

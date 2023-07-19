@@ -3,7 +3,7 @@
     This script exports users from a specified OU and then exports all groups with their members contained in the groups to a CSV file.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.1
+    Version: 1.0.0
     Date: 07.19.23
     Type: Public
 .NOTES
@@ -11,6 +11,8 @@
 .LINK
     
 #>
+
+$OU = "OU=Users,OU=Company,DC=domain,DC=com"
 
 # Import the Active Directory PowerShell module
 Import-Module ActiveDirectory

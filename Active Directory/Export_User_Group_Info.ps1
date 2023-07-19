@@ -1,12 +1,19 @@
+<#
+.SYNOPSIS
+    This script exports users from a specified OU and then exports all groups with their members contained in the groups to a CSV file.
+.DESCRIPTION
+    Author: j0shbl0ck https://github.com/j0shbl0ck
+    Version: 1.0.1
+    Date: 07.19.23
+    Type: Public
+.NOTES
+    You will need to have Active Directory PowerShell module [ Import-Module ActiveDirectory ]
+.LINK
+    
+#>
+
 # Import the Active Directory PowerShell module
 Import-Module ActiveDirectory
-
-$OU = "OU=CHD Staff,DC=CHD,DC=com"
-$Default_Title = $OU 
-
-$justName = $Default_Title.Split(',').Split('=')[-7]
-
-$justName
 
 # Get a list of all users in the OU
 $users = Get-ADUser -Filter * -SearchBase $OU -Properties displayname, SamAccountName, Enabled, PasswordLastSet | Select-Object displayname, SamAccountName, Enabled, PasswordLastSet 

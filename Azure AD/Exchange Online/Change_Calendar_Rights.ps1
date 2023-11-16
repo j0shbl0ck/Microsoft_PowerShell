@@ -18,29 +18,28 @@
 
 # Connect to Exchange Online via Azure AD with Global/Exchange admin.
 Import-Module ExchangeOnlineManagement
-Connect-ExchangeOnline
-Clear-Host
+Connect-ExchangeOnline | Clear-Host
 
 # ======= USER VARIABLES ======= #
-$mainuser = Read-Host -Prompt 'Input User (enduser@domain.com) to change calendar permissions of'
-$seconduser = Read-Host -Prompt 'Input user email (seconduser@domain.com) of who you are giving access rights to'
+$mainuser = Read-Host -Prompt 'Input user (enduser@domain.com) to change calendar permissions of'
+$seconduser = Read-Host -Prompt 'Input user email (seconduser@domain.com) you are granting calendar access rights to'
 
 # Displays Outlook calendar permission levels and access roles.
 function Write-Role {
 Write-Host -ForegroundColor Yellow "" 
 Write-Host -ForegroundColor Yellow "Outlook Calendar Permission Levels and Access Roles"
 Write-Host -ForegroundColor Yellow "======================================================="
-Write-Host -ForegroundColor Yellow "Owner — gives full control of the mailbox folder: read, create, modify, and delete all items and folders. Also, this role allows to manage item's permissions"
-Write-Host -ForegroundColor Yellow "PublishingEditor — read, create, modify, and delete items/subfolders (all permissions, except the right to change permissions)"
-Write-Host -ForegroundColor Yellow "Editor — read, create, modify, and delete items (can't create subfolders)"
-Write-Host -ForegroundColor Yellow "PublishingAuthor — create, read all items/subfolders. You can modify and delete only items you create."
-Write-Host -ForegroundColor Yellow "Author — create and read items. Edit and delete own items"
-Write-Host -ForegroundColor Yellow "NonEditingAuthor — full read access, and create items. You can delete only your own items"
-Write-Host -ForegroundColor Yellow "Reviewer — read folder items only"
-Write-Host -ForegroundColor Yellow "Contributor — create items and folders (can't read items)."
-Write-Host -ForegroundColor Yellow "AvailabilityOnly — read Free/Busy info from the calendar"
-Write-Host -ForegroundColor Yellow "LimitedDetails — view availability data with calendar item subject and location"
-Write-Host -ForegroundColor Yellow "None — no permissions to access folder and files."
+Write-Host -ForegroundColor Yellow "Owner — Gives full control of the mailbox folder: read, create, modify, and delete all items and folders. Also, this role allows to manage item's permissions"
+Write-Host -ForegroundColor Yellow "PublishingEditor — Read, create, modify, and delete items/subfolders (all permissions, except the right to change permissions)"
+Write-Host -ForegroundColor Yellow "Editor — Read, create, modify, and delete items (can't create subfolders)"
+Write-Host -ForegroundColor Yellow "PublishingAuthor — Create, read all items/subfolders. You can modify and delete only items you create."
+Write-Host -ForegroundColor Yellow "Author — Create and read items. Edit and delete own items"
+Write-Host -ForegroundColor Yellow "NonEditingAuthor — Full read access, and create items. You can delete only your own items"
+Write-Host -ForegroundColor Yellow "Reviewer — View all calendar event details."
+Write-Host -ForegroundColor Yellow "Contributor — Create items and folders (can't read items)."
+Write-Host -ForegroundColor Yellow "AvailabilityOnly — Read free/busy info from the calendar"
+Write-Host -ForegroundColor Yellow "LimitedDetails — View availability data with calendar item subject and location"
+Write-Host -ForegroundColor Yellow "None — No permissions to access calendar"
 Write-Host -ForegroundColor Yellow "======================================================="
 Write-Host -ForegroundColor Yellow ""
 }    

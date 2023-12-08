@@ -3,7 +3,7 @@
     This script allows you to change calendar permissions through Exchange Online PowerShell
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.0
+    Version: 1.0.1
     Date: 12.8.23
     Type: Public
 .EXAMPLE
@@ -23,13 +23,13 @@ Connect-ExchangeOnline | Clear-Host
 # ======= USER VARIABLES ======= #
 
 # Shared calendar email address
-$sharedcalendar = "caehs-events@lincolnu.edu"
+$sharedcalendar = "xxxx@domain.com"
 
 # Define calendar permission role
 $role = "PublishingAuthor"
 
 # Import CSV file containing user data
-$users = Import-Csv -Path "C:\Users\JoshBlock\Downloads\LUCAEHS_2023-12-8.csv" | Select-Object userPrincipalName, displayName
+$users = Import-Csv -Path "C:\Users\x\Downloads\x.csv" | Select-Object userPrincipalName, displayName
 
 # Loop through each user in the CSV file
 foreach ($user in $users) {

@@ -3,7 +3,7 @@
     This script gets every user excluding unlicensed, shared, and external then adds them to an all company list.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.1.7
+    Version: 1.1.8
     Date: 04.14.22
     Type: Public
 .EXAMPLE
@@ -16,6 +16,9 @@
     https://social.technet.microsoft.com/Forums/ie/en-US/a48b455e-0114-424f-8b0f-a8c0b88dfb0f/exchange-powershell-loop-through-all-usersmailboxes-and-run-an-exchange-command-on-the-mailbox?forum=winserverpowershell
     https://medium.com/@writeabednego/bulk-create-and-add-members-to-distribution-lists-and-shared-mailboxes-using-powershell-89f5ef6e1362
 #>
+
+
+Clear-Host
 
 # Connect to Exchange Online via Azure AD with Global/Exchange Admin Center credentials
 try {
@@ -32,7 +35,7 @@ catch {
 # Connect to Microsoft Online
 try {
     Write-Host -ForegroundColor Yellow 'Connecting to Microsoft Online...'
-    Connect-MsolService | Clear-Host
+    Connect-AzureAD | Clear-Host
     Write-Host -ForegroundColor Green 'Connected to Microsoft Online.'
     Write-Host ""
 }
@@ -55,7 +58,7 @@ if ($createUpdate -eq "create")
 
     # Get all users excluding unlicensed and external
     Write-Host "Getting users for all company distribution list..." -ForegroundColor Yellow
-    $user = Get-MsolUser -All | 
+    $user = Get-AzureADUser -All $true | 
         Where-Object {($_.UserPrincipalName -notlike "*EXT*") -and ($_.isLicensed -eq $true)} |
         Select-Object UserPrincipalName
 
@@ -63,7 +66,7 @@ if ($createUpdate -eq "create")
     # For each user add to all company list.
     Write-Host "Adding users to all company distribution list..." -ForegroundColor Yellow
     $user | ForEach-Object {
-        Add-DistributionGroupMember -Identity "All Company" -Member $_.UserPrincipalName
+        Add-DistributionGroupMember -Identity "All Company" -Member $user
     }
 
     Write-Host ""
@@ -84,7 +87,7 @@ if ($createUpdate -eq "create")
 elseif ($createUpdate -eq "update")
 {
     # Get all users excluding unlicensed and external
-    $goodusers = Get-MsolUser -All | 
+    $goodusers = Get-AzureADUser -All | 
         Where-Object {($_.UserPrincipalName -notlike "*EXT*") -and ($_.isLicensed -eq $true)} |
         Select-Object UserPrincipalName
 
@@ -95,7 +98,7 @@ elseif ($createUpdate -eq "update")
     }
 
     # For each bad user remove from all company list.
-    $badusers = Get-MsolUser -All | 
+    $badusers = Get-AzureADUser -All | 
         Where-Object {($_.UserPrincipalName -like "*EXT*") -and ($_.isLicensed -eq $false)} |
         Select-Object UserPrincipalName
         

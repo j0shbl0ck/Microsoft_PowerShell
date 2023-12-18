@@ -3,7 +3,7 @@
     This script gets every user excluding unlicensed, shared, and external then adds them to an all company list.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.1.8
+    Version: 1.1.9
     Date: 04.14.22
     Type: Public
 .EXAMPLE
@@ -51,82 +51,90 @@ $createUpdate = Read-Host
 # if user wants to create distribution list
 if ($createUpdate -eq "create")
 {
-    # Create all company distrubition list.
-    New-DistributionGroup -Name "All Company" -Type "Distribution" 
+    # Note: The following block creates the 'All Company' distribution list
+    # and adds eligible users to the list.
+
+    # Create all company distribution list.
+    $primarydomain = ((Get-AzureADTenantDetail).verifieddomains | Where-Object { $_._default -eq $true }).name
+    $PrimarySmtpAddress = "allcompany@$primarydomain"
     Write-Host ""
-    Write-Host "Primary Smtp Address can be changed online if current domain name not desired." -ForegroundColor Yellow
+    Write-Host "Primary Smtp Address can be changed online if the current domain name is not desired." -ForegroundColor Yellow
 
-    # Get all users excluding unlicensed and external
+    New-DistributionGroup -Name "All Company" -Alias "Allcmpny" -PrimarySmtpAddress $PrimarySmtpAddress -Type Distribution
+
+    # Get all users licensed and not external
     Write-Host "Getting users for all company distribution list..." -ForegroundColor Yellow
-    $user = Get-AzureADUser -All $true | 
-        Where-Object {($_.UserPrincipalName -notlike "*EXT*") -and ($_.isLicensed -eq $true)} |
-        Select-Object UserPrincipalName
+    $goodUsers = Get-AzureADUser -All:$true | Where-Object {
+        ($_.AssignedLicenses -ne $null) -and
+        ($_.UserPrincipalName -notlike "*#EXT#*") -and
+        ($_.UserPrincipalName -notlike "SPO_*") -and
+        ($_.UserPrincipalName -notlike "*_admin@*") -and
+        ($_.UserPrincipalName -notlike "*_onmicrosoft.com")
+    } | Select-Object UserPrincipalName, DisplayName
 
-
-    # For each user add to all company list.
+    # For each user, add to all company list.
     Write-Host "Adding users to all company distribution list..." -ForegroundColor Yellow
-    $user | ForEach-Object {
-        Add-DistributionGroupMember -Identity "All Company" -Member $user
+    $goodUsers | ForEach-Object {
+        Add-DistributionGroupMember -Identity "All Company" -Member $_.UserPrincipalName -Confirm:$false -ErrorAction SilentlyContinue
+        Write-Host "Added user: $($_.DisplayName)"
     }
 
-    Write-Host ""
-    Write-Host "All members of company list below:" -ForegroundColor Cyan
-
-    # Show members of all company list.
-    Get-DistributionGroupMember -Identity "All Company" | 
-        Select-Object DisplayName, PrimarySmtpAddress |
-        Sort-Object DisplayName, PrimarySmtpAddress |
-        Format-Table -AutoSize 
-
-    # In green, show success
+    # Indicate success
     Write-Host "Distribution group created successfully" -ForegroundColor Green
-
 }
 
 # if user wants to update distribution list
 elseif ($createUpdate -eq "update")
 {
-    # Get all users excluding unlicensed and external
-    $goodusers = Get-AzureADUser -All | 
-        Where-Object {($_.UserPrincipalName -notlike "*EXT*") -and ($_.isLicensed -eq $true)} |
-        Select-Object UserPrincipalName
+    # Get the current members of the all company distribution list
+    $currentMembers = Get-DistributionGroupMember -Identity "All Company"
 
-    # For each good user add to all company list.
-    foreach ($guser in $goodusers)
-    {
-        Add-DistributionGroupMember -Identity "All Company" -Member $guser.UserPrincipalName -Confirm:$false -ErrorAction SilentlyContinue
+    # Get all users licensed and external
+    $goodUsers = Get-AzureADUser -All:$true | Where-Object {
+        ($_.AssignedLicenses -ne $null) -and
+        ($_.UserPrincipalName -notlike "*#EXT#*") -and
+        ($_.UserPrincipalName -notlike "SPO_*") -and
+        ($_.UserPrincipalName -notlike "*_admin@*") -and
+        ($_.UserPrincipalName -notlike "*_onmicrosoft.com")
+    } | Select-Object UserPrincipalName, DisplayName
+
+    # Add good users to the all company list if they're not already a member
+    foreach ($gUser in $goodUsers) {
+        if ($currentMembers.PrimarySmtpAddress -notcontains $gUser.UserPrincipalName){
+            Add-DistributionGroupMember -Identity "All Company" -Member $gUser.UserPrincipalName -Confirm:$false -ErrorAction SilentlyContinue
+            Write-Host "Added user: $($gUser.DisplayName)"
+        }
+    }
+    
+    # Note: The following block removes bad users from the 'All Company' distribution list.
+
+    # Get all users licensed and external
+    $badUsers = Get-AzureADUser -All:$true | Where-Object {
+        ($_.AssignedLicenses -ne $null) -and
+        ($_.UserPrincipalName -like "*#EXT#*") -or  # Modified to include bad users
+        ($_.UserPrincipalName -like "SPO_*") -or
+        ($_.UserPrincipalName -like "*_admin@*") -or
+        ($_.UserPrincipalName -like "*_onmicrosoft.com")
+    } | Select-Object UserPrincipalName, DisplayName
+
+    # Remove bad users from the all company list if they're already a member
+    foreach ($bUser in $badUsers) {
+        if ($currentMembers.UserPrincipalName -contains $bUser.UserPrincipalName){
+            Remove-DistributionGroupMember -Identity "All Company" -Member $bUser.UserPrincipalName -Confirm:$false -ErrorAction SilentlyContinue
+            Write-Host "Removed user: $($bUser.DisplayName)"
+        }
     }
 
-    # For each bad user remove from all company list.
-    $badusers = Get-AzureADUser -All | 
-        Where-Object {($_.UserPrincipalName -like "*EXT*") -and ($_.isLicensed -eq $false)} |
-        Select-Object UserPrincipalName
-        
-    foreach ($buser in $badusers)
-    {
-        Remove-DistributionGroupMember -Identity "All Company" -Member $buser.UserPrincipalName -Confirm:$false -ErrorAction SilentlyContinue
-    }
-
-    Write-Host ""
-    Write-Host "All members of company list below:" -ForegroundColor Cyan
-
-    # Show members of all company list.
-    Get-DistributionGroupMember -Identity "All Company" | 
-        Select-Object DisplayName, PrimarySmtpAddress |
-        Sort-Object DisplayName, PrimarySmtpAddress |
-        Format-Table -AutoSize 
-
-    # In green, show success
+    # Indicate success
     Write-Host "Distribution group updated successfully" -ForegroundColor Green
-    Write-Host ""
 }
+
 
 # if user does not enter create or update
 else
 {
     Write-Host "Please enter 'create' or 'update' to continue." -ForegroundColor Red
 }
-
 
 # Disconnect from Exchange Online
 Disconnect-ExchangeOnline -Confirm:$false

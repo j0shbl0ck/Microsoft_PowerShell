@@ -56,9 +56,8 @@ if ($createUpdate -eq "create")
 
     # Create all company distribution list.
     $primarydomain = ((Get-AzureADTenantDetail).verifieddomains | Where-Object { $_._default -eq $true }).name
-    $PrimarySmtpAddress = "allcompany@$primarydomain"
+    $PrimarySmtpAddress = "allcompany@${primarydomain}"
     Write-Host ""
-    Write-Host "Primary Smtp Address can be changed online if the current domain name is not desired." -ForegroundColor Yellow
 
     New-DistributionGroup -Name "All Company" -Alias "Allcmpny" -PrimarySmtpAddress $PrimarySmtpAddress -Type Distribution
 

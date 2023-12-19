@@ -63,7 +63,7 @@ if ($createUpdate -eq "create")
 
     # Get all users licensed and not external
     Write-Host "Getting users for all company distribution list..." -ForegroundColor Yellow
-    $goodUsers = Get-AzureADUser -All:$true | Where-Object {
+    $allUsers = Get-AzureADUser -All:$true | Where-Object {
         ($_.AssignedLicenses -ne $null) -and
         ($_.UserPrincipalName -notlike "*#EXT#*") -and
         ($_.UserPrincipalName -notlike "SPO_*") -and
@@ -71,11 +71,13 @@ if ($createUpdate -eq "create")
         ($_.UserPrincipalName -notlike "*_onmicrosoft.com")
     } | Select-Object UserPrincipalName, DisplayName
 
+
     # For each user, add to all company list.
-    Write-Host "Adding users to all company distribution list..." -ForegroundColor Yellow
-    $goodUsers | ForEach-Object {
-        Add-DistributionGroupMember -Identity "All Company" -Member $_.UserPrincipalName -Confirm:$false -ErrorAction SilentlyContinue
-        Write-Host "Added user: $($_.DisplayName)"
+    # Add good users to the all company list if they're not already a member
+    foreach ($aUser in $allUsers) {
+            Add-DistributionGroupMember -Identity "All Company" -Member $aUser.UserPrincipalName -Confirm:$false -ErrorAction SilentlyContinue
+            Write-Host "Added user: $($aUser.DisplayName)"
+        }
     }
 
     # Indicate success

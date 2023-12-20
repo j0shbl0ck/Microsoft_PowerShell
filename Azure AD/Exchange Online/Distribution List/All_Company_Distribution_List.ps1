@@ -82,7 +82,6 @@ if ($createUpdate -eq "create")
 
     # Indicate success
     Write-Host "Distribution group created successfully" -ForegroundColor Green
-}
 
 # if user wants to update distribution list
 elseif ($createUpdate -eq "update")

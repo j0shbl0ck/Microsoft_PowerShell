@@ -3,7 +3,7 @@
     This script gets every user excluding unlicensed, shared, and external then adds them to an all company list.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.1.9
+    Version: 1.2.0
     Date: 04.14.22
     Type: Public
 .EXAMPLE
@@ -77,12 +77,11 @@ if ($createUpdate -eq "create")
     foreach ($aUser in $allUsers) {
             Add-DistributionGroupMember -Identity "All Company" -Member $aUser.UserPrincipalName -Confirm:$false -ErrorAction SilentlyContinue
             Write-Host "Added user: $($aUser.DisplayName)"
-        }
     }
 
     # Indicate success
     Write-Host "Distribution group created successfully" -ForegroundColor Green
-
+}
 # if user wants to update distribution list
 elseif ($createUpdate -eq "update")
 {

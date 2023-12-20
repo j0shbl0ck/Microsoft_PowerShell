@@ -3,7 +3,7 @@
     This script gets every user excluding unlicensed, shared, and external then adds them to an all company list.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.2.0
+    Version: 1.2.1
     Date: 04.14.22
     Type: Public
 .EXAMPLE
@@ -59,7 +59,7 @@ if ($createUpdate -eq "create")
     $PrimarySmtpAddress = "allcompany@${primarydomain}"
     Write-Host ""
 
-    New-DistributionGroup -Name "All Company" -Alias "Allcmpny" -PrimarySmtpAddress $PrimarySmtpAddress -Type Distribution
+    New-DistributionGroup -Name "All Company" -Alias "Allcmpny" -PrimarySmtpAddress $PrimarySmtpAddress -Type Distribution -RequireSenderAuthenticationEnabled $False
 
     # Get all users licensed and not external
     Write-Host "Getting users for all company distribution list..." -ForegroundColor Yellow

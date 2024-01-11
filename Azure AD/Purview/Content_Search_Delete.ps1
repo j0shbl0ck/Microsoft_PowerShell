@@ -3,7 +3,7 @@
     This script performs a content search, then using the search will purge emails from all mailboxes
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.0
+    Version: 1.0.1
     Date: 01.10.24
     Type: Public
 .EXAMPLE
@@ -13,9 +13,12 @@
     You will need to sign in twice for each Azure connection.
     After distribution list is created, check online for the distribution list name and possible primary email address change.
 .LINK
-    https://social.technet.microsoft.com/Forums/ie/en-US/a48b455e-0114-424f-8b0f-a8c0b88dfb0f/exchange-powershell-loop-through-all-usersmailboxes-and-run-an-exchange-command-on-the-mailbox?forum=winserverpowershell
-    https://medium.com/@writeabednego/bulk-create-and-add-members-to-distribution-lists-and-shared-mailboxes-using-powershell-89f5ef6e1362
+    https://www.reddit.com/r/sysadmin/comments/11xjb1z/psa_how_to_administratively_bulk_delete_email/
+    https://learn.microsoft.com/en-us/purview/ediscovery-search-for-and-delete-email-messages#step-2-create-a-content-search-to-find-the-message-to-delete
 #>
+
+
+# Ensure you have appropriate role permissions in Compliance portal.
 
 # Create menu that allows a user to create the content search, then also start a search action, then lastly check on a search action.
 

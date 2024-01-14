@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 08.20.22
     Type: Public
-    Version: 1.0.0
+    Version: 1.0.1
 .LINK
     https://github.com/j0shbl0ck
     https://docs.microsoft.com/en-us/azure/information-protection/activate-service#how-to-activate-or-confirm-the-status-of-the-protection-service
@@ -15,10 +15,10 @@
 Clear-Host
 
 # Connect to Azure Information Protection Service
-Connect-AipService
+Connect-AipService | Clear-Host
 
 # Connect to Exchange Online
-Connect-ExchangeOnline
+Connect-ExchangeOnline | Clear-Host
 
 # Activate Rights Management protection service
 Enable-AipService
@@ -36,4 +36,4 @@ Set-OMEConfiguration -Identity "OME Configuration" -Confirm:$false -Introduction
 
 Set-OMEConfiguration -Identity "OME Configuration" -Confirm:$false -ReadButtonText "View this message"
 
-Set-OMEConfiguration -Identity "OME Configuration" -Confirm:$false -PortalText "Organization Message Portal"
+Set-OMEConfiguration -Identity "OME Configuration" -Confirm:$false -PortalText "<Organization> Message Portal"

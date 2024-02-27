@@ -53,6 +53,8 @@ Write-host ""
 
 Gonna have to use Microsoft Graph.
 
+Import-CSV blabla.csv | % { Update-MgUser -UserId $_.UserPrincipalName -Department $_.Department }
+
 Set-AzureADUser -ObjectId email -PhysicalDeliveryOfficeName Bernard -EmployeeType "PRN" -Confirm:$false
 
 

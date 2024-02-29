@@ -47,7 +47,7 @@ foreach ($user in $users) {
     $officeLocation = $user.officeLocation
     $employeeType = $user.employmentType
 
-    # Check if the user exists
+    <# Check if the user exists
     $existingUser = Get-MgUser -UserId $userPrincipalName -ErrorAction SilentlyContinue
 
     if ($existingUser) {
@@ -57,11 +57,12 @@ foreach ($user in $users) {
             Write-Host "User '$userPrincipalName' already has office location to '$officeLocation' and employee type to '$employeeType' ." -ForegroundColor Yellow
         }
         else {
+    #>        
             # Update the job title
             Update-MgUser -UserId $userPrincipalName -officeLocation $officeLocation -employeeType $employeeType
             Write-Host "User '$userPrincipalName' updated office location to '$officeLocation' and employee type to '$employeeType' successfully." -ForegroundColor Green
         }
-    }
+    #}
     else {
         # User not found
         Write-Host "User '$userPrincipalName' not found." -ForegroundColor Red

@@ -61,7 +61,7 @@ foreach ($user in $users) {
             # Update the job title
             Update-MgUser -UserId $userPrincipalName -officeLocation $officeLocation -employeeType $employeeType
             Write-Host "User '$userPrincipalName' updated office location to '$officeLocation' and employee type to '$employeeType' successfully." -ForegroundColor Green
-        }
+        #}
     #}
     else {
         # User not found

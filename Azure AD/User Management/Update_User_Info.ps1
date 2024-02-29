@@ -1,11 +1,14 @@
 <#
 .SYNOPSIS
-    This creates imports contacts via CSV.
-.NOTES
+    This imports user extension information into already created users in Entra Id.
+.DESCRIPTION
     Author: Josh Block
-    Date: 08.18.22
+    Date: 02.28.24
     Type: Public
-    Version: 1.0.7
+    Version: 1.0.8
+.NOTES
+    You will need PowerShell 7 to run MgGraph and Update-MgUser
+    You will need Microsoft Graph module installed and most up to date.
 .LINK
     https://github.com/j0shbl0ck
     https://m365scripts.com/exchange-online/bulk-import-contacts-office-365-powershell/#:~:text=Multiple%20contacts%20can%20be%20added,file%20with%20the%20contact%20info.
@@ -22,6 +25,7 @@ Write-host ""
 
 # Ask user for file path to .CSV
 Write-Host -ForegroundColor Cyan 'Please enter the path (no quotes around path) to the .CSV file:'
+Write-Host ""
 # Check if file exists if not ask user to try again
 do {
     $filePath = Read-Host
@@ -43,16 +47,14 @@ foreach ($user in $users) {
     $officeLocation = $user.officeLocation
     $employeeType = $user.employmentType
 
-
-
     # Check if the user exists
-    $existingUser = Get-MgBetaUser -UserId $userPrincipalName -ErrorAction SilentlyContinue
+    $existingUser = Get-MgUser -UserId $userPrincipalName -ErrorAction SilentlyContinue
 
     if ($existingUser) {
         # Check if the existing job title matches the new value
-        if ($existingUser.JobTitle -eq $officeLocation) {
+        if ($existingUser.officeLocation -eq $officeLocation && $existingUser.employmentType -eq $employeeType) {
             # Job title already set with the same value
-            Write-Host "User '$userPrincipalName' already has office location to '$officeLocation' and employee type to '$employeeType' ." -ForegroundColor Cyan
+            Write-Host "User '$userPrincipalName' already has office location to '$officeLocation' and employee type to '$employeeType' ." -ForegroundColor Yellow
         }
         else {
             # Update the job title
@@ -65,5 +67,3 @@ foreach ($user in $users) {
         Write-Host "User '$userPrincipalName' not found." -ForegroundColor Red
     }
 }
-
-#Import-CSV blabla.csv | % { Update-MgUser -UserId $_.UserPrincipalName -Department $_.Department }

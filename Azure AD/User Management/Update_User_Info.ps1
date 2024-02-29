@@ -63,8 +63,9 @@ foreach ($user in $users) {
             Write-Host "User '$userPrincipalName' updated office location to '$officeLocation' and employee type to '$employeeType' successfully." -ForegroundColor Green
         #}
     #}
-    else {
+    <#else {
         # User not found
         Write-Host "User '$userPrincipalName' not found." -ForegroundColor Red
     }
+    #>
 }

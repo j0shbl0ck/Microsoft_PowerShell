@@ -22,8 +22,8 @@
 
 # Create menu that allows a user to create the content search, then also start a search action, then lastly check on a search action.
 
+Connect-ExchangeOnline
 Connect-IPPSSession
-
 $name = 'ICONS Suppport Spam 04'
 $subject = "Please review for possible solutions to your support request"
 $searchsubject = '(From:' + $subject + ')'
@@ -33,13 +33,8 @@ $contentmatch = $searchsubject
 $search=New-ComplianceSearch -Name "ICONS Suppport Spam 05" -ExchangeLocation All -ContentMatchQuery '(Subject:ICONS)'
 Start-ComplianceSearch -Identity $Search.Identity
 New-ComplianceSearchAction -SearchName $name -Purge -PurgeType HardDelete -Confirm:$false -Force
+Get-ComplianceSearchAction -Identity '${name}_purge'
 
-
-Support@firstcolumn.com
-
-Please review for possible solutions to your support request
-
-ICONS
 
 
 Get-ComplianceSearchAction -identity “ICONS Suppport Spam 02_purge”

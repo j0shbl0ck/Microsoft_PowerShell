@@ -13,19 +13,32 @@ Function Block-Script {
 #Connect-MgGraph -Scopes "User.ReadWrite.All"
 
 # Pull all users within tenant
-$entrausers = Get-Mguser -ConsistencyLevel:eventual -Count:userCount -Filter "endsWith(UserPrincipalName, '@allstate75.com')" | Select DisplayName,UserPrincipalName,Id,OnPremisesImmutableId
+$entrausers = Get-Mguser -ConsistencyLevel:eventual -Count:userCount -Filter "endsWith(UserPrincipalName, '@company75.com')" | Select DisplayName,UserPrincipalName,Id,OnPremisesImmutableId
 
 GET /contacts?$filter=emailAddresses/any(a:a/address eq 'someone@somplace.com')
 DELETE /contacts/{id}
 
+https://learn.microsoft.com/en-us/graph/api/resources/contact?view=graph-rest-1.0
+https://learn.microsoft.com/en-us/graph/api/resources/contactfolder?view=graph-rest-1.0
 
 another user has shared a contact folder with that user, or, has given delegated access to that user
+
+
+This morning, before diving into scripting, I checked Microsoft's servers to see what categories/folders were associated with your contacts.  Interestingly, the servers only reflected "company Employees Copy" and "company Contacts Copy," which is exactly what you see in Legacy Outlook. This suggests a bug in the new Outlook that prevents it from modifying category information and contact changes after the initial sync to reflect the same.
+
+My initial plan was to identify and remove all other categories from contacts, but since they're not even visible, we're at a dead end. 
+
+https://graph.microsoft.com/v1.0/users/user@test.com/contactFolders/"{contactFolders id}="/contacts?$filter=emailAddresses/any(a:a/address eq 'user@test.com')
+
+
+
+https://graph.microsoft.com/v1.0/users/user@test.com/contactFolders/"{contactFolders id}"/contacts?$filter=categories/any(c:c eq 'Company Contacts Copy')
 
 # Get the UPN of the user
 $getuserId = Write-Host "Enter User Principal Name"
 
 # Insert $getuserId to get UPN variable
-$userId = Get-Mguser -ConsistencyLevel:eventual -Count:userCount -Filter "endsWith(UserPrincipalName, '@allstate75.com')" | Select UserPrincipalName,
+$userId = Get-Mguser -ConsistencyLevel:eventual -Count:userCount -Filter "endsWith(UserPrincipalName, '@test.com')" | Select UserPrincipalName,
 
 # Collect array of contacts from user
 $contacts = Get-MgUserContact -UserId $userId < if pulling from the user mailbox

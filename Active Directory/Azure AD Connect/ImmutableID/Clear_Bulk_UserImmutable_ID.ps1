@@ -24,7 +24,7 @@ Function Block-Script {
 #Connect-MgGraph -Scopes "User.ReadWrite.All"
 
 # Pull all users within tenant
-$entrausers = Get-Mguser -ConsistencyLevel:eventual -Count:userCount -Filter "endsWith(UserPrincipalName, '@allstate75.com')" | Select DisplayName,UserPrincipalName,Id,OnPremisesImmutableId
+$entrausers = Get-Mguser -ConsistencyLevel:eventual -Count:userCount -Filter "endsWith(UserPrincipalName, '@company.com')" | Select DisplayName,UserPrincipalName,Id,OnPremisesImmutableId
 
 
 ForEach ($entrauser in $entrausers){

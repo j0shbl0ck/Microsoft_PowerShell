@@ -3,13 +3,13 @@
     This adds a specified domain or email address to a user's safe sender list. 
 .NOTES
     Author: Josh Block
-    Date: 01.17.23
+    Date: 06.12.24
     Type: Public
     Version: 1.0.0
 .LINK
     https://github.com/j0shbl0ck
-    https://learn.microsoft.com/en-us/powershell/module/exchange/set-mailboxjunkemailconfiguration?view=exchange-ps
-    https://o365info.com/manage-safe-senders-block-sender-lists-using-powershell-office-365/
+    https://o365reports.com/2022/07/13/get-shared-mailbox-in-office-365-using-powershell/
+    https://learn.microsoft.com/en-us/microsoft-365/enterprise/block-user-accounts-with-microsoft-365-powershell?view=o365-worldwide
 #>
 
 
@@ -50,21 +50,18 @@ Function Connect_Msg {
     }
 }
 
-
 Connect_Msg
 Connect_Exo
 
 # Get all shared mailboxes in Exchange Online
 Get-Mailbox -ResultSize Unlimited -RecipientTypeDetails SharedMailbox | foreach {
     $userAccount=$_.UserPrincipalName
-    $PrimarySMTPAddress=$_.PrimarySMTPAddress
-    $Name=$_.Name
+    Write-Host "Blocking sign-in capabilities for shared mailbox: $userAccount"
     # Block all shared mailbox sign-in capabilities
     $params = @{
 	    accountEnabled = $false
     }
     Update-MgUser -UserId $userAccount -BodyParameter $params
-
 }
 
 

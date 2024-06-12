@@ -38,7 +38,7 @@ Function Connect_Msg {
         Write-Host -ForegroundColor Yellow 'Connecting to Microsoft Graph...'
 
         # Connecto Microsoft Graph
-        Connect-Graph -Scopes User.ReadWrite.All | Clear Host
+        Connect-Graph -Scopes User.ReadWrite.All | Clear-Host
 
         Write-Host -ForegroundColor Green 'Connected to Microsoft Graph'
         Write-Host ""
@@ -54,12 +54,12 @@ Connect_Msg
 Connect_Exo
 
 # Get all shared mailboxes in Exchange Online
-Get-Mailbox -ResultSize Unlimited -RecipientTypeDetails SharedMailbox | foreach {
+Get-Mailbox -ResultSize Unlimited -RecipientTypeDetails SharedMailbox | ForEach-Object {
     $userAccount=$_.UserPrincipalName
     Write-Host "Blocking sign-in capabilities for shared mailbox: $userAccount"
     # Block all shared mailbox sign-in capabilities
     $params = @{
-	    accountEnabled = $false
+        accountEnabled = $false
     }
     Update-MgUser -UserId $userAccount -BodyParameter $params
 }

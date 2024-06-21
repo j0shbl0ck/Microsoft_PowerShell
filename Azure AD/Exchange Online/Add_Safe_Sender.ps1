@@ -42,7 +42,7 @@ $addMore = Read-Host -Prompt 'Do you want to add another item? (Y/N)'
 # Check if user wants to add more items
 while ($addMore -eq 'Y') {
     $additionalItem = Read-Host -Prompt 'Enter another domain or email address'
-    "$addition01 += ",$additionalItem"
+    $addition01 += ",$additionalItem"
     $addMore = Read-Host -Prompt 'Do you want to add another item? (Y/N)'
 }
 

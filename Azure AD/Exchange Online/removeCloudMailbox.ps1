@@ -47,10 +47,10 @@ $progressMax = $csv.Count
 # Loop through each row in the CSV and remove the cloud mailbox
 foreach ($row in $csv) {
     $progress++
-    Write-Progress -Activity "Removing cloud mailbox for $displayName ($email) $progress of $progressMax" -PercentComplete ($progress / $progressMax * 100)
+    Write-Progress -Activity "Removing cloud mailboxes" -Status "Processing  $progress of $progressMax" -PercentComplete ($progress / $progressMax * 100)
     
     $displayName = $row.DisplayName
-    $email = $row.Mail
+    $email = $row.EmailAddress
 
     # Remove the cloud mailbox
     Set-User $email -PermanentlyClearPreviousMailboxInfo -Confirm:$false 

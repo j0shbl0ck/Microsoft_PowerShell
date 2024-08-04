@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 06.12.24
     Type: Public
-    Version: 1.0.0
+    Version: 1.0.1
 .LINK
     https://github.com/j0shbl0ck
     https://o365reports.com/2022/07/13/get-shared-mailbox-in-office-365-using-powershell/
@@ -32,17 +32,64 @@ Function Connect_Exo{
     }   
 }
 
+function Select-File {
+
+    [CmdletBinding()]
+
+    param(
+        [Parameter(ParameterSetName="Single")]
+        [Parameter(ParameterSetName="Multi")]
+        [Parameter(ParameterSetName="Save")]
+        [string]$StartingFolder = [environment]::getfolderpath("mydocuments"),
+
+        [Parameter(ParameterSetName="Single")]
+        [Parameter(ParameterSetName="Multi")]
+        [Parameter(ParameterSetName="Save")]
+        [string]$NameFilter = "All Files (*.*)|*.*",
+
+        [Parameter(ParameterSetName="Single")]
+        [Parameter(ParameterSetName="Multi")]
+        [Parameter(ParameterSetName="Save")]
+        [switch]$AllowAnyExtension,
+
+        [Parameter(Mandatory=$true,ParameterSetName="Save")]
+        [switch]$Save,
+
+        [Parameter(Mandatory=$true,ParameterSetName="Multi")]
+        [Alias("Multi")]
+        [switch]$AllowMulti
+    )
+
+    if ($Save) {
+        $Dialog = New-Object -TypeName System.Windows.Forms.SaveFileDialog
+    } else {
+        $Dialog = New-Object -TypeName System.Windows.Forms.OpenFileDialog
+        if ($AllowMulti) {
+            $Dialog.Multiselect = $true
+        }
+    }
+    if ($AllowAnyExtension) {
+        $NameFilter = $NameFilter + "|All Files (*.*)|*.*"
+    }
+    $Dialog.Filter = $NameFilter
+    $Dialog.InitialDirectory = $StartingFolder
+    [void]($Dialog.ShowDialog())
+    $Dialog.FileNames
+}
+
 Connect_Exo
 
-# Import CSV
-$csvPath = Read-Host "Enter the path to the CSV file, remove quotes."
-$csv = Import-Csv $csvPath
+# Select the CSV File
+Write-Host -ForegroundColor Yellow "Selecting the CSV file..."
+$FileName = Select-File -StartingFolder "C:\Users\%username%\Documents" -NameFilter "CSV Files (*.CSV)|*.CSV"
+Write-Host -ForegroundColor Green "Selected the CSV file: $FileName"
+Write-Host -ForegroundColor Yellow "Importing the CSV file..."
+$csv = Import-Csv $FileName
 
 # CSV Headers is DisplayName and Email
 # Create a progession bar
 $progress = 0
 $progressMax = $csv.Count
-#$PercentComplete = ($progress / $progressMax * 100)
 
 # Loop through each row in the CSV and remove the cloud mailbox
 foreach ($row in $csv) {

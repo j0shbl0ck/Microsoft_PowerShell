@@ -3,7 +3,7 @@
     This script allows you to change calendar permissions through Exchange Online PowerShell
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.1
+    Version: 1.0.2
     Date: 12.8.23
     Type: Public
 .EXAMPLE
@@ -37,10 +37,10 @@ foreach ($user in $users) {
   Write-Host -ForegroundColor Cyan "Allowing $mainuser the role of $role to $sharedcalendar calendar..."
 
   try {
-      Set-MailboxFolderPermission -Identity $sharedcalendar:\calendar -user $mainuser -AccessRights $role -ErrorAction Stop
+      Set-MailboxFolderPermission -Identity ${sharedcalendar}:\calendar -user $mainuser -AccessRights $role -ErrorAction Stop
       Write-Host -ForegroundColor Green "Successfully granted access to $mainuser."
   } catch {
-      Add-MailboxFolderPermission -Identity $sharedcalendar:\calendar -user $mainuser -AccessRights $role -ErrorAction Stop
+      Add-MailboxFolderPermission -Identity ${sharedcalendar}:\calendar -user $mainuser -AccessRights $role -ErrorAction Stop
       Write-Host -ForegroundColor Green "User $mainuser added successfully."
   }
 
@@ -49,7 +49,7 @@ foreach ($user in $users) {
 
 # Show calendar permissions for all users
 Write-Host -ForegroundColor Yellow "======= Calendar Rights Users Have to Shared Mailbox ======="
-Get-EXOMailboxFolderPermission -Identity $sharedcalendar:\calendar
+Get-EXOMailboxFolderPermission -Identity ${sharedcalendar}:\calendar
 
 # Disconnect from Exchange Online
 Disconnect-ExchangeOnline -Confirm:$false

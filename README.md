@@ -6,4 +6,4 @@
 | `Active Directory` | Contains scripts in reference to managing and editing user attritbutes and AAD Connect  |
 | `Azure AD` | Contains scripts for Exchange and SharePoint online, plus user management and security |
 | `Scripts` | Contains scripts for installing M365 PowerShell modules |
-| `System` | Contains scripts for handling system security and management |
+| `System` | Contains scripts for handling system security and RMM management |

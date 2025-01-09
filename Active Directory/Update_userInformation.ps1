@@ -5,10 +5,12 @@
     Author: Josh Block
     Date: 01.09.25
     Type: Public
-    Version: 1.0.4
+    Version: 1.0.5
 .LINK
     https://github.com/j0shbl0ck
 #>
+
+if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) { Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs; exit }
 
 Import-Module ActiveDirectory
 
@@ -52,6 +54,6 @@ foreach ($user in $users) {
     $findManager = Get-ADUser -Filter { displayName -like "*$Mananger*" }
     $office = $user."Location"
 
-    Get-ADUser  -filter * -SearchBase "OU=Chariton Valley Staff,DC=corp,DC=cvalley,DC=net" | Set-ADUser -OfficePhone $workPhone -MobilePhone $mobilePhone -Department $department -Title $jobTitle -Manager $findManager -Office $office -ErrorAction Ignore
+    Get-ADUser -Filter {emailaddress -like $userPrincipalName} | Set-ADUser -OfficePhone $workPhone -MobilePhone $mobilePhone -Department $department -Title $jobTitle -Manager $findManager -Office $office -ErrorAction Ignore
     Write-Host "Updated $userPrincipalName work phone: $workPhone, mobile phone: $mobilePhone, department: $department, job title: $jobTitle, manager: $Manager, office: $office`n" -ForegroundColor Green
 }

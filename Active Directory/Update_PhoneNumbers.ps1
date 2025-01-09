@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 01.09.25
     Type: Public
-    Version: 1.0.1
+    Version: 1.0.2
 .LINK
     https://github.com/j0shbl0ck
 #>
@@ -52,5 +52,5 @@ foreach ($user in $users) {
     $office = $user."Location"
 
     Get-ADUser -Filter {emailaddress -like $userPrincipalName} | Set-ADUser -OfficePhone $workPhone -MobilePhone $mobilePhone -Department $department -Title $jobTitle -Manager $Manager -Office $office -ErrorAction Ignore
-    Write-Host "Updated $userPrincipalName work phone: $("`e[33m" + $workPhone + "`e[0m"), mobile phone: $("`e[33m" + $mobilePhone + "`e[0m"), department: $("`e[33m" + $department + "`e[0m"), job title: $("`e[33m" + $jobTitle + "`e[0m"), manager: $("`e[33m" + $Manager + "`e[0m"), office: $("`e[33m" + $office + "`e[0m")" -ForegroundColor Green -ForegroundColor Green
+    Write-Host "Updated $userPrincipalName work phone: $workPhone, mobile phone: $mobilePhone, department: $department, job title: $jobTitle, manager: $Manager, office: $office`n" -ForegroundColor Green
 }

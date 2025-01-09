@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 01.09.25
     Type: Public
-    Version: 1.0.2
+    Version: 1.0.3
 .LINK
     https://github.com/j0shbl0ck
 #>
@@ -49,8 +49,9 @@ foreach ($user in $users) {
     $department = $user."Department"
     $jobTitle = $user."Job Title"
     $Manager = $user."Reporting to"
+    $findManager = Get-ADUser -Filter { displayName -like "*$Mananger*" }
     $office = $user."Location"
 
-    Get-ADUser -Filter {emailaddress -like $userPrincipalName} | Set-ADUser -OfficePhone $workPhone -MobilePhone $mobilePhone -Department $department -Title $jobTitle -Manager $Manager -Office $office -ErrorAction Ignore
+    Get-ADUser  -filter * -SearchBase "OU=Chariton Valley Staff,DC=corp,DC=cvalley,DC=net" | Set-ADUser -OfficePhone $workPhone -MobilePhone $mobilePhone -Department $department -Title $jobTitle -Manager $findManager -Office $office
     Write-Host "Updated $userPrincipalName work phone: $workPhone, mobile phone: $mobilePhone, department: $department, job title: $jobTitle, manager: $Manager, office: $office`n" -ForegroundColor Green
 }

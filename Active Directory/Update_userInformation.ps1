@@ -1,11 +1,11 @@
 <#
 .SYNOPSIS
-    This takes a CSV using the headers "Work Email","Work Phone", and "Mobile Phone" to update respective attributes in AD.
+    This takes a CSV using the headers "Work Email","Work Phone", "Manager, and "Mobile Phone" to update respective attributes in AD.
 .NOTES
     Author: Josh Block
     Date: 01.09.25
     Type: Public
-    Version: 1.0.6
+    Version: 1.0.7
 .LINK
     https://github.com/j0shbl0ck
 #>
@@ -60,9 +60,9 @@ foreach ($user in $users) {
         }
 
         $findManager = if ($Manager) { 
-            Get-ADUser -Filter { displayName -like "*$Manager*" } -Properties DistinguishedName | Select-Object -ExpandProperty DistinguishedName 
+            Get-ADUser -Filter { displayName -like ${Manager} } -Properties * | Select-Object -ExpandProperty DistinguishedName 
         } else { 
-            $null 
+            $null
         }
 
         $params = @{}

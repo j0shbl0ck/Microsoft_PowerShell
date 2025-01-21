@@ -1,11 +1,11 @@
 <#
 .SYNOPSIS
-    This takes a CSV using the headers "Work Email","Work Phone", "Manager, and "Mobile Phone" to update respective attributes in AD.
+    This takes a CSV using the headers "Work Email","Work Phone", "Manager", and "Mobile Phone" to update respective attributes in AD.
 .NOTES
     Author: Josh Block
     Date: 01.09.25
     Type: Public
-    Version: 1.0.7
+    Version: 1.0.8
 .LINK
     https://github.com/j0shbl0ck
 #>
@@ -65,7 +65,7 @@ foreach ($user in $users) {
             $null
         }
 
-        $params = @{}
+        $params = @{ }
         if ($workPhone) { $params['OfficePhone'] = $workPhone }
         if ($mobilePhone) { $params['MobilePhone'] = $mobilePhone }
         if ($department) { $params['Department'] = $department }
@@ -79,3 +79,11 @@ foreach ($user in $users) {
         Write-Host "Failed to update user: $userPrincipalName. Error: $_" -ForegroundColor Red
     }
 }
+
+# Display countdown before closing
+Write-Host "Script completed. The window will close automatically in 30 seconds..." -ForegroundColor Cyan
+for ($i = 30; $i -ge 1; $i--) {
+    Write-Host "`rClosing in $i seconds..." -ForegroundColor Yellow -NoNewline
+    Start-Sleep -Seconds 1
+}
+exit

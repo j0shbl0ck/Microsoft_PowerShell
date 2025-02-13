@@ -1,7 +1,7 @@
 
 <#
 .SYNOPSIS
-    This adds a specified domain or email address to a user's safe sender list. 
+    This adds a specified domain or email address to all users' safe sender list. 
 .NOTES
     Author: Josh Block
     Date: 02.13.2025

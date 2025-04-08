@@ -7,7 +7,7 @@
 This can be used in an emergency where a user account is compromised.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.2
+    Version: 1.0.3
     Date: 04.08.25
     Type: Private
 .NOTES
@@ -67,8 +67,8 @@ $params = @{
 Write-Host -ForegroundColor Magenta "Generated Password: $passwd"
 Write-Host -ForegroundColor Yellow "Changing password. Disabling Account. Revoking Sessions...`n"
 
+# Updates password (automatically refreshes tokens too) and disables account
 Update-MgUser -UserId $userName -BodyParameter $params
-Revoke-MgUserSignInSession -UserId $userName | Out-Null
 
 $userInfo = Get-MgUser -UserId $username -Property accountEnabled,lastPasswordChangeDateTime | Select-Object accountEnabled,lastPasswordChangeDateTime
 

@@ -7,7 +7,7 @@
 This can be used in an emergency where a user account is compromised.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.0
+    Version: 1.0.1
     Date: 04.08.25
     Type: Private
 .NOTES
@@ -61,9 +61,10 @@ $params = @{
 }
 # Show the generated password
 Write-Host -ForegroundColor Magenta "Generated Password: $passwd"
-Write-Host -ForegroundColor Yellow "Rolling user password and blocking sign-in for user...`n"
+Write-Host -ForegroundColor Yellow "Changing password. Disabling Account. Revoking Sessions...`n"
 
-Update-MgUser -UserId $userName -BodyParameter $params 
+Update-MgUser -UserId $userName -BodyParameter $params
+Revoke-MgUserSignInSession -UserId $userName
 
 $userInfo = Get-MgUser -UserId $username -Property accountEnabled,lastPasswordChangeDateTime | Select-Object accountEnabled,lastPasswordChangeDateTime
 

@@ -11,10 +11,14 @@ This can be used in an emergency where a user account is compromised.
     Date: 04.08.25
     Type: Private
 .NOTES
-    This script it built for the Datto RMM platform and could be used for Intune. 
+    Requires the Microsoft Graph PowerShell SDK to be installed.
+    Requires the User.ReadWrite.All and Directory.AccessAsUser.All permissions.
+    Ensure you have the necessary permissions to run this script.
 .LINK
-    https://helpx.adobe.com/acrobat/kb/download-64-bit-installer.html
-    https://get.adobe.com/reader/enterprise/
+    https://learn.microsoft.com/en-us/answers/questions/1403617/changing-user-password-in-azure-ad-with-mggraph
+    https://learn.microsoft.com/en-us/graph/api/resources/passwordprofile?view=graph-rest-1.0
+    https://learn.microsoft.com/en-us/answers/questions/1029231/get-last-password-change-time-stamp-with-graph-pow
+    https://learn.microsoft.com/en-us/graph/api/user-revokesigninsessions?view=graph-rest-1.0&tabs=powershell
 #>
 
 # Set variables for the Microsoft Graph connection

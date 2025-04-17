@@ -1,3 +1,5 @@
+## This script is made for 587 port testing
+
 $EmailFrom = "xlock@test.com"
 $EmailTo = "2lock@test2.com"  
 $Subject = "today date"

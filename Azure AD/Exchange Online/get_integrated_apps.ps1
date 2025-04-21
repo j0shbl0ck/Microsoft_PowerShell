@@ -8,8 +8,9 @@
     Version: 1.0.0
 .LINK
     https://github.com/j0shbl0ck
-    https://o365reports.com/2022/07/13/get-shared-mailbox-in-office-365-using-powershell/
-    https://learn.microsoft.com/en-us/microsoft-365/enterprise/block-user-accounts-with-microsoft-365-powershell?view=o365-worldwide
+    https://learn.microsoft.com/en-us/microsoft-365/enterprise/use-the-centralized-deployment-powershell-cmdlets-to-manage-add-ins?view=o365-worldwide#get-details-of-an-add-in
+    https://learn.microsoft.com/en-us/powershell/module/exchange/get-app?view=exchange-ps
+    https://community.spiceworks.com/t/cant-remove-office-365-integrated-app-add-in/929425
 #>
 
 

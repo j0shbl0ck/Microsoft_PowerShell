@@ -2,7 +2,7 @@
 .SYNOPSIS
     This script deploys the Nodeware.
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.0
+    Version: 1.0.1
     Date: 04.22.25
     Type: Public
 .NOTES
@@ -19,3 +19,6 @@ New-Item -Path C:\ -Name "Nodeware" -ItemType "Directory" -Force -ErrorAction Si
 #Nodeware Source
 Copy-Item .\NodewareAgentSetup.8631745.msi C:\Nodeware -Force
 Start-Process Msiexec -Wait -ArgumentList '/package C:\Nodeware\NodewareAgentSetup.8631745.msi /qn'
+
+# Remove the source directory
+Remove-Item C:\Nodeware -Recurse -Force -ErrorAction SilentlyContinue

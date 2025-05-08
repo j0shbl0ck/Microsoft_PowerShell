@@ -63,9 +63,9 @@ Function Disable-RetentionHoldAll {
     foreach ($mailbox in $mailboxes) {
         try {
             Set-Mailbox -Identity $mailbox.Identity -RetentionHoldEnabled $false
-            Write-Host "Disabled retention hold for mailbox: $($mailbox.Identity)" -ForegroundColor Green
+            Write-Host "Disabled retention hold for mailbox: $($mailbox.DisplayName)" -ForegroundColor Green
         } catch {
-            Write-Host "Failed to disable retention hold for mailbox: $($mailbox.Identity)" -ForegroundColor Red
+            Write-Host "Failed to disable retention hold for mailbox: $($mailbox.DisplayName)" -ForegroundColor Red
         }
     }
 }

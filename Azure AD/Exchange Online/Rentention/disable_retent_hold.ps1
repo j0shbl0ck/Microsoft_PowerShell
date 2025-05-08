@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 05.08.25
     Type: Public
-    Version: 1.0.0
+    Version: 1.0.1
 .LINK
     https://github.com/j0shbl0ck
     https://www.reddit.com/r/exchangeserver/comments/125pc5s/exchange_online_managed_folder_assistant_error_log/

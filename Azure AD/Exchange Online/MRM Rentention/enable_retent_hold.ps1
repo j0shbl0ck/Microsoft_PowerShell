@@ -35,8 +35,8 @@ Function Connect_Exo{
 Function Menu {
     Write-Host "Select an option:" -ForegroundColor Yellow
     Write-Host "1. Enable retention hold for all mailboxes" -ForegroundColor Green
-    Write-Host "2. Enable  retention hold for a specific mailbox" -ForegroundColor Green
-    Write-Host "3. Set a rentention policy as the default for your organization" -ForegroundColor Red
+    Write-Host "2. Enable retention hold for a specific mailbox" -ForegroundColor Green
+    Write-Host "3. Set a retention policy as the default for your organization" -ForegroundColor Red
     Write-Host "4. Exit" -ForegroundColor Red
 
     $choice = Read-Host "Enter your choice (1, 2, 3, or 4)"
@@ -50,7 +50,7 @@ Function Menu {
     }
 }
 
-# Get all rentention policies and display them in a menu to select from
+# Get all retention policies and display them in a menu to select from
 Function Get-RetentionPolicies {
     $retentionPolicies = Get-RetentionPolicy | Select-Object -Property Name, Identity, RetentionPolicyTagLinks
     $retentionPolicies | Format-Table -AutoSize | Out-Null

@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 05.12.25
     Type: Public
-    Version: 1.0.3
+    Version: 1.0.4
 .LINK
     https://github.com/j0shbl0ck
     https://www.reddit.com/r/exchangeserver/comments/125pc5s/exchange_online_managed_folder_assistant_error_log/
@@ -97,7 +97,7 @@ Function Enable-AutoArchive {
     # Enable Auto-Archive for all mailboxes
     Set-OrganizationConfig -AutoEnableArchiveMailbox $true
 
-    Write-Host "Auto-Archive enabled for all mailboxes." -ForegroundColor Green
+    Write-Host "Auto-Archive enabled for all mailboxes ~ Automatically provision an archive mailbox when a primary mailbox that's licensed for archiving reaches 90% of the quota." -ForegroundColor Green
 }
 
 # Get Archive Status

@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 05.12.25
     Type: Public
-    Version: 1.0.6
+    Version: 1.0.7
 .LINK
     https://github.com/j0shbl0ck
     https://www.reddit.com/r/exchangeserver/comments/125pc5s/exchange_online_managed_folder_assistant_error_log/
@@ -34,8 +34,8 @@ Function Connect_Exo{
 # Create a menu that allows the user to do it all mailboxes or a specific mailbox
 Function Menu {
     Write-Host "Select an option:" -ForegroundColor Yellow
-    Write-Host "1. Enable Archive for all mailboxes" -ForegroundColor Green
-    Write-Host "2. Enable Archive for a specific mailbox" -ForegroundColor Green
+    Write-Host "1. Enable Archive for all User mailboxes" -ForegroundColor Green
+    Write-Host "2. Enable Archive for a specific User mailbox" -ForegroundColor Green
     Write-Host "3. Enable Auto-Archive in Organization" -ForegroundColor Green
     Write-Host "4. Get Archive Status" -ForegroundColor Green
     Write-Host "5. Exit" -ForegroundColor Red
@@ -109,7 +109,7 @@ Function Get-ArchiveStatus {
     
 
     if ($mailboxes) {
-        Write-Host "Archive Status for all mailboxes:" -ForegroundColor Green
+        Write-Host "Archive Status for all mailboxes, including shared mailboxes:" -ForegroundColor Green
         $mailboxes | Format-Table -AutoSize
     } else {
         Write-Host "No mailboxes found." -ForegroundColor Red

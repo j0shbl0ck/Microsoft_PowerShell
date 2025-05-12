@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 05.12.25
     Type: Public
-    Version: 1.0.4
+    Version: 1.0.5
 .LINK
     https://github.com/j0shbl0ck
     https://www.reddit.com/r/exchangeserver/comments/125pc5s/exchange_online_managed_folder_assistant_error_log/
@@ -70,7 +70,7 @@ Function Enable-ArchiveAll {
 
     if ($mailboxes) {
         foreach ($mailbox in $mailboxes) {
-            Enable-Mailbox -Identity $mailbox.Identity -Archive
+            Enable-Mailbox -Identity $mailbox.Identity -Archive | Out-Null
             Write-Host "Enabled Archive for mailbox: $($mailbox.DisplayName)" -ForegroundColor Green
         }
     } else {
@@ -83,7 +83,7 @@ Function Enable-ArchiveSpecific {
     try {
         $mailbox = Read-Host "Enter the email address of the mailbox to enable archive"
         Write-Host "Enabling Archive for mailbox: $mailbox..." -ForegroundColor Yellow
-        Enable-Mailbox -Identity $mailbox -Archive
+        Enable-Mailbox -Identity $mailbox -Archive | Out-Null
         Write-Host "Enabled Archive for mailbox: $mailbox" -ForegroundColor Green
     } catch {
         Write-Host "Failed to enable archive for mailbox: $mailbox" -ForegroundColor Red

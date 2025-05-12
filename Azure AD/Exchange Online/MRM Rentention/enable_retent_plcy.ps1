@@ -1,11 +1,11 @@
 <#
 .SYNOPSIS
-    This script turns on the retention hold for a mailbox in Exchange Online.
+    This script turns on the retention policy for a mailbox in Exchange Online.
 .NOTES
     Author: Josh Block
     Date: 05.08.25
     Type: Public
-    Version: 1.0.0
+    Version: 1.0.1
 .LINK
     https://github.com/j0shbl0ck
     https://www.reddit.com/r/exchangeserver/comments/125pc5s/exchange_online_managed_folder_assistant_error_log/
@@ -34,8 +34,8 @@ Function Connect_Exo{
 # Create a menu that allows the user to do it all mailboxes or a specific mailbox
 Function Menu {
     Write-Host "Select an option:" -ForegroundColor Yellow
-    Write-Host "1. Enable retention hold for all mailboxes" -ForegroundColor Green
-    Write-Host "2. Enable retention hold for a specific mailbox" -ForegroundColor Green
+    Write-Host "1. Enable retention policy for all mailboxes" -ForegroundColor Green
+    Write-Host "2. Enable retention policy for a specific mailbox" -ForegroundColor Green
     Write-Host "3. Set a retention policy as the default for your organization" -ForegroundColor Red
     Write-Host "4. Exit" -ForegroundColor Red
 
@@ -78,33 +78,33 @@ Function Get-RetentionPolicies {
     } while ($true)
 }
 
-# Enable retention hold for all mailboxes
+# Enable retention policy for all mailboxes
 Function Enable-RetentionPolicy_AllMailboxes {
-    Write-Host "Enabling retention hold for all mailboxes..." -ForegroundColor Yellow
+    Write-Host "Enabling retention policy for all mailboxes..." -ForegroundColor Yellow
     
     # Select a retention policy from the menu
     $pchoice = Get-RetentionPolicies
     # Get all mailboxes
     $mailboxes = Get-Mailbox -ResultSize Unlimited | Where-Object { $_.RecipientTypeDetails -eq 'UserMailbox' }
 
-    # Enable retention hold for each mailbox
+    # Enable retention policy for each mailbox
     foreach ($mailbox in $mailboxes) {
         try {
             Set-Mailbox -Identity $mailbox.Identity -RetentionPolicy $pchoice
-            Write-Host "Enabled retention hold for mailbox: $($mailbox.DisplayName)" -ForegroundColor Green
+            Write-Host "Enabled retention policy for mailbox: $($mailbox.DisplayName)" -ForegroundColor Green
             # Start the Managed Folder Assistant for the mailbox
             Start-ManagedFolderAssistant -Identity $mailbox.Identity
             Write-Host "Started Managed Folder Assistant for mailbox: $($mailbox.DisplayName)" -ForegroundColor Cyan
 
         } catch {
-            Write-Host "Failed to enable retention hold for mailbox: $($mailbox.DisplayName). Error: $_" -ForegroundColor Red
+            Write-Host "Failed to enable retention policy for mailbox: $($mailbox.DisplayName). Error: $_" -ForegroundColor Red
         }
     }
 }
 
-# Enable retention hold for a specific mailbox
+# Enable retention policy for a specific mailbox
 Function Enable-RetentionPolicy_SpecificMailbox {
-    Write-Host "Enabling retention hold for a specific mailbox..." -ForegroundColor Yellow
+    Write-Host "Enabling retention policy for a specific mailbox..." -ForegroundColor Yellow
 
     # Select a retention policy from the menu
     $pchoice = Get-RetentionPolicies
@@ -112,14 +112,14 @@ Function Enable-RetentionPolicy_SpecificMailbox {
     $mailboxIdentity = Read-Host "Enter the mailbox identity (email address or display name)"
 
     try {
-        # Enable selected retention hold for the specified mailbox
+        # Enable selected retention policy for the specified mailbox
         Set-Mailbox -Identity $mailboxIdentity -RetentionPolicy $pchoice
-        Write-Host "Enabled retention hold for mailbox: $mailboxIdentity" -ForegroundColor Green
+        Write-Host "Enabled retention policy for mailbox: $mailboxIdentity" -ForegroundColor Green
         # Start the Managed Folder Assistant for the mailbox
         Start-ManagedFolderAssistant -Identity $mailboxIdentity
         Write-Host "Started Managed Folder Assistant for mailbox: $mailboxIdentity" -ForegroundColor Cyan
     } catch {
-        Write-Host "Failed to enable retention hold for mailbox: $mailboxIdentity. Error: $_" -ForegroundColor Red
+        Write-Host "Failed to enable retention policy for mailbox: $mailboxIdentity. Error: $_" -ForegroundColor Red
     }
 }
 

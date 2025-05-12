@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 05.12.25
     Type: Public
-    Version: 1.0.5
+    Version: 1.0.6
 .LINK
     https://github.com/j0shbl0ck
     https://www.reddit.com/r/exchangeserver/comments/125pc5s/exchange_online_managed_folder_assistant_error_log/
@@ -61,12 +61,12 @@ Function Enable-ArchiveAll {
 
     if ($mailboxes) {
         Write-Host "Archive is already enabled for the following mailboxes:" -ForegroundColor Green
-        $mailboxes | Select-Object DisplayName, ArchiveState | Format-Table -AutoSize
+        $mailboxes | Select-Object DisplayName, ArchiveStatus | Format-Table -AutoSize
     } else {
         Write-Host "No mailboxes with archive enabled found." -ForegroundColor Red
     }
 
-    $mailboxes = Get-Mailbox -ResultSize Unlimited -RecipientTypeDetails UserMailbox -Archive:$false
+    $mailboxes = Get-Mailbox -Filter {ArchiveStatus -Eq "None" -AND RecipientTypeDetails -Eq "UserMailbox"}
 
     if ($mailboxes) {
         foreach ($mailbox in $mailboxes) {
@@ -118,9 +118,3 @@ Function Get-ArchiveStatus {
 
 Connect_Exo
 Menu
-
-
-        
-
-
-

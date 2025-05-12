@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 05.12.25
     Type: Public
-    Version: 1.0.2
+    Version: 1.0.3
 .LINK
     https://github.com/j0shbl0ck
     https://www.reddit.com/r/exchangeserver/comments/125pc5s/exchange_online_managed_folder_assistant_error_log/
@@ -105,7 +105,7 @@ Function Get-ArchiveStatus {
     Write-Host "Getting Archive Status..." -ForegroundColor Yellow
 
     # Get all mailboxes and their archive status
-    $mailboxes = Get-Mailbox -ResultSize Unlimited | Where-Object {$_.ArchiveStatus -eq "Active"} | Select-Object DisplayName, UserPrincipalName, ArchiveStatus
+    $mailboxes = Get-Mailbox -ResultSize Unlimited | Select-Object DisplayName, UserPrincipalName, ArchiveStatus
     
 
     if ($mailboxes) {

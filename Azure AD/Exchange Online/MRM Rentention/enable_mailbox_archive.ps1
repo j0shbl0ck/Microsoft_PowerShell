@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 05.12.25
     Type: Public
-    Version: 1.0.0
+    Version: 1.0.1
 .LINK
     https://github.com/j0shbl0ck
     https://www.reddit.com/r/exchangeserver/comments/125pc5s/exchange_online_managed_folder_assistant_error_log/
@@ -76,8 +76,6 @@ Function Enable-ArchiveAll {
     } else {
         Write-Host "No mailboxes found without archive enabled." -ForegroundColor Red
     }
-
-    Menu
 }
 
 # Enable Archive for a specific mailbox

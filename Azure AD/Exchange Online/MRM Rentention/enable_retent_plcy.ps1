@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 05.08.25
     Type: Public
-    Version: 1.0.1
+    Version: 1.0.2
 .LINK
     https://github.com/j0shbl0ck
     https://www.reddit.com/r/exchangeserver/comments/125pc5s/exchange_online_managed_folder_assistant_error_log/
@@ -93,8 +93,8 @@ Function Enable-RetentionPolicy_AllMailboxes {
             Set-Mailbox -Identity $mailbox.Identity -RetentionPolicy $pchoice
             Write-Host "Enabled retention policy for mailbox: $($mailbox.DisplayName)" -ForegroundColor Green
             # Start the Managed Folder Assistant for the mailbox
-            Start-ManagedFolderAssistant -Identity $mailbox.Identity
-            Write-Host "Started Managed Folder Assistant for mailbox: $($mailbox.DisplayName)" -ForegroundColor Cyan
+            #Start-ManagedFolderAssistant -Identity $mailbox.Identity
+            #Write-Host "Started Managed Folder Assistant for mailbox: $($mailbox.DisplayName)" -ForegroundColor Cyan
 
         } catch {
             Write-Host "Failed to enable retention policy for mailbox: $($mailbox.DisplayName). Error: $_" -ForegroundColor Red
@@ -116,8 +116,8 @@ Function Enable-RetentionPolicy_SpecificMailbox {
         Set-Mailbox -Identity $mailboxIdentity -RetentionPolicy $pchoice
         Write-Host "Enabled retention policy for mailbox: $mailboxIdentity" -ForegroundColor Green
         # Start the Managed Folder Assistant for the mailbox
-        Start-ManagedFolderAssistant -Identity $mailboxIdentity
-        Write-Host "Started Managed Folder Assistant for mailbox: $mailboxIdentity" -ForegroundColor Cyan
+        #Start-ManagedFolderAssistant -Identity $mailboxIdentity
+        #Write-Host "Started Managed Folder Assistant for mailbox: $mailboxIdentity" -ForegroundColor Cyan
     } catch {
         Write-Host "Failed to enable retention policy for mailbox: $mailboxIdentity. Error: $_" -ForegroundColor Red
     }

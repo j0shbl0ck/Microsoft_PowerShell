@@ -1,3 +1,5 @@
+⚠️ THIS SCRIPT IS DECOMISSIONED ⚠️ 
+
 <#
 .SYNOPSIS
     This sets an Entra ID user's ImmutableID attribute to $null
@@ -25,7 +27,7 @@ $entrauser = Read-Host -Prompt "Enter the UPN of user being set to $null"
 Invoke-MgGraphRequest -Method PATCH -Uri "https://graph.microsoft.com/v1.0/users/${entrauser}" -Body @{OnPremisesImmutableId = $null}
 
 # Get User's Immutable ID property
-Get-Mguser -UserId $entrauser -Property onPremisesImmutableId | select onpremisesimmutableid
+Get-Mguser -UserId $entrauser -Property onPremisesImmutableId | select-object onpremisesimmutableid
 
 # Disconnect from Microsoft Graph module
 Disconnect-MgGraph

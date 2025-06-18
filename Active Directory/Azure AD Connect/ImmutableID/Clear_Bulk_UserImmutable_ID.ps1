@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    This pulls in all users in Etra ID and sets their ImmutableID attribute to $null
+    This pulls in all users in Entra ID and sets their ImmutableID attribute to $null
 .NOTES
     Author: Josh Block
     Date: 04.19.24

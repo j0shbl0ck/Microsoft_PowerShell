@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    This script turns off the retention hold for a mailbox in Exchange Online.
+    This script finds the user in Azure AD based on the Immutable ID (Source Anchor).
 .NOTES
     Author: Josh Block
     Date: 05.30.25

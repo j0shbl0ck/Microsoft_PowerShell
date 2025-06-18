@@ -1,4 +1,4 @@
-⚠️ THIS SCRIPT IS UNDER DEVELOPMENT AND NOT READY FOR USE. ⚠️ 
+⚠️ THIS SCRIPT IS DECOMISSIONED ⚠️ 
 
 .LINK
 https://poweraddict.net/get-immutable-id-of-ad-object/
@@ -23,5 +23,5 @@ $ImmutableID
 
 Connect-MsolService
 $AzureUser = Read-Host "Provide Azure AD user name"
-Get-MsolUser -UserPrincipalName $AzureUser | FL immutableId
+Get-MsolUser -UserPrincipalName $AzureUser | Format-List immutableId
 

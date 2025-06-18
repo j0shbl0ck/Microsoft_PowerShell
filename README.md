@@ -31,6 +31,6 @@ Each script follows a clean, consistent format:
   ```powershell
   <#
   .SYNOPSIS     Short description of the script
-  .NOTES  Contains Author, Date, Type, Version, and Links
-  .LINK Relevant links for further information
+  .NOTES        Contains Author, Date, Type, Version, and Links
+  .LINK         Relevant links for further information
   #>

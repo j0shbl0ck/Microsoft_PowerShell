@@ -13,3 +13,6 @@ Restore-RecoverableItems -Identity "$GuidSource" -ResultSize "unlimited" -Source
 
 
 Get-RecoverableItems -identity "$GuideSource" | Restore-RecoverableItems
+
+
+Set-MailboxPermission -Identity "user@domain.com" -User username -AccessRights FullAccess -InheritanceType All -Automapping $true

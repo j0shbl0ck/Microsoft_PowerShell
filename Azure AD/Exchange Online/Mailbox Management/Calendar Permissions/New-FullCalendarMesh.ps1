@@ -7,7 +7,7 @@
     to ensure each user has the expected number of permissions.
 
     Author: j0shbl0ck (https://github.com/j0shbl0ck)
-    Version: 1.0.0
+    Version: 1.0.1
     Date: 06.24.25
     Type: Public
 .EXAMPLE
@@ -21,7 +21,7 @@
 #>
 
 # Connect to Microsoft Graph
-Connect-MgGraph -Scopes "User.Read.All", "Calendars.ReadWrite"
+Connect-MgGraph -Scopes "User.Read.All", "Calendars.ReadWrite" | Out-Null
 
 # Get all licensed users (i.e., users with at least one assigned license)
 Write-Host "Retrieving licensed users..." -ForegroundColor Yellow

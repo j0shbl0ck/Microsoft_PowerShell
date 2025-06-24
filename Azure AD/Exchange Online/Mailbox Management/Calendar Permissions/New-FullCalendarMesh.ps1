@@ -7,7 +7,7 @@
     to ensure each user has the expected number of permissions.
 
     Author: j0shbl0ck (https://github.com/j0shbl0ck)
-    Version: 1.0.3
+    Version: 1.0.4
     Date: 06.24.25
     Type: Public
 .EXAMPLE
@@ -25,12 +25,9 @@ function Test-RunningAsAdministrator {
         [Security.Principal.WindowsBuiltInRole]::Administrator)
 
     if (-not $isAdmin) {
-        Write-Host "Not running as administrator. Re-launching script with elevated privileges..." -ForegroundColor Yellow
-
-        $scriptPath = $MyInvocation.MyCommand.Definition
-        $arguments = "-ExecutionPolicy Bypass -File `"$scriptPath`""
-
-        Start-Process powershell -Verb RunAs -ArgumentList $arguments
+        Write-Host "Not running as administrator. Re-launch script with elevated privileges..." -ForegroundColor Yellow
+        # Pause for user to read the message
+        Start-Sleep -Seconds 3
         exit
     }
 }

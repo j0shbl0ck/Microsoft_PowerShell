@@ -7,7 +7,7 @@
     to ensure each user has the expected number of permissions.
 
     Author: j0shbl0ck (https://github.com/j0shbl0ck)
-    Version: 1.0.2
+    Version: 1.0.3
     Date: 06.24.25
     Type: Public
 .EXAMPLE
@@ -20,7 +20,7 @@
     - Admin consent must be granted for required Graph scopes
 #>
 
-function Ensure-RunningAsAdministrator {
+function Test-RunningAsAdministrator {
     $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(
         [Security.Principal.WindowsBuiltInRole]::Administrator)
 
@@ -35,7 +35,7 @@ function Ensure-RunningAsAdministrator {
     }
 }
 
-function Ensure-GraphModule {
+function Install-GraphModule {
     $requiredGraphVersion = [version]"2.28.0"
     $installedGraph = Get-InstalledModule -Name Microsoft.Graph -ErrorAction SilentlyContinue
 
@@ -102,11 +102,11 @@ function Grant-CalendarPermissions {
             }
         }
 
-        Validate-UserPermissions -User $user -OtherUsers $otherUsers -TotalExpected ($totalUsers - 1) -LogRef $LogRef
+        Test-UserPermissions -User $user -OtherUsers $otherUsers -TotalExpected ($totalUsers - 1) -LogRef $LogRef
     }
 }
 
-function Validate-UserPermissions {
+function Test-UserPermissions {
     param (
         [string]$User,
         [string[]]$OtherUsers,
@@ -142,7 +142,7 @@ function Validate-UserPermissions {
             }
         }
     } catch {
-        Write-Warning "Validation failed for $User: $_"
+        Write-Warning "Validation failed for ${User}: $_"
         $LogRef.Value += [PSCustomObject]@{
             User   = $User
             Status = "Validation Error"
@@ -153,8 +153,8 @@ function Validate-UserPermissions {
 }
 
 function Main {
-    Ensure-RunningAsAdministrator
-    Ensure-GraphModule
+    Test-RunningAsAdministrator
+    Install-GraphModule
     Connect-ToGraph
     Clear-Host
 

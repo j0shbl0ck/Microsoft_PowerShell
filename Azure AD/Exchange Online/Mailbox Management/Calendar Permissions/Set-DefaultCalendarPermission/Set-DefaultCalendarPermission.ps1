@@ -2,22 +2,25 @@
 .SYNOPSIS
     Creates editor-level calendar permissions between all licensed users in Microsoft 365 using Microsoft Graph.
 .DESCRIPTION
-    This script builds a fully-connected calendar permission mesh by granting each licensed mailbox user "Editor" access 
+    This script builds a fully-connected calendar permission mesh by granting each licensed mailbox user "Write" access 
     to every other licensed user's primary calendar. It uses Microsoft Graph PowerShell SDK and supports validation 
     to ensure each user has the expected number of permissions.
 
     Author: j0shbl0ck (https://github.com/j0shbl0ck)
-    Version: 1.0.4
+    Version: 1.0.5
     Date: 06.24.25
     Type: Public
-.EXAMPLE
-    .\New-FullCalendarMesh.ps1
-    Connects to Microsoft Graph, gathers all licensed users, assigns calendar permissions, and validates access mesh.
 .NOTES
     Prerequisites:
     - Microsoft Graph PowerShell SDK [Install-Module Microsoft.Graph -Scope CurrentUser]
     - App registration or delegated Graph access with Calendars.ReadWrite and User.Read.All
     - Admin consent must be granted for required Graph scopes
+.LINK
+    Source: https://office365itpros.com/2024/06/18/set-default-calendar-permission/
+    Source: https://www.reddit.com/r/PowerShell/comments/1lgag8j/needing_mggraph_help_access_denied_when_setting/
+    Source: https://o365info.com/connect-microsoft-graph-powershell/#h-connect-to-microsoft-graph-with-client-secret
+    Source: https://www.reddit.com/r/PowerShell/comments/18c9605/graph_ps_connection_error/
+    Source: https://practical365.com/calendar-events-graph-api/
 #>
 
 param (

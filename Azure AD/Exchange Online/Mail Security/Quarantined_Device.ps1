@@ -6,7 +6,7 @@
     Author: Josh Block
     Date: 07.15.2025
     Type: Public
-    Version: 1.0.0
+    Version: 1.0.1
 .LINK
     https://github.com/j0shbl0ck
 #>
@@ -31,40 +31,40 @@ Clear-Host
 
 
 # Approve quarantined ActiveSync devices for a given mailbox
-function Release-QuarantinedDevices {
+function Release-QuarantinedCASDevices {
     param (
         [Parameter(Mandatory = $true)]
         [string]$UserEmail
     )
 
     try {
-        $devices = Get-MobileDevice -Mailbox $UserEmail -ErrorAction Stop
+        # Get quarantined mobile devices for the user
+        $quarantinedDevices = Get-MobileDevice -Mailbox $UserEmail | Where-Object {
+            $_.DeviceAccessState -eq 'Quarantined'
+        }
 
-        if ($devices.Count -eq 0) {
-            Write-Host "No mobile devices found for $UserEmail"
+        if (-not $quarantinedDevices) {
+            Write-Host "No quarantined devices found for $UserEmail."
             return
         }
 
-        $quarantined = $devices | Where-Object { $_.DeviceAccessState -eq "Quarantined" }
-
-        if ($quarantined.Count -eq 0) {
-            Write-Host "No quarantined devices found for $UserEmail"
-            return
-        }
-
-        foreach ($device in $quarantined) {
+        foreach ($device in $quarantinedDevices) {
             Write-Host "Releasing device: $($device.DeviceID) on $($device.DeviceType)..."
-            Set-MobileDevice -Identity $device.Identity -DeviceAccessState Allowed -Confirm:$false
+
+            # Approve the device using CASMailbox settings
+            Set-CASMailbox -Identity $UserEmail -ActiveSyncAllowedDeviceIDs @{Add=$device.DeviceID}
+
+            Write-Host "Device $($device.DeviceID) released from quarantine."
         }
 
         Write-Host "All quarantined devices have been released for $UserEmail."
     } catch {
-        Write-Error "Error: $_"
+        Write-Error "Error releasing devices for ${UserEmail}: $_"
     }
 }
 
-# Main Script
+# Main script input
 $userEmail = Read-Host "Enter the user's email address"
-Release-QuarantinedDevices -UserEmail $userEmail
+Release-QuarantinedCASDevices -UserEmail $userEmail
 
 

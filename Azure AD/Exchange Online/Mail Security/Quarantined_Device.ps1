@@ -1,4 +1,3 @@
-
 <#
 .SYNOPSIS
     This allows all devices for a specific user to have access to ExchangeActiveSync.
@@ -6,7 +5,7 @@
     Author: Josh Block
     Date: 07.15.2025
     Type: Public
-    Version: 1.0.1
+    Version: 1.0.2
 .LINK
     https://github.com/j0shbl0ck
 #>
@@ -14,21 +13,19 @@
 Clear-Host
 
 # Connect to Exchange Online via Azure AD with Global/Exchange Admin Center credentials
-    try {
-        Write-Host -ForegroundColor Yellow 'Connecting to Exchange Online...'
-        
-        # Connect to Exchange Online
-        Connect-ExchangeOnline -ShowBanner:$false
-        
-        Write-Host -ForegroundColor Green 'Connected to Exchange Online.'
-        Write-Host ""
-    }
-    catch {
-        Write-Host "Failed to connect to Exchange Online. Ending script." -ForegroundColor Red
-        exit
-    }
+try {
+    Write-Host -ForegroundColor Yellow 'Connecting to Exchange Online...'
 
+    # Connect to Exchange Online
+    Connect-ExchangeOnline -ShowBanner:$false
 
+    Write-Host -ForegroundColor Green 'Connected to Exchange Online.'
+    Write-Host ""
+}
+catch {
+    Write-Host "Failed to connect to Exchange Online. Ending script." -ForegroundColor Red
+    exit
+}
 
 # Approve quarantined ActiveSync devices for a given mailbox
 function Release-QuarantinedCASDevices {
@@ -58,13 +55,19 @@ function Release-QuarantinedCASDevices {
         }
 
         Write-Host "All quarantined devices have been released for $UserEmail."
-    } catch {
+    }
+    catch {
         Write-Error "Error releasing devices for ${UserEmail}: $_"
     }
 }
 
-# Main script input
-$userEmail = Read-Host "Enter the user's email address"
-Release-QuarantinedCASDevices -UserEmail $userEmail
+# Loop to handle multiple users
+do {
+    $userEmail = Read-Host "Enter the user's email address"
+    Release-QuarantinedCASDevices -UserEmail $userEmail
 
+    $continue = Read-Host "Do you want to process another email address? (Y/N)"
+}
+while ($continue -match '^(Y|y)$')
 
+Write-Host "`nExiting script." -ForegroundColor Cyan

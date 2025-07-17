@@ -1,18 +1,14 @@
 <#
 .SYNOPSIS
-    This script will prompt for the username of a user and then do the following:
-    - Roll user password
-    - Block user from signing in to Microsoft
-    - Revoke current signins from user
-This can be used in an emergency where a user account is compromised.
+    This script uploads user photos to Microsoft Entra ID (Azure AD) using the Microsoft Graph PowerShell SDK.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.0
+    Version: 1.0.1
     Date: 07.17.25
     Type: Private
 .NOTES
     Requires the Microsoft Graph PowerShell SDK to be installed.
-    Requires the User.ReadWrite.All and Directory.AccessAsUser.All permissions.
+    Requires the User.ReadWrite.All permissions.
     Ensure you have the necessary permissions to run this script.
 .LINK
     https://office365itpros.com/2024/01/12/user-extension-attributes-sdk/
@@ -41,7 +37,7 @@ function Update-GraphModule {
     )
 
     foreach ($Module in $RequiredModules) {
-        Write-Message "Checking module: $Module" -Color Cyan
+        Write-Message "Checking module: $Module" -Color Yellow
 
         $InstalledVersions = Get-InstalledModule -Name $Module -AllVersions -ErrorAction SilentlyContinue
 
@@ -94,6 +90,7 @@ Update-GraphModule
 try {
     Connect-MgGraph -NoWelcome -Scopes "User.ReadWrite.All" -ErrorAction Stop
     Write-Message "Connected to Microsoft Graph via interactive login." -Color Green
+    Write-Host ""
 } catch {
     Write-Message "Interactive auth failed: $_" -Color Red
     exit 1
@@ -107,7 +104,6 @@ if (!(Test-Path $RootFolder)) {
     exit 1
 }
 
-# Get all image files
 $PhotoFiles = @()
 $Extensions = "*.jpg", "*.jpeg", "*.png", "*.bmp"
 
@@ -115,7 +111,6 @@ foreach ($ext in $Extensions) {
     $PhotoFiles += Get-ChildItem -Path $RootFolder -Filter $ext -File
 }
 
-Write-Host "Found $($PhotoFiles.Count) photo(s) in $RootFolder"
 $TotalUsers = $PhotoFiles.Count
 $UserIndex = 0
 
@@ -131,11 +126,21 @@ foreach ($Photo in $PhotoFiles) {
         if ($User) {
             $UserId = $User.Id
             $UPN = $User.UserPrincipalName
-            Write-Host "Found user: $UPN" -ForegroundColor Green
+            Write-Host "Match found! Photo '$($Photo.Name)' corresponds to user: $UPN" -ForegroundColor Pink
 
             try {
                 Set-MgUserPhotoContent -UserId $UserId -InFile $Photo.FullName -ContentType "image/jpeg"
                 Write-Host "Photo uploaded for $UPN" -ForegroundColor Green
+
+                # Rename the photo file to append "-uploaded" before the extension
+                $NewName = [System.IO.Path]::GetFileNameWithoutExtension($Photo.Name) + "-uploaded" + $Photo.Extension
+                $NewFullPath = Join-Path -Path $Photo.DirectoryName -ChildPath $NewName
+
+                # Rename the file
+                Rename-Item -Path $Photo.FullName -NewName $NewName -ErrorAction Stop
+                Write-Host "Renamed photo to '$NewName'" -ForegroundColor Cyan
+                Write-Host ""
+
             } catch {
                 Write-Host "Error uploading photo for ${UPN}: $_" -ForegroundColor Red
             }

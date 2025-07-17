@@ -3,7 +3,7 @@
     This script uploads user photos to Microsoft Entra ID (Azure AD) using the Microsoft Graph PowerShell SDK.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.1
+    Version: 1.0.2
     Date: 07.17.25
     Type: Private
 .NOTES
@@ -151,3 +151,9 @@ foreach ($Photo in $PhotoFiles) {
         Write-Host "Error processing $($Photo.Name): $_" -ForegroundColor Red
     }
 }
+
+# Disconnect from Graph
+Write-Message "Disconnecting from Microsoft Graph."
+Disconnect-MgGraph
+
+Write-Message "Script execution finished."

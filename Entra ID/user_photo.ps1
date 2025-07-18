@@ -5,7 +5,7 @@
     Author: j0shbl0ck https://github.com/j0shbl0ck
     Version: 1.0.2
     Date: 07.17.25
-    Type: Private
+    Type: Public
 .NOTES
     Requires the Microsoft Graph PowerShell SDK to be installed.
     Requires the User.ReadWrite.All permissions.

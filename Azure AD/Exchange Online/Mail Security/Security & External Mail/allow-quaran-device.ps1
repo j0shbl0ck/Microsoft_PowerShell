@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 07.15.2025
     Type: Public
-    Version: 1.0.2
+    Version: 1.0.3
 .LINK
     https://github.com/j0shbl0ck
 #>
@@ -68,6 +68,6 @@ do {
 
     $continue = Read-Host "Do you want to process another email address? (Y/N)"
 }
-while ($continue -match '^(Y|y)$')
+while ($continue -notmatch '^[YyNn]$')
 
 Write-Host "`nExiting script." -ForegroundColor Cyan

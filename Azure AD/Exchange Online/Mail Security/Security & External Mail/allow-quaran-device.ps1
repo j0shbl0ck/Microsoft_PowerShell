@@ -66,8 +66,10 @@ do {
     $userEmail = Read-Host "Enter the user's email address"
     Release-QuarantinedCASDevices -UserEmail $userEmail
 
-    $continue = Read-Host "Do you want to process another email address? (Y/N)"
-}
-while ($continue -notmatch '^[YyNn]$')
+    do {
+        $continue = Read-Host "Do you want to process another email address? (Y/N)"
+    } while ($continue -notmatch '^[YyNn]$')
+
+} while ($continue -match '^[Yy]$')
 
 Write-Host "`nExiting script." -ForegroundColor Cyan

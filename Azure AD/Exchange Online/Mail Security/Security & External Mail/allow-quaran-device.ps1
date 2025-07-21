@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 07.15.2025
     Type: Public
-    Version: 1.0.3
+    Version: 1.0.4
 .LINK
     https://github.com/j0shbl0ck
 #>
@@ -63,13 +63,19 @@ function Release-QuarantinedCASDevices {
 
 # Loop to handle multiple users
 do {
+    do {
+        $Continue = Read-Host -Prompt "Would you like to add another user? (Y/N)"
+    } while ($Continue -notin @('Y', 'y', 'N', 'n'))
+
+    if ($Continue -in @('N', 'n')) {
+        Write-Host "Exiting script."
+        exit
+    }
+
+    # Your user processing code here
     $userEmail = Read-Host "Enter the user's email address"
     Release-QuarantinedCASDevices -UserEmail $userEmail
 
-    do {
-        $continue = Read-Host "Do you want to process another email address? (Y/N)"
-    } while ($continue -notmatch '^[YyNn]$')
-
-} while ($continue -match '^[Yy]$')
+} while ($Continue -in @('Y', 'y'))
 
 Write-Host "`nExiting script." -ForegroundColor Cyan

@@ -5,18 +5,17 @@
     Author: Josh Block
     Date: 07.15.2025
     Type: Public
-    Version: 1.0.7
+    Version: 1.0.8
 .LINK
     https://github.com/j0shbl0ck
 #>
 
 Clear-Host
 
-# Connect to Exchange Online via Azure AD with Global/Exchange Admin Center credentials
+# region Connect to Exchange Online
 try {
     Write-Host -ForegroundColor Yellow 'Connecting to Exchange Online...'
 
-    # Connect to Exchange Online
     Connect-ExchangeOnline -ShowBanner:$false
 
     Write-Host -ForegroundColor Green 'Connected to Exchange Online.'
@@ -26,8 +25,10 @@ catch {
     Write-Host "Failed to connect to Exchange Online. Ending script." -ForegroundColor Red
     exit
 }
+# endregion
 
-# Approve quarantined ActiveSync devices for a given mailbox
+
+# region Function: Release-QuarantinedCASDevices
 function Release-QuarantinedCASDevices {
     param (
         [Parameter(Mandatory = $true)]
@@ -36,9 +37,7 @@ function Release-QuarantinedCASDevices {
 
     try {
         # Get quarantined mobile devices for the user
-        $quarantinedDevices = Get-MobileDevice -Mailbox $UserEmail | Where-Object {
-            $_.DeviceAccessState -eq 'Quarantined'
-        }
+        $quarantinedDevices = Get-MobileDevice -Mailbox $UserEmail | Where-Object { $_.DeviceAccessState -eq 'Quarantined' }
 
         if (-not $quarantinedDevices) {
             Write-Host "No quarantined devices found for $UserEmail."
@@ -60,14 +59,24 @@ function Release-QuarantinedCASDevices {
         Write-Error "Error releasing devices for ${UserEmail}: $_"
     }
 }
+# endregion
 
-# Loop to handle multiple users
-# Loop to handle multiple users
+
+# region Main Script Loop
 do {
     $userEmail = Read-Host "Enter the user's email address"
     Release-QuarantinedCASDevices -UserEmail $userEmail
 
-    $continue = Read-Host "Do you want to process another email address? (Y/N)"
+    # Input validation loop for continuation
+    do {
+        $continue = Read-Host "Do you want to process another email address? (Y/N)"
+        if ($continue -notmatch '^[YyNn]$') {
+            Write-Host "Invalid input. Please enter 'Y' for Yes or 'N' for No." -ForegroundColor Red
+        }
+    } while ($continue -notmatch '^[YyNn]$')
+
 } while ($continue -in 'Y', 'y')
+# endregion
+
 
 Write-Host "`nExiting script." -ForegroundColor Cyan

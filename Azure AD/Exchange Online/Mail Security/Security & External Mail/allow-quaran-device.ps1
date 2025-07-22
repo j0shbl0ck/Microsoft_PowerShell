@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 07.15.2025
     Type: Public
-    Version: 1.0.8
+    Version: 1.0.9
 .LINK
     https://github.com/j0shbl0ck
 #>
@@ -40,20 +40,20 @@ function Release-QuarantinedCASDevices {
         $quarantinedDevices = Get-MobileDevice -Mailbox $UserEmail | Where-Object { $_.DeviceAccessState -eq 'Quarantined' }
 
         if (-not $quarantinedDevices) {
-            Write-Host "No quarantined devices found for $UserEmail."
+            Write-Host "No quarantined devices found for $UserEmail." -ForegroundColor Gray
             return
         }
 
         foreach ($device in $quarantinedDevices) {
-            Write-Host "Releasing device: $($device.DeviceID) on $($device.DeviceType)..."
+            Write-Host "Releasing device: $($device.DeviceID) on $($device.DeviceType)..." -ForegroundColor Yellow
 
             # Approve the device using CASMailbox settings
             Set-CASMailbox -Identity $UserEmail -ActiveSyncAllowedDeviceIDs @{Add=$device.DeviceID}
 
-            Write-Host "Device $($device.DeviceID) released from quarantine."
+            Write-Host "Device $($device.DeviceID) released from quarantine." -ForegroundColor Green
         }
 
-        Write-Host "All quarantined devices have been released for $UserEmail."
+        Write-Host "All quarantined devices have been released for $UserEmail.`n" -ForegroundColor Green
     }
     catch {
         Write-Error "Error releasing devices for ${UserEmail}: $_"
@@ -64,12 +64,12 @@ function Release-QuarantinedCASDevices {
 
 # region Main Script Loop
 do {
-    $userEmail = Read-Host "Enter the user's email address"
+    $userEmail = Read-Host "`nEnter the user's email address"
     Release-QuarantinedCASDevices -UserEmail $userEmail
 
     # Input validation loop for continuation
     do {
-        $continue = Read-Host "Do you want to process another email address? (Y/N)"
+        $continue = Read-Host "`nDo you want to process another email address? (Y/N)"
         if ($continue -notmatch '^[YyNn]$') {
             Write-Host "Invalid input. Please enter 'Y' for Yes or 'N' for No." -ForegroundColor Red
         }

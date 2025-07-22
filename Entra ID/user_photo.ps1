@@ -126,7 +126,7 @@ foreach ($Photo in $PhotoFiles) {
         if ($User) {
             $UserId = $User.Id
             $UPN = $User.UserPrincipalName
-            Write-Host "Match found! Photo '$($Photo.Name)' corresponds to user: $UPN" -ForegroundColor Pink
+            Write-Host "Match found! Photo '$($Photo.Name)' corresponds to user: $UPN" -ForegroundColor Magenta
 
             try {
                 Set-MgUserPhotoContent -UserId $UserId -InFile $Photo.FullName -ContentType "image/jpeg"

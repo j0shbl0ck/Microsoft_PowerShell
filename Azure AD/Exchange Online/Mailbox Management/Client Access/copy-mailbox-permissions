@@ -1,0 +1,162 @@
+<#
+.SYNOPSIS
+    Compares and synchronizes "Send As" and "Full Access" permissions between a source and target shared mailbox, removes any mismatched permissions, and provides a detailed summary including total permission counts.
+.NOTES
+    Author: Josh Block
+    Date: 08.01.25
+    Type: Public
+    Version: 1.0.0
+.LINK
+    https://github.com/j0shbl0ck
+    https://www.reddit.com/r/Office365/comments/1k5xu5b/office_365_global_admin_hacked_with_mfa_enabled
+#>
+
+
+Clear-Host
+
+# region Connect to Exchange Online
+try {
+    Write-Host -ForegroundColor Yellow 'Connecting to Exchange Online...'
+    Connect-ExchangeOnline -ShowBanner:$false
+    Write-Host -ForegroundColor Green 'Connected to Exchange Online.'
+    Write-Host ""
+}
+catch {
+    Write-Host "Failed to connect to Exchange Online. Ending script." -ForegroundColor Red
+    exit
+}
+
+# Prompt for source and target shared mailboxes
+$sourceMailbox = Read-Host "Enter the source shared mailbox email"
+$targetMailbox = Read-Host "Enter the target shared mailbox email"
+
+# Validate source shared mailbox
+$sourceMailboxObj = Get-Mailbox -Identity $sourceMailbox -ErrorAction SilentlyContinue
+if (-not $sourceMailboxObj) {
+    Write-Host -ForegroundColor Red "Source mailbox '$sourceMailbox' not found. Exiting script."
+    return
+}
+Write-Host -ForegroundColor Green "Found source mailbox: $($sourceMailboxObj.DisplayName)"
+Write-Host ""
+
+# Validate target shared mailbox
+$targetMailboxObj = Get-Mailbox -Identity $targetMailbox -ErrorAction SilentlyContinue
+if (-not $targetMailboxObj) {
+    Write-Host -ForegroundColor Red "Target mailbox '$targetMailbox' not found. Exiting script."
+    return
+}
+Write-Host -ForegroundColor Green "Found target mailbox: $($targetMailboxObj.DisplayName)"
+Write-Host ""
+
+# Get users with Full Access to the source shared mailbox
+$sourceFullAccessUsers = Get-MailboxPermission -Identity $sourceMailbox | Where-Object {
+    $_.User -ne "NT AUTHORITY\SELF" -and $_.AccessRights -contains "FullAccess"
+} | Select-Object -ExpandProperty User
+
+# Get users with Send As permission on the source shared mailbox
+$sourceSendAsUsers = Get-RecipientPermission -Identity $sourceMailbox | Where-Object {
+    $_.Trustee -ne "NT AUTHORITY\SELF" -and $_.AccessRights -contains "SendAs"
+} | Select-Object -ExpandProperty Trustee
+
+# Combine and deduplicate users
+$allSourceUsers = ($sourceFullAccessUsers + $sourceSendAsUsers) | Sort-Object -Unique
+
+# Initialize summary list
+$userSummary = @()
+
+foreach ($user in $allSourceUsers) {
+    try {
+        $userObj = Get-User -Identity $user -ErrorAction Stop
+        $displayName = $userObj.DisplayName
+    } catch {
+        Write-Host "User '$user' could not be found in Exchange Online. This will affect target mailbox count."
+        continue
+    }
+
+    $hadSendAs = $sourceSendAsUsers -contains $user
+    $hadFullAccess = $sourceFullAccessUsers -contains $user
+
+    # Check and sync Full Access
+    $existingFullAccess = Get-MailboxPermission -Identity $targetMailbox | Where-Object {
+        $_.User -eq $user -and $_.AccessRights -contains "FullAccess"
+    }
+    if ($hadFullAccess) {
+        if (-not $existingFullAccess) {
+            try {
+                Add-MailboxPermission -Identity $targetMailbox -User $user -AccessRights FullAccess -InheritanceType All -ErrorAction Stop
+                $fullAccessSummary = "True"
+            } catch {
+                Write-Host "Error adding Full Access for $displayName"
+                $fullAccessSummary = "Error"
+            }
+        } else {
+            $fullAccessSummary = "Already Applied"
+        }
+    } elseif ($existingFullAccess) {
+        try {
+            Remove-MailboxPermission -Identity $targetMailbox -User $user -AccessRights FullAccess -Confirm:$false -ErrorAction Stop
+            Write-Host "$displayName had Full Access removed from target mailbox."
+            $fullAccessSummary = "Removed"
+        } catch {
+            Write-Host "Error removing Full Access for $displayName"
+            $fullAccessSummary = "Error"
+        }
+    } else {
+        $fullAccessSummary = "False"
+    }
+
+    # Check and sync Send As
+    $existingSendAs = Get-RecipientPermission -Identity $targetMailbox | Where-Object {
+        $_.Trustee -eq $user -and $_.AccessRights -contains "SendAs"
+    }
+    if ($hadSendAs) {
+        if (-not $existingSendAs) {
+            try {
+                Add-RecipientPermission -Identity $targetMailbox -Trustee $user -AccessRights SendAs -Confirm:$false -ErrorAction Stop
+                $sendAsSummary = "True"
+            } catch {
+                Write-Host "Error adding Send As for $displayName"
+                $sendAsSummary = "Error"
+            }
+        } else {
+            $sendAsSummary = "Already Applied"
+        }
+    } elseif ($existingSendAs) {
+        try {
+            Remove-RecipientPermission -Identity $targetMailbox -Trustee $user -AccessRights SendAs -Confirm:$false -ErrorAction Stop
+            Write-Host "$displayName had Send As removed from target mailbox."
+            $sendAsSummary = "Removed"
+        } catch {
+            Write-Host "Error removing Send As for $displayName"
+            $sendAsSummary = "Error"
+        }
+    } else {
+        $sendAsSummary = "False"
+    }
+
+    # Add to summary
+    $userSummary += [PSCustomObject]@{
+        DisplayName     = $displayName
+        SendAsStatus     = $sendAsSummary
+        FullAccessStatus = $fullAccessSummary
+    }
+}
+
+# Output summary
+Write-Host ""
+Write-Host "Permission Assignment Summary:"
+$userSummary | Format-Table -AutoSize
+
+# Final permission counts
+$targetFullAccessUsers = Get-MailboxPermission -Identity $targetMailbox | Where-Object {
+    $_.User -ne "NT AUTHORITY\SELF" -and $_.AccessRights -contains "FullAccess"
+} | Select-Object -ExpandProperty User
+
+$targetSendAsUsers = Get-RecipientPermission -Identity $targetMailbox | Where-Object {
+    $_.Trustee -ne "NT AUTHORITY\SELF" -and $_.AccessRights -contains "SendAs"
+} | Select-Object -ExpandProperty Trustee
+
+Write-Host ""
+Write-Host "Permission Count Summary:"
+Write-Host "Source Mailbox - Send As: $($sourceSendAsUsers.Count), Full Access: $($sourceFullAccessUsers.Count)"
+Write-Host "Target Mailbox - Send As: $($targetSendAsUsers.Count), Full Access: $($targetFullAccessUsers.Count)"

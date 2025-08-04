@@ -17,6 +17,8 @@
     https://ourcloudnetwork.com/how-to-update-user-photos-with-microsoft-graph-powershell/
 #>
 
+Clear-Host
+
 function Write-Message {
     param (
         [string]$Message,
@@ -126,7 +128,7 @@ foreach ($Photo in $PhotoFiles) {
         if ($User) {
             $UserId = $User.Id
             $UPN = $User.UserPrincipalName
-            Write-Host "Match found! Photo '$($Photo.Name)' corresponds to user: $UPN" -ForegroundColor Magenta
+            Write-Host "Match found! Photo '$($Photo.Name)' corresponds to user: $UPN" -ForegroundColor Yellow
 
             try {
                 Set-MgUserPhotoContent -UserId $UserId -InFile $Photo.FullName -ContentType "image/jpeg"
@@ -157,3 +159,4 @@ Write-Message "Disconnecting from Microsoft Graph."
 Disconnect-MgGraph
 
 Write-Message "Script execution finished."
+

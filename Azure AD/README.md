@@ -13,7 +13,7 @@ A personal quick-access list of frequently used PowerShell scripts for managing 
 |--------------------------|----------------------------------------------------------------------------------------|
 | **Exchange Online**      | [✅ Allow Quarantined Device](https://github.com/j0shbl0ck/Microsoft_PowerShell/blob/main/Azure%20AD/Exchange%20Online/Mail%20Security/Security%20%26%20External%20Mail/allow-quaran-device.ps1) ・ [👥 Bulk Create Users](#👥-bulk-create-users)         |
 | **Mailbox Tools**        | [📬 Mailbox Permissions](#📬-mailbox-permissions) ・ [📤 Shared Mailbox Convert](#📤-shared-mailbox-convert) |
-| **User Management**  | [💀 Termed User Access](#🔍-immutableid-match) ・ [👁‍🗨 View Sign-ins](#👁‍🗨-view-sign-ins)           |
+| **User Management**  | [💀 Termed User Access](https://github.com/j0shbl0ck/Microsoft_PowerShell/blob/main/Azure%20AD/User%20Management/set_user_termed_access.ps1) ・ [👁‍🗨 View Sign-ins](#👁‍🗨-view-sign-ins)           |
 | **Security / Compliance**| [🛡 Disable Legacy Auth](#🛡-disable-legacy-auth) ・ [🔒 MFA Report](#🔒-mfa-report)             |
 
 ---

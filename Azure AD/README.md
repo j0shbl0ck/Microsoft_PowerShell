@@ -11,11 +11,10 @@ A personal quick-access list of frequently used PowerShell scripts for managing 
 
 | 🧩 **Category**           | 📜 **Example Scripts**                                                                 |
 |--------------------------|----------------------------------------------------------------------------------------|
-| **User Management**      | [🔑 Reset Password](#🔑-reset-password) ・ [👥 Bulk Create Users](#👥-bulk-create-users)         |
+| **Exchange Online**      | [✅ Allow Quarantined Device](https://github.com/j0shbl0ck/Microsoft_PowerShell/blob/main/Azure%20AD/Exchange%20Online/Mail%20Security/Security%20%26%20External%20Mail/allow-quaran-device.ps1) ・ [👥 Bulk Create Users](#👥-bulk-create-users)         |
 | **Mailbox Tools**        | [📬 Mailbox Permissions](#📬-mailbox-permissions) ・ [📤 Shared Mailbox Convert](#📤-shared-mailbox-convert) |
-| **Entra ID / Azure AD**  | [🔍 ImmutableID Match](#🔍-immutableid-match) ・ [👁‍🗨 View Sign-ins](#👁‍🗨-view-sign-ins)           |
+| **User Management**  | [💀 Termed User Access](#🔍-immutableid-match) ・ [👁‍🗨 View Sign-ins](#👁‍🗨-view-sign-ins)           |
 | **Security / Compliance**| [🛡 Disable Legacy Auth](#🛡-disable-legacy-auth) ・ [🔒 MFA Report](#🔒-mfa-report)             |
-| **System Tools**         | [🧹 Temp File Cleanup](#🧹-temp-file-cleanup) ・ [🧪 Defender Scan](#🧪-defender-scan)             |
 
 ---
 

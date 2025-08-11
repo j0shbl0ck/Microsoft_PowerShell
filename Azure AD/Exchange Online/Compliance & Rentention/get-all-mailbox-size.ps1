@@ -3,7 +3,7 @@
 This script allows you to view all mailbox sizes in your tenant.
 .DESCRIPTION
 Author: j0shbl0ck https://github.com/j0shbl0ck
-Version: 1.0.2
+Version: 1.0.3
 Date: 12.05.22
 Type: Public
 .NOTES
@@ -14,10 +14,8 @@ Source: https://m365scripts.com/exchange-online/get-mailbox-details-in-microsoft
 
 Clear-Host
 
-$gAdmin = Read-Host -Prompt 'Input Global/Exchange Admin UPN (globaladmin@domain.com)'
-
-#Connect to Exchange Online via Azure AD
-Connect-ExchangeOnline -UserPrincipalName $gAdmin | Out-Null
+# Connect to Exchange Online
+Connect-ExchangeOnline -ShowBanner:$false
 
 Write-Output "Fetching mailbox details... Please wait..."
 $mailboxes = Get-Mailbox -ResultSize Unlimited

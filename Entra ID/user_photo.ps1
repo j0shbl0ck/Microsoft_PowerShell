@@ -3,8 +3,8 @@
     This script uploads user photos to Microsoft Entra ID (Azure AD) using the Microsoft Graph PowerShell SDK.
 .DESCRIPTION
     Author: j0shbl0ck https://github.com/j0shbl0ck
-    Version: 1.0.2
-    Date: 07.17.25
+    Version: 1.0.3
+    Date: 09.04.25
     Type: Public
 .NOTES
     Requires the Microsoft Graph PowerShell SDK to be installed.
@@ -85,9 +85,6 @@ function Update-GraphModule {
 # Load Microsoft Graph modules
 Update-GraphModule
 
-# Use beta profile for full user photo support
-#Select-MgProfile -Name "beta"
-
 # Authenticate via interactive login
 try {
     Connect-MgGraph -NoWelcome -Scopes "User.ReadWrite.All" -ErrorAction Stop
@@ -116,6 +113,9 @@ foreach ($ext in $Extensions) {
 $TotalUsers = $PhotoFiles.Count
 $UserIndex = 0
 
+# Track not found users
+$NotFoundUsers = @()
+
 foreach ($Photo in $PhotoFiles) {
     $UserIndex++
     $BaseName = [System.IO.Path]::GetFileNameWithoutExtension($Photo.Name)
@@ -138,16 +138,15 @@ foreach ($Photo in $PhotoFiles) {
                 $NewName = [System.IO.Path]::GetFileNameWithoutExtension($Photo.Name) + "-uploaded" + $Photo.Extension
                 $NewFullPath = Join-Path -Path $Photo.DirectoryName -ChildPath $NewName
 
-                # Rename the file
                 Rename-Item -Path $Photo.FullName -NewName $NewName -ErrorAction Stop
                 Write-Host "Renamed photo to '$NewName'" -ForegroundColor Cyan
                 Write-Host ""
-
             } catch {
                 Write-Host "Error uploading photo for ${UPN}: $_" -ForegroundColor Red
             }
         } else {
             Write-Host "No user found with ExtensionAttribute3 = $BaseName" -ForegroundColor DarkRed
+            $NotFoundUsers += $BaseName
         }
     } catch {
         Write-Host "Error processing $($Photo.Name): $_" -ForegroundColor Red
@@ -160,3 +159,16 @@ Disconnect-MgGraph
 
 Write-Message "Script execution finished."
 
+# --- SUMMARY REPORT ---
+if ($NotFoundUsers.Count -gt 0) {
+    Write-Host "`n=== USERS NOT FOUND ===" -ForegroundColor Red
+    $NotFoundUsers | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
+    Write-Host "========================`n" -ForegroundColor Red
+
+    # Optional: also export to log file
+    $LogPath = Join-Path $RootFolder "UserPhotoUpload-NotFound.txt"
+    $NotFoundUsers | Out-File -FilePath $LogPath -Encoding UTF8
+    Write-Host "Not found users list exported to: $LogPath" -ForegroundColor Cyan
+} else {
+    Write-Host "`nAll users were successfully matched!`n" -ForegroundColor Green
+}

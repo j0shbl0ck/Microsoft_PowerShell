@@ -14,7 +14,8 @@
 
 
 
-Get-InboxRule -Mailbox "b@email.com" -IncludeHidden | Select-Object Name, Identity, Description | Format-List 
+Get-InboxRule -Mailbox "b@email.com" -IncludeHidden | Select-Object Name, Enabled, Identity, Description | Format-List
 
 
 # Get-InboxRule -Mailbox "b@email.com" -IncludeHidden | Remove-InboxRule 
+

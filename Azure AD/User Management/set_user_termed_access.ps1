@@ -28,7 +28,7 @@ catch {
 # region Connect to SharePoint Online
 try {
     Write-Host -ForegroundColor Yellow 'Connecting to SharePoint Online...'
-    Import-Module Microsoft.Online.SharePoint.PowerShell -UseWindowsPowerShell
+    Import-Module Microsoft.Online.SharePoint.PowerShell
     Connect-SPOService -Url "https://commercebank-admin.sharepoint.com"
     Write-Host -ForegroundColor Green 'Connected to SharePoint Online.'
     Write-Host ""
@@ -124,4 +124,5 @@ while ($true) {
     }
 
 }
+
 

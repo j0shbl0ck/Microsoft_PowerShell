@@ -1,62 +1,128 @@
 <#
 .SYNOPSIS
-    This adds members to a distrubtion list via CSV.
+    Imports members into the single cloud DL: DL-Vacation Purchase Plan
 .NOTES
     Author: Josh Block
-    Date: 07.21.22
-    Type: Public
-    Version: 1.2.1
-.LINK
-    https://github.com/j0shbl0ck
-    https://social.technet.microsoft.com/wiki/contents/articles/54249.365-add-members-in-distribution-list-using-powershell-and-csv-list-file.aspx
+    Date: 11.17.25
+    Type: Private
+    Version: 2.0.0 (EXO Only)
 #>
 
 Clear-Host
+Write-Host -ForegroundColor Cyan "Loading Exchange Online..."
 
-# Connect to Exchange Online via Azure AD with Global/Exchange admin.
-Write-Host -ForegroundColor Cyan 'Connecting to Exchange Online...'
-Connect-ExchangeOnline
-Write-Host -ForegroundColor Green 'Connected to Exchange Online!'
-Write-host ""
-
-# Ask user for file path to .CSV
-Write-Host -ForegroundColor Cyan 'Please enter the path (no quotes around path) to the .CSV file:'
-# Check if file exists if not ask user to try again
-do {
-    $filePath = Read-Host
-    $validatefile = Test-Path -Path $filePath
-    if ($validation -eq $False){
-        Write-Host -ForegroundColor Red 'File does not exist. Please try again.'
-    }
-} until ($validatefile -eq $True)
-
-# Import .CSV file
-$members = Import-CSV $filePath
-Write-Host -ForegroundColor Yellow 'Importing .CSV file...'
-Write-Host -ForegroundColor Green 'Import complete.'
-Write-host ""
-
-# Ask user for Distribution List email address
-Write-Host -ForegroundColor Cyan 'Please enter the email address (no quotes around email) of the Distribution List:'
-$distList = Read-Host
-Write-Host -ForegroundColor Green 'Distribution List email address entered.'
-Write-host ""
-
-# Perform the add members to distrubution list operation
-ForEach ($member in $members){
-    Write-Host ""
-    Write-Host -ForegroundColor Yellow 'Importing member: ' $member.Name
-    Add-DistributionGroupMember -Identity $distList -Member $member.ExternalEmailAddress -Confirm:$false
-    Write-Host -ForegroundColor Green 'Member added:' $member.ExternalEmailAddress
-    Write-Host ""
+# Connect to Exchange Online
+try {
+    Connect-ExchangeOnline -ErrorAction Stop
+    Write-Host -ForegroundColor Green "Connected to Exchange Online."
+}
+catch {
+    Write-Host -ForegroundColor Red "Failed to connect to Exchange Online."
+    exit
 }
 
-# Get the distribution list members
-Write-Host -ForegroundColor Green 'Successfully added distribution list members:'
-Get-DistributionGroupMember -Identity $distList | Select-Object DisplayName,PrimarySMTPAddress | Format-Table -AutoSize
+# The only DL this script operates on
+$DLName = "DL-Vacation Purchase Plan"
+Write-Host -ForegroundColor Cyan "Target Distribution List: $DLName"
 
-# Disconnect from Exchange Online
-Write-Host -ForegroundColor Yellow 'Disconnecting from Exchange Online...'
-Disconnect-ExchangeOnline -Confirm:$false
-Write-Host -ForegroundColor Green 'Done.'
-Write-host ""
+# Validate DL exists
+$DL = Get-DistributionGroup -Identity $DLName -ErrorAction SilentlyContinue
+if (-not $DL) {
+    Write-Host -ForegroundColor Red "❌ DL '$DLName' not found in Exchange Online."
+    exit
+}
+
+Write-Host -ForegroundColor Green "Found DL: $($DL.DisplayName)"
+Write-Host ""
+
+# Open File Dialog for CSV
+Add-Type -AssemblyName System.Windows.Forms
+$dialog = New-Object System.Windows.Forms.OpenFileDialog
+$dialog.Filter = "CSV files (*.csv)|*.csv"
+$dialog.Title = "Select CSV containing emails"
+$null = $dialog.ShowDialog()
+$filePath = $dialog.FileName
+
+if (-not (Test-Path $filePath)) {
+    Write-Host -ForegroundColor Red "No valid CSV selected. Exiting."
+    exit
+}
+
+Write-Host -ForegroundColor Yellow "Importing CSV: $filePath"
+$csv = Import-Csv $filePath
+
+if ($csv.Count -eq 0) {
+    Write-Host -ForegroundColor Red "CSV is empty. Exiting."
+    exit
+}
+
+Write-Host -ForegroundColor Green "Imported $($csv.Count) rows."
+Write-Host ""
+
+# Get current members (email normalized)
+$current = (Get-DistributionGroupMember -Identity $DLName -ResultSize Unlimited).PrimarySMTPAddress.ToLower()
+
+# Tracking arrays
+$added = @()
+$skipped = @()
+$failed = @()
+
+$total = $csv.Count
+$index = 0
+
+foreach ($row in $csv) {
+    $index++
+    $percent = [math]::Round(($index / $total) * 100)
+
+    Write-Progress -Activity "Processing CSV" `
+        -Status "Working: $index of $total" `
+        -PercentComplete $percent
+
+    $email = $row.WorkEmail.ToLower().Trim()
+
+    if (-not $email) {
+        $failed += "Blank email in row $index"
+        continue
+    }
+
+    # Already in group?
+    if ($current -contains $email) {
+        $skipped += $email
+        continue
+    }
+
+    try {
+        Add-DistributionGroupMember -Identity $DLName -Member $email -ErrorAction Stop
+        $added += $email
+        $current += $email
+    }
+    catch {
+        $failed += $email
+    }
+}
+
+Write-Progress -Activity "Complete" -Completed
+
+Write-Host ""
+Write-Host -ForegroundColor Cyan "========== Summary =========="
+Write-Host -ForegroundColor Green "Added: $($added.Count)"
+Write-Host -ForegroundColor Yellow "Skipped (already members): $($skipped.Count)"
+Write-Host -ForegroundColor Red "Failed to Add: $($failed.Count)"
+Write-Host ""
+
+# Log outputs
+$timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+
+if ($skipped.Count -gt 0) {
+    $path = "$env:USERPROFILE\Desktop\Skipped_$timestamp.txt"
+    $skipped | Out-File -FilePath $path -Encoding UTF8
+    Write-Host -ForegroundColor Yellow "Skipped list saved to: $path"
+}
+
+if ($failed.Count -gt 0) {
+    $path = "$env:USERPROFILE\Desktop\Failed_$timestamp.txt"
+    $failed | Out-File -FilePath $path -Encoding UTF8
+    Write-Host -ForegroundColor Red "Failed list saved to: $path"
+}
+
+Write-Host -ForegroundColor Green "Done."

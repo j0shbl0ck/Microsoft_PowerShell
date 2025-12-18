@@ -1,11 +1,12 @@
 <#
 .SYNOPSIS
-    This script disables automapping for a mailbox by removing and re-adding Full Access permissions with AutoMapping set to false.
+    This script disables automapping and refreshes Send As permissions
+    by removing and re-adding Full Access and Send As rights on a shared mailbox.
 .NOTES
     Author: Josh Block
     Date: 09.04.25
     Type: Public
-    Version: 1.0.0
+    Version: 1.1.0
 .LINK
     https://github.com/j0shbl0ck
 #>
@@ -14,13 +15,44 @@
 Connect-ExchangeOnline -ShowBanner:$false
 
 # Prompt for user input
-$delegate = Read-Host "Enter the delegate's email (who has Full Access)"
-$sharedMailbox = Read-Host "Enter the shared mailbox email"
+$delegate = Read-Host "Enter the delegate's email address"
+$sharedMailbox = Read-Host "Enter the shared mailbox email address"
 
-# Remove Full Access permission
-Remove-MailboxPermission -Identity $sharedMailbox -User $delegate -AccessRights FullAccess -Confirm:$false
+Write-Host "Removing existing permissions..." -ForegroundColor Yellow
 
-# Re-add Full Access permission with automapping disabled
-Add-MailboxPermission -Identity $sharedMailbox -User $delegate -AccessRights FullAccess -AutoMapping:$false
+# Remove Full Access
+Remove-MailboxPermission `
+    -Identity $sharedMailbox `
+    -User $delegate `
+    -AccessRights FullAccess `
+    -Confirm:$false `
+    -ErrorAction SilentlyContinue
 
-Write-Host "Automapping has been disabled for $delegate on $sharedMailbox"
+# Remove Send As
+Remove-RecipientPermission `
+    -Identity $sharedMailbox `
+    -Trustee $delegate `
+    -AccessRights SendAs `
+    -Confirm:$false `
+    -ErrorAction SilentlyContinue
+
+Start-Sleep -Seconds 3
+
+Write-Host "Re-adding permissions..." -ForegroundColor Yellow
+
+# Re-add Full Access with AutoMapping disabled
+Add-MailboxPermission `
+    -Identity $sharedMailbox `
+    -User $delegate `
+    -AccessRights FullAccess `
+    -AutoMapping:$false
+
+# Re-add Send As
+Add-RecipientPermission `
+    -Identity $sharedMailbox `
+    -Trustee $delegate `
+    -AccessRights SendAs `
+    -Confirm:$false
+
+Write-Host "Permissions refreshed successfully." -ForegroundColor Green
+Write-Host "Full Access (AutoMapping disabled) and Send As have been re-applied for $delegate on $sharedMailbox."

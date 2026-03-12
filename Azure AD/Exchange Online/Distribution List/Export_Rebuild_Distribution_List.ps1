@@ -77,6 +77,9 @@ function Resolve-RecipientNames {
 $gadmin = Read-Host -Prompt 'Input Global/Exchange Admin UPN (globaladmin@domain.com)'
 Connect-ExchangeOnline -UserPrincipalName $gadmin -ShowBanner:$false | Out-Null
 
+$continueExport = $true
+
+do {
 $groupIdentity = Read-Host -Prompt 'Enter the distribution list email address or alias to export'
 $outputFolder = Read-Host -Prompt 'Enter export folder path (Press Enter to use Desktop)'
 
@@ -234,5 +237,10 @@ Set-Content -Path $rebuildScriptPath -Value $rebuildScript -Encoding UTF8
 Write-Host "`nExport complete:" -ForegroundColor Green
 Write-Host "Snapshot CSV : $csvPath" -ForegroundColor Cyan
 Write-Host "Rebuild script: $rebuildScriptPath" -ForegroundColor Cyan
+
+$anotherExport = Read-Host -Prompt 'Do you want to export another distribution list? (Y/N)'
+$continueExport = $anotherExport -match '^(?i)y(es)?$'
+}
+while ($continueExport)
 
 Disconnect-ExchangeOnline -Confirm:$false

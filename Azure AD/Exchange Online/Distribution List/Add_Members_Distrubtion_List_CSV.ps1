@@ -5,7 +5,7 @@
     Author: Josh Block
     Date: 11.17.25
     Type: Private
-    Version: 2.0.0 (EXO Only)
+    Version: 2.0.1 (EXO Only)
 #>
 
 Clear-Host
@@ -22,7 +22,8 @@ catch {
 }
 
 # The only DL this script operates on
-$DLName = "DL-Vacation Purchase Plan"
+$choice = Read-Host "DisplayName of DL"
+$DLName = $choice
 Write-Host -ForegroundColor Cyan "Target Distribution List: $DLName"
 
 # Validate DL exists
@@ -60,7 +61,9 @@ Write-Host -ForegroundColor Green "Imported $($csv.Count) rows."
 Write-Host ""
 
 # Get current members (email normalized)
-$current = (Get-DistributionGroupMember -Identity $DLName -ResultSize Unlimited).PrimarySMTPAddress.ToLower()
+$current = Get-DistributionGroupMember -Identity $DLName -ResultSize Unlimited |
+    Select-Object -ExpandProperty PrimarySmtpAddress |
+    ForEach-Object { $_.ToString().ToLower().Trim() }
 
 # Tracking arrays
 $added = @()
@@ -78,7 +81,8 @@ foreach ($row in $csv) {
         -Status "Working: $index of $total" `
         -PercentComplete $percent
 
-    $email = $row.WorkEmail.ToLower().Trim()
+    $email = ($row.WorkEmail | ForEach-Object { $_ }) -as [string]
+    $email = $email.ToLower().Trim()
 
     if (-not $email) {
         $failed += "Blank email in row $index"
@@ -97,7 +101,9 @@ foreach ($row in $csv) {
         $current += $email
     }
     catch {
-        $failed += $email
+        $errorMessage = $_.Exception.Message
+        Write-Host -ForegroundColor Red "FAILED: $email - $errorMessage"
+        $failed += "$email | $errorMessage"
     }
 }
 
@@ -116,13 +122,13 @@ $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
 if ($skipped.Count -gt 0) {
     $path = "$env:USERPROFILE\Desktop\Skipped_$timestamp.txt"
     $skipped | Out-File -FilePath $path -Encoding UTF8
-    Write-Host -ForegroundColor Yellow "Skipped list saved to: $path"
+    Write-Host -ForegroundColor Magenta "Skipped list saved to: $path"
 }
 
 if ($failed.Count -gt 0) {
     $path = "$env:USERPROFILE\Desktop\Failed_$timestamp.txt"
     $failed | Out-File -FilePath $path -Encoding UTF8
-    Write-Host -ForegroundColor Red "Failed list saved to: $path"
+    Write-Host -ForegroundColor Magenta "Failed list saved to: $path"
 }
 
 Write-Host -ForegroundColor Green "Done."

@@ -9,6 +9,7 @@
 .EXAMPLE
 
 .NOTES
+    https://www.architechlabs.io/articles/external-email-banner/
     You will need to have the AzureAD PowerShell module:
         Install-Module -Name AzureAD
 

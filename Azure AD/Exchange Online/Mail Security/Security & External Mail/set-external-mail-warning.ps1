@@ -31,24 +31,31 @@ $Enabled                          = $true
 $FromScope                        = "NotInOrganization"
 $SentToScope                      = "InOrganization"
 $ApplyHtmlDisclaimerText         = @'
-<div style="
-  width: 100%;
-  padding: 6px 12px;
-  font-size: 10pt;
-  line-height: 1.3;
-  font-family: Calibri, sans-serif;
-  color: #ffffff;
-  background: linear-gradient(to left, #ff4e50, #f00000);
-  text-align: left;
-  margin-bottom: 10px;
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 0 10px rgba(255, 0, 0, 0.4);
+<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="
+  width:100%;
+  background-color:#c62828;
+  border:1px solid #8e0000;
+  margin-bottom:10px;
 ">
-  <span style="color: #ffff66; font-weight: bold;">⚠️ WARNING:</span>
-  This message has <strong>originated from outside the organization</strong>.
-  Please use proper judgment and caution when opening attachments, clicking links, or responding to this email.
-</div>
+  <tr>
+    <td style="
+      padding:10px 12px;
+      font-family:Calibri, Arial, sans-serif;
+      font-size:11pt;
+      line-height:1.4;
+      color:#ffffff;
+    ">
+      <span style="
+        color:#ffff66;
+        font-weight:bold;
+      ">
+        WARNING:
+      </span>
+      This message has <strong>originated from outside the organization</strong>.
+      Please use proper judgment and caution when opening attachments, clicking links, or responding to this email.
+    </td>
+  </tr>
+</table>
 '@
 $ApplyHtmlDisclaimerLocation     = "Prepend"
 $ApplyHtmlDisclaimerFallbackAction = "Wrap"

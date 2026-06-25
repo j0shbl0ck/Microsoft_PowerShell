@@ -1,6 +1,19 @@
 <#
 .SYNOPSIS
-    Imports members into the single cloud DL: DL-Vacation Purchase Plan
+    Imports members from a CSV into the single cloud DL.
+
+.DESCRIPTION
+    Imports users from a CSV file and adds them to the specified
+    Exchange Online Distribution List if they are not already members.
+
+    Required CSV Headers:
+        WorkEmail
+
+    Example CSV:
+        WorkEmail
+        user1@contoso.com
+        user2@contoso.com
+
 .NOTES
     Author: Josh Block
     Date: 11.17.25

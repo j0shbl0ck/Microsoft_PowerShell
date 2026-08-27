@@ -6,12 +6,29 @@
     Cross-references the App IDs found in the M365 admin center EWS usage report export
     against Microsoft's published list of first-party application IDs and, for anything
     not on that list, queries Entra ID (app registrations and service principals) to
-    resolve a display name. Outputs two CSVs: one with resolved app names, one with App
-    IDs that couldn't be matched to anything in the tenant (candidates for manual
-    follow-up / possible external or decommissioned apps).
+    resolve a display name. Outputs two timestamped CSVs (EwsApps_<timestamp>.csv and
+    EwsAppsNotFound_<timestamp>.csv, sharing one timestamp per run) so repeat runs never
+    collide or get blocked by a file still open in Excel — one with resolved app names,
+    one with App IDs that couldn't be matched to anything in the tenant (candidates for
+    manual follow-up / possible external or decommissioned apps).
+
+    Every resolved row is also checked for a live service principal in THIS tenant,
+    regardless of whether the app is first-party or not. Microsoft first-party apps
+    (Outlook, Teams, Office, etc.) only get a local service principal once something in
+    the tenant has actually consented to them — so a first-party app showing EWS usage
+    with no tenant service principal is a real signal worth investigating, not a lookup
+    failure. Output includes a Source column (how the name was resolved) and
+    ConsentedInTenant / ServicePrincipalId columns (whether/where it's actually
+    provisioned locally, so you can jump straight to it in Entra > Enterprise
+    Applications instead of searching and coming up empty).
 
     Part of the Commerce Bank EWS retirement working set. Feeds the app inventory step
     of the EWS deprecation runbook (Phase 1 — app usage discovery).
+
+    Graph session handling: if no Microsoft Graph session is active, the script signs
+    in and disconnects it automatically when done (including on error). If a session
+    is already active when the script starts, it's left connected on exit — the script
+    won't tear down a session you were already using for other work.
 
 .PARAMETER OutputPath
     Optional. Local folder to write output CSVs to. Defaults to Downloads.
@@ -30,7 +47,7 @@
 .EXAMPLE
     .\Find-EwsApps.ps1
     # Zero-parameter run: auto-detects/prompts for the usage report in Downloads and
-    # writes EwsApps.csv / EwsAppsNotFound.csv back to Downloads.
+    # writes EwsApps_<timestamp>.csv / EwsAppsNotFound_<timestamp>.csv back to Downloads.
 
 .EXAMPLE
     .\Find-EwsApps.ps1 -OutputPath C:\Temp\EWS
@@ -41,7 +58,7 @@
     # Skips detection/picker and uses the exact file given.
 
 .NOTES
-    Version:      1.2.0 (Commerce Bank internal build)
+    Version:      1.5.0 (Commerce Bank internal build)
     Author:       Josh Block
     Adapted from: Microsoft's Exchange-App-Usage-Reporting project (MIT licensed,
                   Copyright (c) Microsoft Corporation)
@@ -167,6 +184,42 @@ function Select-EwsUsageReportFile {
 }
 
 
+function Get-TenantServicePrincipalInfo {
+    <#
+        Checks whether an App ID has a service principal (Enterprise Application)
+        provisioned in THIS tenant, regardless of whether it's a Microsoft first-party
+        app or a third-party/custom one. First-party apps only get a local service
+        principal once something in the tenant has actually consented to them, so
+        "not present" is a meaningful signal, not a lookup failure.
+    #>
+    param(
+        [Parameter(Mandatory = $true)][string] $AppId
+    )
+
+    try {
+        $sp = Get-MgServicePrincipal -Filter "appId eq '$AppId'" -ErrorAction Stop
+        if ($sp) {
+            return [PSCustomObject]@{
+                Consented       = $true
+                ObjectId        = $sp.Id
+                DisplayName     = $sp.DisplayName
+                SignInAudience  = $sp.SignInAudience
+            }
+        }
+    }
+    catch {
+        Write-Status "  Warning: service principal lookup failed for $AppId : $($_.Exception.Message)" -Level Warning
+    }
+
+    return [PSCustomObject]@{
+        Consented      = $false
+        ObjectId       = $null
+        DisplayName    = $null
+        SignInAudience = $null
+    }
+}
+
+
 function Resolve-EwsAppName {
     <#
         Attempts to resolve a single App ID to a display name via app registration,
@@ -199,6 +252,8 @@ function Resolve-EwsAppName {
 #region Main
 Write-Status "Find-EwsApps v$script:Version — resolving EWS App IDs to display names" -Level Info
 
+$script:ConnectedByThisScript = $false
+
 try {
     #region Prerequisite checks
     if (-not (Get-Module -Name Microsoft.Graph.Applications -ListAvailable)) {
@@ -209,6 +264,10 @@ try {
     if (-not (Get-MgContext)) {
         Write-Status "Connecting to Microsoft Graph (Application.Read.All)..." -Level Info
         Connect-MgGraph -Scopes Application.Read.All -NoWelcome
+        $script:ConnectedByThisScript = $true
+    }
+    else {
+        Write-Status "Using existing Microsoft Graph session — will leave it connected on exit." -Level Info
     }
     #endregion
 
@@ -240,9 +299,14 @@ try {
 
     foreach ($app in $ewsApps) {
         if ($firstPartyLookup.ContainsKey($app.AppId)) {
+            Write-Status "Checking tenant consent for first-party app $($app.AppId)..." -Level Info
+            $spInfo = Get-TenantServicePrincipalInfo -AppId $app.AppId
             $resolvedApps.Add([PSCustomObject]@{
-                AppId       = $app.AppId
-                DisplayName = "$($firstPartyLookup[$app.AppId]) (MSFT)"
+                AppId              = $app.AppId
+                DisplayName        = "$($firstPartyLookup[$app.AppId]) (MSFT)"
+                Source             = "Microsoft First-Party (reference list)"
+                ConsentedInTenant  = $spInfo.Consented
+                ServicePrincipalId = $spInfo.ObjectId
             })
             continue
         }
@@ -251,9 +315,13 @@ try {
         try {
             $displayName = Resolve-EwsAppName -AppId $app.AppId
             if ($displayName) {
+                $spInfo = Get-TenantServicePrincipalInfo -AppId $app.AppId
                 $resolvedApps.Add([PSCustomObject]@{
-                    AppId       = $app.AppId
-                    DisplayName = $displayName
+                    AppId              = $app.AppId
+                    DisplayName        = $displayName
+                    Source             = "Tenant App Registration / Service Principal"
+                    ConsentedInTenant  = $spInfo.Consented
+                    ServicePrincipalId = $spInfo.ObjectId
                 })
             }
             else {
@@ -273,8 +341,9 @@ try {
 
     $resolvedApps | Out-GridView -Title "EWS Applications"
 
-    $resolvedCsvPath = Join-Path $OutputPath "EwsApps.csv"
-    $unresolvedCsvPath = Join-Path $OutputPath "EwsAppsNotFound.csv"
+    $runTimestamp = (Get-Date).ToString("yyyyMMdd_HHmmss")
+    $resolvedCsvPath = Join-Path $OutputPath "EwsApps_$runTimestamp.csv"
+    $unresolvedCsvPath = Join-Path $OutputPath "EwsAppsNotFound_$runTimestamp.csv"
 
     if ($PSCmdlet.ShouldProcess($resolvedCsvPath, "Write resolved app list")) {
         $resolvedApps | Export-Csv -Path $resolvedCsvPath -NoTypeInformation -Force
@@ -290,5 +359,12 @@ try {
 catch {
     Write-Status "Unhandled error: $($_.Exception.Message)" -Level Error
     throw
+}
+finally {
+    if ($script:ConnectedByThisScript) {
+        Write-Status "Disconnecting Microsoft Graph session..." -Level Info
+        Disconnect-MgGraph | Out-Null
+        Write-Status "Disconnected." -Level Success
+    }
 }
 #endregion

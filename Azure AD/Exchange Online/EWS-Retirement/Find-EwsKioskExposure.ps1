@@ -5,11 +5,14 @@
 
 .DESCRIPTION
     Three-step audit:
-      1. You select which SKUs in your tenant count as EWS-restricted (Kiosk/F1/F3 and
-         similar) from an interactive grid of your actual subscribed SKUs — no hardcoded
-         SKU IDs, since those vary and drift over time. A user is flagged only if EVERY
-         license they hold is in your selected restricted set (anyone with an
-         EWS-capable add-on alongside is automatically excluded).
+      1. You select which SKUs in your tenant to flag (Kiosk/F1/F3 and similar) from an
+         interactive grid of your actual subscribed SKUs — no hardcoded SKU IDs, since
+         those vary and drift over time. Matching is CONTAINS, not EQUALS: a user is
+         flagged if they hold ANY of the selected SKUs, regardless of whatever else is
+         on their account — add-ons like Power BI Free, Teams Exploratory, Defender
+         Discovery, etc, or any other license, are ignored. (An earlier version required
+         a user's entire license set to match the selected SKUs exactly, which silently
+         excluded almost everyone carrying any incidental extra SKU — most real users.)
       2. For each App ID in your resolved EWS app list (EwsApps_<timestamp>.csv from
          Find-EwsApps.ps1), pulls sign-in activity within the lookback window and
          collects which users signed into that app.
@@ -47,7 +50,10 @@
     # to pick restricted SKUs from your tenant, and writes results back to Downloads.
 
 .NOTES
-    Version:      1.1.0 (Commerce Bank internal build)
+    Version:      1.4.0 (Commerce Bank internal build — output CSVs renamed to
+                  F1F3KioskExposure_<timestamp>.csv and F1F3KioskLicenseUsers_<timestamp>.csv
+                  to reflect that the audit covers F1/F3/Kiosk, not just Kiosk. Script
+                  filename left unchanged for documentation consistency.)
     Author:       Josh Block
     Companion to: Find-EwsApps.ps1 (same working set)
     Requires:     Microsoft.Graph.Users, Microsoft.Graph.Identity.DirectoryManagement,
@@ -151,24 +157,30 @@ function Select-EwsAppsCsvFile {
 
 function Get-RestrictedSkuSelection {
     <#
-        Shows every subscribed SKU in the tenant in an interactive grid and lets the
-        admin pick which ones count as EWS-restricted (Kiosk/F1/F3/etc). Deliberately
+        Shows every subscribed SKU in the tenant in one interactive grid and lets the
+        admin pick which ones count as restricted (Kiosk/F1/F3/etc). Deliberately
         interactive rather than hardcoded — SkuPartNumbers and their meanings vary and
         occasionally get renamed, so tenant-confirmed selection beats a guessed list.
+
+        Matching is CONTAINS, not EQUALS: a user is flagged if they hold ANY of the
+        selected SKUs, regardless of whatever else is on their account (add-ons like
+        Power BI Free, Teams Exploratory, Defender Discovery, etc, or anything else).
+        An earlier version required a user's entire license set to match, which
+        silently excluded almost everyone carrying any incidental extra SKU.
     #>
     $allSkus = Get-MgSubscribedSku -All -ErrorAction Stop |
         Select-Object SkuId, SkuPartNumber, @{N = 'ConsumedUnits'; E = { $_.ConsumedUnits } }, @{N = 'Enabled'; E = { $_.PrepaidUnits.Enabled } } |
         Sort-Object SkuPartNumber
 
-    Write-Status "Select every SKU in the grid that should NOT retain EWS access (Kiosk, F1, F3, and similar), then click OK." -Level Warning
-    $selection = $allSkus | Out-GridView -Title "Select EWS-restricted SKUs for this tenant" -OutputMode Multiple
+    Write-Status "Select the SKUs to flag (Kiosk, F1, F3, and similar), then click OK. A user matches if they hold ANY of these, regardless of other licenses on their account." -Level Warning
+    $selection = $allSkus | Out-GridView -Title "Select SKUs to flag (Kiosk/F1/F3)" -OutputMode Multiple
 
     if (-not $selection -or $selection.Count -eq 0) {
         throw "No SKUs selected — nothing to audit against. Aborting."
     }
 
-    Write-Status "Selected $($selection.Count) restricted SKU(s): $($selection.SkuPartNumber -join ', ')" -Level Success
-    return $selection.SkuId
+    Write-Status "Selected $($selection.Count) SKU(s) to flag: $($selection.SkuPartNumber -join ', ')" -Level Success
+    return @($selection.SkuId)
 }
 #endregion
 
@@ -209,17 +221,18 @@ try {
     #endregion
 
     #region Step 1 — Restricted-license mailboxes
-    Write-Status "Step 1: identifying mailboxes on EWS-restricted licenses only..." -Level Info
+    Write-Status "Step 1: identifying mailboxes on flagged licenses..." -Level Info
     $restrictedSkuIds = Get-RestrictedSkuSelection
 
     Write-Status "Pulling user license assignments (this can take a while in large tenants)..." -Level Info
     $allUsers = Get-MgUser -All -Property Id, UserPrincipalName, DisplayName, AssignedLicenses -ErrorAction Stop
 
+    # Contains, not equals: a user is flagged if they hold ANY selected SKU, regardless
+    # of whatever else is assigned (add-ons, unrelated free SKUs, or anything else).
     $restrictedUsers = $allUsers | Where-Object {
-        $_.AssignedLicenses.Count -gt 0 -and
-        -not ($_.AssignedLicenses.SkuId | Where-Object { $_ -notin $restrictedSkuIds })
+        ($_.AssignedLicenses.SkuId | Where-Object { $_ -in $restrictedSkuIds }).Count -gt 0
     }
-    Write-Status "Found $($restrictedUsers.Count) mailbox(es) licensed only with restricted SKUs." -Level Success
+    Write-Status "Found $($restrictedUsers.Count) mailbox(es) holding at least one flagged license." -Level Success
     #endregion
 
     #region Step 2 — EWS app sign-in activity
@@ -288,8 +301,8 @@ try {
     $exposureReport | Out-GridView -Title "Kiosk/F1/F3 EWS Exposure"
 
     $runTimestamp = (Get-Date).ToString("yyyyMMdd_HHmmss")
-    $exposureCsvPath = Join-Path $OutputPath "EwsKioskExposure_$runTimestamp.csv"
-    $allRestrictedCsvPath = Join-Path $OutputPath "RestrictedLicenseUsers_$runTimestamp.csv"
+    $exposureCsvPath = Join-Path $OutputPath "F1F3KioskExposure_$runTimestamp.csv"
+    $allRestrictedCsvPath = Join-Path $OutputPath "F1F3KioskLicenseUsers_$runTimestamp.csv"
 
     if ($PSCmdlet.ShouldProcess($exposureCsvPath, "Write exposure report")) {
         $exposureReport | Export-Csv -Path $exposureCsvPath -NoTypeInformation -Force

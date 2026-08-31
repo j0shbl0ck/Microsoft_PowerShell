@@ -16,13 +16,24 @@
       2. For each App ID in your resolved EWS app list (EwsApps_<timestamp>.csv from
          Find-EwsApps.ps1), pulls sign-in activity within the lookback window and
          collects which users signed into that app.
-      3. Intersects the two sets on UserPrincipalName.
+      3. Intersects the two sets on UserPrincipalName, then narrows to hits whose sign-in
+         resource (ResourceDisplayName) actually contains "Exchange" — filtering out
+         sign-ins that matched by App ID alone but were issued for an unrelated
+         resource (OfficeClientService, SharePoint, etc). This does not confirm EWS
+         specifically — Entra sign-in logs don't carry protocol-level detail (EWS vs.
+         OWA vs. ActiveSync vs. REST all show the same Exchange resource) — it only
+         rules out sign-ins that were never Exchange-related to begin with.
 
     CAVEAT: a sign-in to an app that calls EWS is not proof that specific sign-in was an
-    EWS call — that app may do other things too. Treat the output as an investigation
-    list, not a confirmed-impact list. For higher-precision (but narrower — only mailboxes
-    with auditing enabled) results, see Microsoft's Find-EwsUsage.ps1 -Operation
-    GetUserLicenses against an audit log query instead.
+    EWS call — that app may do other things too, especially broad first-party App IDs
+    like "Microsoft Office" that cover many unrelated features. Treat the output as an
+    investigation list, not a confirmed-impact list. The ResourceDisplayName column (the
+    actual API/resource the sign-in token was issued for, e.g. "Office 365 Exchange
+    Online" vs. "OfficeClientService") is a stronger triage signal than the App ID alone
+    — a resource unrelated to Exchange is good evidence that specific sign-in wasn't an
+    EWS call, even if the App ID matched. For higher-precision (but narrower — only
+    mailboxes with auditing enabled) results, see Microsoft's Find-EwsUsage.ps1
+    -Operation GetUserLicenses against an audit log query instead.
 
     Part of the Commerce Bank EWS retirement working set. Feeds the Kiosk/Frontline
     license audit step of the EWS deprecation runbook (Phase 1).
@@ -50,10 +61,10 @@
     # to pick restricted SKUs from your tenant, and writes results back to Downloads.
 
 .NOTES
-    Version:      1.4.0 (Commerce Bank internal build — output CSVs renamed to
-                  F1F3KioskExposure_<timestamp>.csv and F1F3KioskLicenseUsers_<timestamp>.csv
-                  to reflect that the audit covers F1/F3/Kiosk, not just Kiosk. Script
-                  filename left unchanged for documentation consistency.)
+    Version:      1.7.0 (Commerce Bank internal build — renamed the LastSignIn column
+                  to LastSignInUtc in both the exposure report and internal sign-in
+                  data, since Get-MgAuditLogSignIn's CreatedDateTime is returned in UTC
+                  and that wasn't obvious from the column name alone)
     Author:       Josh Block
     Companion to: Find-EwsApps.ps1 (same working set)
     Requires:     Microsoft.Graph.Users, Microsoft.Graph.Identity.DirectoryManagement,
@@ -251,10 +262,11 @@ try {
             $signIns = Get-MgAuditLogSignIn -Filter $filter -All -ErrorAction Stop
             foreach ($signIn in $signIns) {
                 $signInActivity.Add([PSCustomObject]@{
-                    UserPrincipalName = $signIn.UserPrincipalName
-                    AppId             = $app.AppId
-                    AppDisplayName    = $app.DisplayName
-                    LastSignIn        = $signIn.CreatedDateTime
+                    UserPrincipalName   = $signIn.UserPrincipalName
+                    AppId               = $app.AppId
+                    AppDisplayName      = $app.DisplayName
+                    ResourceDisplayName = $signIn.ResourceDisplayName
+                    LastSignInUtc       = $signIn.CreatedDateTime
                 })
             }
         }
@@ -267,7 +279,7 @@ try {
     $signInActivity = $signInActivity |
         Where-Object { -not [string]::IsNullOrEmpty($_.UserPrincipalName) } |
         Group-Object UserPrincipalName, AppId |
-        ForEach-Object { $_.Group | Sort-Object LastSignIn -Descending | Select-Object -First 1 }
+        ForEach-Object { $_.Group | Sort-Object LastSignInUtc -Descending | Select-Object -First 1 }
 
     Write-Status "Found sign-in activity from $(($signInActivity.UserPrincipalName | Sort-Object -Unique).Count) unique user(s) across flagged apps." -Level Success
     #endregion
@@ -276,16 +288,31 @@ try {
     Write-Status "Step 3: intersecting restricted-license users with EWS-app sign-in activity..." -Level Info
     $restrictedUpns = $restrictedUsers.UserPrincipalName
 
-    $exposedUsers = $signInActivity | Where-Object { $_.UserPrincipalName -in $restrictedUpns }
+    $licenseMatches = $signInActivity | Where-Object { $_.UserPrincipalName -in $restrictedUpns }
+
+    # Narrow to sign-ins whose actual token resource was Exchange-related, not just the
+    # App ID. Broad first-party App IDs like "Microsoft Office" cover many unrelated
+    # resources (OfficeClientService, SharePoint, etc) — ResourceDisplayName is the
+    # field that tells you what the token was actually issued for. This does NOT
+    # confirm the activity was specifically EWS (vs. OWA, ActiveSync, MAPI/HTTP, REST)
+    # — Entra sign-in logs don't carry that level of protocol detail. It just rules out
+    # the cases that were never Exchange-related in the first place.
+    $exposedUsers = $licenseMatches | Where-Object { $_.ResourceDisplayName -match 'Exchange' }
+
+    $excludedCount = $licenseMatches.Count - $exposedUsers.Count
+    if ($excludedCount -gt 0) {
+        Write-Status "Filtered out $excludedCount hit(s) whose sign-in resource wasn't Exchange-related (e.g. OfficeClientService, SharePoint) — these were flagged by App ID alone and ruled out by resource." -Level Info
+    }
 
     $exposureReport = foreach ($hit in $exposedUsers) {
         $userDetail = $restrictedUsers | Where-Object { $_.UserPrincipalName -eq $hit.UserPrincipalName } | Select-Object -First 1
         [PSCustomObject]@{
-            UserPrincipalName = $hit.UserPrincipalName
-            DisplayName       = $userDetail.DisplayName
-            AppId             = $hit.AppId
-            AppDisplayName    = $hit.AppDisplayName
-            LastSignIn        = $hit.LastSignIn
+            UserPrincipalName   = $hit.UserPrincipalName
+            DisplayName         = $userDetail.DisplayName
+            AppId               = $hit.AppId
+            AppDisplayName      = $hit.AppDisplayName
+            ResourceDisplayName = $hit.ResourceDisplayName
+            LastSignInUtc       = $hit.LastSignInUtc
         }
     }
 

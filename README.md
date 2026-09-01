@@ -4,7 +4,7 @@ A curated collection of PowerShell scripts for managing Microsoft environments �
 
 <p>
   <img src="https://img.shields.io/badge/PowerShell-5.1%2B-5391FE?logo=powershell&logoColor=white" alt="PowerShell 5.1+"/>
-  <img src="https://img.shields.io/badge/Categories-4-blue" alt="4 Categories"/>
+  <img src="https://img.shields.io/badge/Categories-3-blue" alt="3 Categories"/>
   <img src="https://img.shields.io/badge/License-MIT-green" alt="License"/>
   <img src="https://img.shields.io/badge/Author-j0shbl0ck-black?logo=github" alt="Author"/>
 </p>
@@ -15,22 +15,17 @@ Jump to a category 👇
 
 <table>
 <tr>
-<td width="25%">
+<td width="33%">
 
 🗃️ [Active Directory](#️-active-directory)
 
 </td>
-<td width="25%">
-
-🔒 [Azure AD](#-azure-ad)
-
-</td>
-<td width="25%">
+<td width="33%">
 
 🆔 [Entra ID](#-entra-id)
 
 </td>
-<td width="25%">
+<td width="33%">
 
 🛠️ [Scripts](#️-scripts)
 
@@ -59,38 +54,26 @@ On-prem AD attribute management and Azure AD Connect / hybrid sync tasks.
 
 </details>
 
-## 🔒 Azure AD
+## 🆔 Entra ID
 
-Tools for **Exchange Online**, **SharePoint Online**, Microsoft MFA, Purview, and Azure AD/M365 user management.
+Tools for **Exchange Online**, **SharePoint Online**, Microsoft MFA, Purview, and Entra ID/M365 user management. Also includes a handful of scripts using legacy Entra ID cmdlets — retained for reference, superseded where possible by the modern Microsoft Graph SDK.
 
 <details open>
-<summary><strong>5 subfolders</strong></summary>
+<summary><strong>5 subfolders · 4 scripts</strong></summary>
 
-| 📁 **Folder** | 📜 **Description** |
+| 📁 **Item** | 📜 **Description** |
 | --- | :--- |
-| [`Exchange Online/`](Azure%20AD/Exchange%20Online/README.md) | 50+ scripts across 13 categories — mailboxes, distribution lists, contacts, calendar permissions, compliance/retention, mail security, and reporting. See its dedicated README for the full breakdown. |
+| [`Exchange Online/`](Entra%20ID/Exchange%20Online/README.md) | 50+ scripts across 13 categories — mailboxes, distribution lists, contacts, calendar permissions, compliance/retention, mail security, and reporting. See its dedicated README for the full breakdown. |
 | `Microsoft MFA/` | MFA reporting and configuration scripts. |
 | `Purview/` | Microsoft Purview compliance scripts. |
 | `SharePoint Online/` | SharePoint Online administration scripts. |
-| `User Management/` | Azure AD / M365 user lifecycle scripts (e.g., termed user access). |
+| `User Management/` | Entra ID / M365 user lifecycle scripts (e.g., termed user access). |
+| `disable_user.ps1` | ⚠️ Legacy — disables a user account in Entra ID. |
+| `find-e3-assignment-30-day.ps1` | ⚠️ Legacy — finds users with an E3 license assignment within the last 30 days. |
+| `mail_entrpse_apps.ps1` | ⚠️ Legacy — reports on mail-related enterprise app registrations. |
+| `user_photo.ps1` | ⚠️ Legacy — manages/uploads user profile photos in Entra ID. |
 
-Also includes its own [Quick Access README](Azure%20AD/README.md) — a bookmark-bar style index of the most frequently used scripts in this category.
-
-</details>
-
-## 🆔 Entra ID
-
-⚠️ Scripts using legacy Entra ID cmdlets — retained for reference, superseded where possible by the modern Microsoft Graph SDK.
-
-<details open>
-<summary><strong>4 scripts</strong></summary>
-
-| 📜 **Script** | 📄 **Description** |
-| --- | :--- |
-| `disable_user.ps1` | Disables a user account in Entra ID. |
-| `find-e3-assignment-30-day.ps1` | Finds users with an E3 license assignment within the last 30 days. |
-| `mail_entrpse_apps.ps1` | Reports on mail-related enterprise app registrations. |
-| `user_photo.ps1` | Manages/uploads user profile photos in Entra ID. |
+Also includes its own [Quick Access README](Entra%20ID/README.md) — a bookmark-bar style index of the most frequently used scripts in this category.
 
 </details>
 

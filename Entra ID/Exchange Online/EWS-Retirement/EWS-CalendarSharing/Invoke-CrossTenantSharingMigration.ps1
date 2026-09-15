@@ -27,6 +27,35 @@
     Run one -Phase at a time and confirm results before moving to the next.
     Everything that writes configuration supports -WhatIf.
 
+    SETUP ORDER (required, not interchangeable):
+        1. EstablishTrust   -- creates the parent partner configuration. Must
+                                exist before step 2 -- GrantCapability will
+                                fail with "Parent Entra Cross-Tenant Access
+                                Policy not found" if this hasn't run yet for
+                                that TenantId.
+        2. GrantCapability  -- adds a specific capability (Free/Busy, MailTips,
+                                Calendar Sharing) as a sub-resource under the
+                                trust created in step 1. Cannot exist without it.
+        3. DisableRelationship / DisableSharingPolicy -- disable the OLD legacy
+                                config once the new capability is confirmed working,
+                                to test side-by-side.
+        4. RemoveRelationship / RemoveSharingPolicy -- remove the OLD legacy
+                                config permanently once testing confirms nothing broke.
+
+    TEARDOWN ORDER (reverse of setup -- for fully decommissioning a partner
+    relationship, not for the normal legacy-cleanup steps 3-4 above):
+        1. Remove the capability grant (child) first.
+        2. RemoveTrust -- removes the partner trust (parent) second. A trust
+           with a user synchronization policy attached must have that removed
+           first too (Graph API requirement, not something this script's
+           EstablishTrust sets up, but worth checking on trusts modified
+           outside this script).
+        NOTE: RemoveCapability (removing a single capability without removing
+        the whole trust) is not yet implemented -- its exact cmdlet syntax
+        hasn't been verified. If nothing was ever successfully granted under
+        a trust (e.g. GrantCapability failed before RemoveTrust is needed),
+        skip straight to RemoveTrust -- there's nothing to remove first.
+
 .PARAMETER Phase
     Which step to execute:
         Inventory              - Lists all Organization Relationships and Sharing Policies,
@@ -37,12 +66,21 @@
         GuestReview            - Reports last sign-in for guest users matching -DomainFilter,
                                   to help assess whether a relationship is still in active use
         EstablishTrust         - Creates the Entra XTAP partner trust for -TenantId
-                                  (once per partner organization)
+                                  (once per partner organization). MUST run before
+                                  GrantCapability for that same TenantId -- see
+                                  SETUP ORDER above.
         GrantCapability        - Grants a Free/Busy, MailTips, or Calendar Sharing capability.
-                                  Scope is inferred from parameters:
+                                  Requires EstablishTrust to have already succeeded for the
+                                  same -TenantId (partner scope) -- fails with "Parent Entra
+                                  Cross-Tenant Access Policy not found" otherwise. Scope is
+                                  inferred from parameters:
                                     -TenantId given            -> partner-specific
                                     -Anonymous switch given    -> anonymous (default policy only)
                                     neither given               -> default policy (wildcard/org-wide)
+        RemoveTrust            - Removes the partner trust for -TenantId entirely (the parent
+                                  object EstablishTrust created), including any capabilities
+                                  granted under it. This is teardown, not the routine
+                                  legacy-cleanup step -- see TEARDOWN ORDER above.
         DisableRelationship    - Disables an Organization Relationship for side-by-side XTAP testing
         ReenableRelationship   - Re-enables an Organization Relationship if XTAP testing fails
         RemoveRelationship     - Removes an Organization Relationship once XTAP is confirmed working
@@ -113,9 +151,12 @@
 .EXAMPLE
     .\Invoke-CrossTenantSharingMigration.ps1 -Phase DisableSharingPolicy -PolicyName "Default Sharing Policy" -WhatIf
 
+.EXAMPLE
+    .\Invoke-CrossTenantSharingMigration.ps1 -Phase RemoveTrust -TenantId "<partnerTenantId>"
+
 .NOTES
     Author:   Josh Block (j0shbl0ck)
-    Version:  2.1.0
+    Version:  2.4.0
     Repo:     https://github.com/j0shbl0ck
     Requires: ExchangeOnlineManagement module + active Connect-ExchangeOnline session
               Microsoft Graph PowerShell SDK Beta for EstablishTrust/GrantCapability
@@ -124,6 +165,13 @@
               Get-OrganizationRelationship directly with those properties if you
               need to confirm an existing relationship was already scoped to a
               group before choosing -GroupId here.
+    Changes in 2.2.0: every mutating Graph/EXO cmdlet call is now wrapped in
+              try/catch with -ErrorAction Stop, so a failed call (e.g. "Parent
+              Cross-Tenant Access Policy not found" when EstablishTrust hasn't
+              run yet, or wasn't run for the right TenantId) prints a clear
+              FAILED message and re-throws, instead of the script silently
+              continuing on to print a false "success" message regardless of
+              whether the change actually took effect.
 #>
 
 [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
@@ -135,6 +183,7 @@ param(
         'GuestReview',
         'EstablishTrust',
         'GrantCapability',
+        'RemoveTrust',
         'DisableRelationship',
         'ReenableRelationship',
         'RemoveRelationship',
@@ -165,18 +214,51 @@ param(
 
 #region Helper: connection checks
 function Assert-ExchangeOnlineConnected {
-    try { $null = Get-ConnectionInformation -ErrorAction Stop }
-    catch {
+    if (-not (Get-Module -ListAvailable -Name ExchangeOnlineManagement)) {
+        throw "ExchangeOnlineManagement module not found. Install with: Install-Module ExchangeOnlineManagement -Scope AllUsers (run PowerShell as Administrator for machine-wide install), or -Scope CurrentUser for your profile only."
+    }
+
+    # Get-ConnectionInformation does NOT throw when there's no active session -- it just
+    # returns nothing. Check the result itself, not just whether the call errored.
+    $connectionInfo = $null
+    try { $connectionInfo = Get-ConnectionInformation -ErrorAction Stop }
+    catch { }
+
+    if (-not $connectionInfo) {
         Write-Host "Not connected to Exchange Online. Connecting now..." -ForegroundColor Yellow
         Connect-ExchangeOnline -ShowBanner:$false
     }
 }
 
 function Assert-GraphConnected {
-    try { $null = Get-MgContext -ErrorAction Stop }
-    catch {
+    if (-not (Get-Module -ListAvailable -Name Microsoft.Graph.Beta.Identity.SignIns)) {
+        throw "Microsoft Graph Beta module not found. Install with: Install-Module Microsoft.Graph.Beta -Scope AllUsers (run PowerShell as Administrator for machine-wide install), or -Scope CurrentUser for your profile only."
+    }
+
+    # Same pattern as above -- Get-MgContext returns nothing rather than throwing
+    # when there's no active session.
+    $context = $null
+    try { $context = Get-MgContext -ErrorAction Stop }
+    catch { }
+
+    if (-not $context) {
         Write-Host "Not connected to Microsoft Graph. Connecting now..." -ForegroundColor Yellow
-        Connect-MgGraph -Scopes "Policy.Read.All,Policy.ReadWrite.CrossTenantAccess,Policy.ReadWrite.CrossTenantCapability" -ContextScope Process
+        Write-Host "If you connected to Exchange Online earlier in this same session, Connect-MgGraph" -ForegroundColor DarkGray
+        Write-Host "can fail with a 'Method not found' MSAL/Identity.Client assembly clash -- that's an" -ForegroundColor DarkGray
+        Write-Host "environment issue, not a credentials problem. Close this window and connect Graph" -ForegroundColor DarkGray
+        Write-Host "FIRST in a fresh session if that happens." -ForegroundColor DarkGray
+
+        Connect-MgGraph -Scopes "Policy.Read.All,Policy.ReadWrite.CrossTenantAccess,Policy.ReadWrite.CrossTenantCapability" -ContextScope Process -ErrorAction SilentlyContinue
+
+        # Connect-MgGraph can fail (assembly clash, cancelled sign-in, etc.) without throwing a
+        # terminating error that stops the script -- verify the connection actually took before
+        # letting any phase proceed, instead of silently continuing in a half-connected state.
+        $context = $null
+        try { $context = Get-MgContext -ErrorAction Stop } catch { }
+
+        if (-not $context) {
+            throw "Failed to connect to Microsoft Graph. See the guidance above if this was a 'Method not found' error, otherwise re-run and check the sign-in prompt."
+        }
     }
 }
 #endregion
@@ -279,9 +361,15 @@ switch ($Phase) {
         }
 
         if ($PSCmdlet.ShouldProcess($TenantId, "New-MgBetaPolicyCrossTenantAccessPolicyPartner")) {
-            New-MgBetaPolicyCrossTenantAccessPolicyPartner -BodyParameter $body
-            Write-Host "Established Microsoft 365 Collaboration trust with tenant $TenantId." -ForegroundColor Green
-            Write-Host "This trust covers ALL domains verified in that tenant automatically -- there is no per-domain exclusion once granted." -ForegroundColor DarkGray
+            try {
+                New-MgBetaPolicyCrossTenantAccessPolicyPartner -BodyParameter $body -ErrorAction Stop
+                Write-Host "Established Microsoft 365 Collaboration trust with tenant $TenantId." -ForegroundColor Green
+                Write-Host "This trust covers ALL domains verified in that tenant automatically -- there is no per-domain exclusion once granted." -ForegroundColor DarkGray
+            }
+            catch {
+                Write-Host "FAILED to establish trust with tenant $TenantId. $($_.Exception.Message)" -ForegroundColor Red
+                throw
+            }
         }
     }
     #endregion
@@ -354,16 +442,52 @@ switch ($Phase) {
         if ($TenantId) {
             # Partner-specific scope
             if ($PSCmdlet.ShouldProcess($TenantId, "New-MgBetaPolicyCrossTenantAccessPolicyPartnerM365Capability ($capability)")) {
-                New-MgBetaPolicyCrossTenantAccessPolicyPartnerM365Capability -CrossTenantAccessPolicyConfigurationPartnerTenantId $TenantId -BodyParameter $body
-                Write-Host "Granted $capability to partner tenant $TenantId." -ForegroundColor Green
+                try {
+                    New-MgBetaPolicyCrossTenantAccessPolicyPartnerM365Capability -CrossTenantAccessPolicyConfigurationPartnerTenantId $TenantId -BodyParameter $body -ErrorAction Stop
+                    Write-Host "Granted $capability to partner tenant $TenantId." -ForegroundColor Green
+                }
+                catch {
+                    Write-Host "FAILED to grant $capability to partner tenant $TenantId. $($_.Exception.Message)" -ForegroundColor Red
+                    Write-Host "If this says the parent Cross-Tenant Access Policy wasn't found, run -Phase EstablishTrust for this TenantId first." -ForegroundColor Yellow
+                    throw
+                }
             }
         }
         else {
             # Default (org-wide / wildcard / anonymous) scope
             $scopeLabel = if ($Anonymous) { "Default Cross-Tenant Access Policy (Anonymous)" } else { "Default Cross-Tenant Access Policy (org-wide)" }
             if ($PSCmdlet.ShouldProcess($scopeLabel, "New-MgBetaPolicyCrossTenantAccessPolicyDefaultM365Capability ($capability)")) {
-                New-MgBetaPolicyCrossTenantAccessPolicyDefaultM365Capability -BodyParameter $body
-                Write-Host "Granted $capability via $scopeLabel." -ForegroundColor Green
+                try {
+                    New-MgBetaPolicyCrossTenantAccessPolicyDefaultM365Capability -BodyParameter $body -ErrorAction Stop
+                    Write-Host "Granted $capability via $scopeLabel." -ForegroundColor Green
+                }
+                catch {
+                    Write-Host "FAILED to grant $capability via $scopeLabel. $($_.Exception.Message)" -ForegroundColor Red
+                    throw
+                }
+            }
+        }
+    }
+    #endregion
+
+    #region Teardown -- remove a partner trust (only after any attached capability is removed)
+    'RemoveTrust' {
+        if (-not $TenantId) { throw "Provide -TenantId for the partner organization." }
+        Assert-GraphConnected
+
+        Write-Host "This removes the ENTIRE partner trust for tenant $TenantId, including any capabilities granted under it." -ForegroundColor Yellow
+        Write-Host "If this partner configuration has a user synchronization policy attached, Graph requires that to be" -ForegroundColor DarkGray
+        Write-Host "deleted first (Remove-MgBetaPolicyCrossTenantAccessPolicyPartnerIdentitySynchronization) -- not something" -ForegroundColor DarkGray
+        Write-Host "this script sets up, but worth checking if this trust was created or modified outside this script." -ForegroundColor DarkGray
+
+        if ($PSCmdlet.ShouldProcess($TenantId, "Remove-MgBetaPolicyCrossTenantAccessPolicyPartner")) {
+            try {
+                Remove-MgBetaPolicyCrossTenantAccessPolicyPartner -CrossTenantAccessPolicyConfigurationPartnerTenantId $TenantId -ErrorAction Stop
+                Write-Host "Removed the partner trust for tenant $TenantId." -ForegroundColor Green
+            }
+            catch {
+                Write-Host "FAILED to remove the partner trust for tenant $TenantId. $($_.Exception.Message)" -ForegroundColor Red
+                throw
             }
         }
     }
@@ -374,8 +498,14 @@ switch ($Phase) {
         if (-not $RelationshipName) { throw "Provide -RelationshipName." }
         Assert-ExchangeOnlineConnected
         if ($PSCmdlet.ShouldProcess($RelationshipName, "Set-OrganizationRelationship -Enabled `$False")) {
-            Set-OrganizationRelationship -Identity $RelationshipName -Enabled $false
-            Write-Host "Disabled '$RelationshipName'. Coordinate with the partner admin to test XTAP now." -ForegroundColor Yellow
+            try {
+                Set-OrganizationRelationship -Identity $RelationshipName -Enabled $false -ErrorAction Stop
+                Write-Host "Disabled '$RelationshipName'. Coordinate with the partner admin to test XTAP now." -ForegroundColor Yellow
+            }
+            catch {
+                Write-Host "FAILED to disable '$RelationshipName'. $($_.Exception.Message)" -ForegroundColor Red
+                throw
+            }
         }
     }
     #endregion
@@ -385,8 +515,14 @@ switch ($Phase) {
         if (-not $RelationshipName) { throw "Provide -RelationshipName." }
         Assert-ExchangeOnlineConnected
         if ($PSCmdlet.ShouldProcess($RelationshipName, "Set-OrganizationRelationship -Enabled `$True")) {
-            Set-OrganizationRelationship -Identity $RelationshipName -Enabled $true
-            Write-Host "Re-enabled '$RelationshipName'." -ForegroundColor Yellow
+            try {
+                Set-OrganizationRelationship -Identity $RelationshipName -Enabled $true -ErrorAction Stop
+                Write-Host "Re-enabled '$RelationshipName'." -ForegroundColor Yellow
+            }
+            catch {
+                Write-Host "FAILED to re-enable '$RelationshipName'. $($_.Exception.Message)" -ForegroundColor Red
+                throw
+            }
         }
     }
     #endregion
@@ -396,8 +532,14 @@ switch ($Phase) {
         if (-not $RelationshipName) { throw "Provide -RelationshipName." }
         Assert-ExchangeOnlineConnected
         if ($PSCmdlet.ShouldProcess($RelationshipName, "Remove-OrganizationRelationship")) {
-            Remove-OrganizationRelationship -Identity $RelationshipName
-            Write-Host "Removed '$RelationshipName'." -ForegroundColor Green
+            try {
+                Remove-OrganizationRelationship -Identity $RelationshipName -ErrorAction Stop -Confirm:$false
+                Write-Host "Removed '$RelationshipName'." -ForegroundColor Green
+            }
+            catch {
+                Write-Host "FAILED to remove '$RelationshipName'. $($_.Exception.Message)" -ForegroundColor Red
+                throw
+            }
         }
     }
     #endregion
@@ -407,8 +549,14 @@ switch ($Phase) {
         if (-not $PolicyName) { throw "Provide -PolicyName." }
         Assert-ExchangeOnlineConnected
         if ($PSCmdlet.ShouldProcess($PolicyName, "Set-SharingPolicy -Enabled `$False")) {
-            Set-SharingPolicy -Identity $PolicyName -Enabled $false
-            Write-Host "Disabled '$PolicyName'. Watch for reports of broken external calendar-sharing invitations." -ForegroundColor Yellow
+            try {
+                Set-SharingPolicy -Identity $PolicyName -Enabled $false -ErrorAction Stop
+                Write-Host "Disabled '$PolicyName'. Watch for reports of broken external calendar-sharing invitations." -ForegroundColor Yellow
+            }
+            catch {
+                Write-Host "FAILED to disable '$PolicyName'. $($_.Exception.Message)" -ForegroundColor Red
+                throw
+            }
         }
     }
     #endregion
@@ -418,8 +566,14 @@ switch ($Phase) {
         if (-not $PolicyName) { throw "Provide -PolicyName." }
         Assert-ExchangeOnlineConnected
         if ($PSCmdlet.ShouldProcess($PolicyName, "Set-SharingPolicy -Enabled `$True")) {
-            Set-SharingPolicy -Identity $PolicyName -Enabled $true
-            Write-Host "Re-enabled '$PolicyName'." -ForegroundColor Yellow
+            try {
+                Set-SharingPolicy -Identity $PolicyName -Enabled $true -ErrorAction Stop
+                Write-Host "Re-enabled '$PolicyName'." -ForegroundColor Yellow
+            }
+            catch {
+                Write-Host "FAILED to re-enable '$PolicyName'. $($_.Exception.Message)" -ForegroundColor Red
+                throw
+            }
         }
     }
     #endregion
@@ -429,8 +583,14 @@ switch ($Phase) {
         if (-not $PolicyName) { throw "Provide -PolicyName." }
         Assert-ExchangeOnlineConnected
         if ($PSCmdlet.ShouldProcess($PolicyName, "Remove-SharingPolicy")) {
-            Remove-SharingPolicy -Identity $PolicyName
-            Write-Host "Removed '$PolicyName'." -ForegroundColor Green
+            try {
+                Remove-SharingPolicy -Identity $PolicyName -ErrorAction Stop -Confirm:$false
+                Write-Host "Removed '$PolicyName'." -ForegroundColor Green
+            }
+            catch {
+                Write-Host "FAILED to remove '$PolicyName'. $($_.Exception.Message)" -ForegroundColor Red
+                throw
+            }
         }
     }
     #endregion

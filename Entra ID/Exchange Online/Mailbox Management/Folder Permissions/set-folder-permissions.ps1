@@ -11,7 +11,8 @@ Interactive, menu-driven tool for managing Exchange Online mailbox folder permis
     AvailabilityOnly and LimitedDetails).
   - Choose a scope: the folder only, the folder plus its direct subfolders, or the
     folder plus every subfolder beneath it.
-  - Search for and pick the folder from a numbered list instead of typing exact paths.
+  - Find mailboxes (user, shared, room, equipment) and users by email address or
+    display name, and pick folders from a searchable numbered list.
   - Review a summary before any change is made, watch progress, and get a results
     table at the end (optionally exported to CSV).
 
@@ -24,7 +25,7 @@ to backslashes for the permission cmdlets. Folder names that contain a "/" are
 handled as well.
 
 Author: j0shbl0ck (https://github.com/j0shbl0ck)
-Version: 2.2.0
+Version: 2.3.0
 Date: 10.29.26
 Type: Public
 
@@ -36,8 +37,8 @@ Clear-Host
 
 #region ---------- SETTINGS (optional - leave blank to be prompted) ----------
 
-$Mailbox     = ''      # Mailbox to modify, e.g. shared@contoso.com
-$TargetUser  = ''      # User to grant/remove, e.g. jane@contoso.com (or Default / Anonymous)
+$Mailbox     = ''      # Mailbox to modify: email or display name, e.g. shared@contoso.com or Conference Room A
+$TargetUser  = ''      # User to grant/remove: email or display name (or Default / Anonymous)
 $RootFolder  = ''      # Folder path, e.g. /Inbox/My Archive
 $Action      = ''      # Add | Remove
 $AccessRight = ''      # Author | Contributor | Editor | NonEditingAuthor | Owner | PublishingAuthor |
@@ -225,7 +226,8 @@ function Test-IsCalendarFolder {
 function Select-MailboxFolder {
     param(
         [object[]]$AllFolders,
-        [string]$InitialPath
+        [string]$InitialPath,
+        $DefaultFolder
     )
 
     $search = $InitialPath
@@ -233,7 +235,14 @@ function Select-MailboxFolder {
         if ([string]::IsNullOrWhiteSpace($search)) {
             Write-Section 'Select folder'
             Write-Info 'Type a full path (e.g. /Inbox/My Archive) or part of a folder name to search.'
-            $search = Read-Input -Prompt 'Folder path or search text:'
+            if ($DefaultFolder) {
+                $defaultPath = Get-DisplayPath $DefaultFolder.FolderPath
+                $search = Read-Input -Prompt "Folder path or search text (Enter for $defaultPath):" -AllowEmpty
+                if ([string]::IsNullOrWhiteSpace($search)) { return $DefaultFolder }
+            }
+            else {
+                $search = Read-Input -Prompt 'Folder path or search text:'
+            }
         }
 
         # Normalise a typed path: leading "/", no trailing "/"
@@ -283,10 +292,101 @@ function Select-MailboxFolder {
 
 #region ---------- Main ----------
 
+function Get-RecipientTypeLabel {
+    param([string]$TypeDetails)
+    switch ($TypeDetails) {
+        'UserMailbox'      { 'User' }
+        'SharedMailbox'    { 'Shared' }
+        'RoomMailbox'      { 'Room' }
+        'EquipmentMailbox' { 'Equipment' }
+        'MailUniversalSecurityGroup'     { 'Security group' }
+        'MailUniversalDistributionGroup' { 'Distribution group' }
+        'GroupMailbox'     { 'Microsoft 365 group' }
+        default            { $TypeDetails }
+    }
+}
+
+function Find-Recipient {
+    <#
+        Looks up a mailbox (-Kind Mailbox) or any recipient (-Kind Recipient) by email
+        address, alias, or display name. Exact matches are returned directly; otherwise
+        partial matches are listed to pick from. Returns $null to ask for a new search.
+    #>
+    param(
+        [string]$Text,
+        [ValidateSet('Mailbox', 'Recipient')]
+        [string]$Kind
+    )
+
+    $Text = $Text.Trim()
+
+    # 1. Exact match (email, alias, UPN, or an exact unique display name)
+    try {
+        if ($Kind -eq 'Mailbox') { $hit = Get-EXOMailbox -Identity $Text -ErrorAction Stop }
+        else                     { $hit = Get-EXORecipient -Identity $Text -ErrorAction Stop }
+        if (@($hit).Count -eq 1) { return @($hit)[0] }
+    }
+    catch { }
+
+    # 2. Partial match: name resolution first (start of display name, first/last name, alias, email),
+    #    then a "contains" search on display name and email address
+    Write-Info "Searching for '$Text'..."
+    $found = @()
+    try {
+        if ($Kind -eq 'Mailbox') { $found = @(Get-EXOMailbox -Anr $Text -ResultSize 100 -ErrorAction Stop) }
+        else                     { $found = @(Get-EXORecipient -Anr $Text -ResultSize 100 -ErrorAction Stop) }
+    }
+    catch { }
+
+    if ($found.Count -eq 0) {
+        $safe   = $Text -replace "'", "''"
+        $filter = "DisplayName -like '*$safe*' -or PrimarySmtpAddress -like '*$safe*'"
+        try {
+            if ($Kind -eq 'Mailbox') { $found = @(Get-EXOMailbox -Filter $filter -ResultSize 100 -ErrorAction Stop) }
+            else                     { $found = @(Get-EXORecipient -Filter $filter -ResultSize 100 -ErrorAction Stop) }
+        }
+        catch { }
+    }
+
+    if ($found.Count -eq 0) {
+        Write-Fail "Nothing found matching '$Text'."
+        return $null
+    }
+    if ($found.Count -eq 1) {
+        return $found[0]
+    }
+
+    $found = @($found | Sort-Object DisplayName)
+    $maxShown = 30
+    $shown = @($found | Select-Object -First $maxShown)
+    if ($found.Count -gt $maxShown) {
+        Write-Warn "$($found.Count) matches; showing the first $maxShown. Refine your search to narrow it down."
+    }
+
+    # Last menu entry lets the user search again
+    $searchAgain = [pscustomobject]@{ DisplayName = '<< Search again >>'; PrimarySmtpAddress = ''; RecipientTypeDetails = '' }
+    $options = $shown + $searchAgain
+
+    $index = Read-MenuChoice -Title "Matches ($($found.Count))" -Items $options `
+        -LabelScript {
+            param($r)
+            if ($r.PrimarySmtpAddress) { "$($r.DisplayName) <$($r.PrimarySmtpAddress)>" } else { $r.DisplayName }
+        } `
+        -DetailScript { param($r) Get-RecipientTypeLabel $r.RecipientTypeDetails }
+
+    if ($index -eq $options.Count - 1) { return $null }
+    return $options[$index]
+}
+
 function Resolve-Mailbox {
-    # Prompts until a valid mailbox is entered. $Current (if set) is kept when Enter is pressed.
+    <#
+        Prompts until a mailbox is chosen (search by email or display name).
+        $Current (if set) is kept when Enter is pressed.
+        Returns an object with Address, DisplayName and Type.
+    #>
     param([string]$Value, [string]$Current)
     Write-Section 'Mailbox'
+    Write-Info 'Enter an email address or (part of) a display name. Shared, room and equipment mailboxes all work.'
     while ($true) {
         if ([string]::IsNullOrWhiteSpace($Value)) {
             if ($Current) {
@@ -294,26 +394,29 @@ function Resolve-Mailbox {
                 if ([string]::IsNullOrWhiteSpace($Value)) { $Value = $Current }
             }
             else {
-                $Value = Read-Input -Prompt 'Mailbox to modify (e.g. shared@contoso.com):'
+                $Value = Read-Input -Prompt 'Mailbox to modify (email or display name):'
             }
         }
-        try {
-            $mbx = Get-EXOMailbox -Identity $Value -ErrorAction Stop
-            $address = $mbx.PrimarySmtpAddress.ToString()
-            Write-Ok "Mailbox found: $($mbx.DisplayName) <$address>"
-            return $address
+
+        $mbx = Find-Recipient -Text $Value -Kind Mailbox
+        if ($mbx) {
+            $info = [pscustomobject]@{
+                Address     = $mbx.PrimarySmtpAddress.ToString()
+                DisplayName = $mbx.DisplayName
+                Type        = Get-RecipientTypeLabel $mbx.RecipientTypeDetails
+            }
+            Write-Ok "Mailbox: $($info.DisplayName) <$($info.Address)> ($($info.Type))"
+            return $info
         }
-        catch {
-            Write-Fail "Mailbox '$Value' was not found."
-            $Value = $null
-        }
+        $Value = $null
     }
 }
 
 function Resolve-TargetUser {
-    # Prompts until a valid user (or Default/Anonymous) is entered. $Current is kept when Enter is pressed.
+    # Prompts until a user (or Default/Anonymous) is chosen. $Current is kept when Enter is pressed.
     param([string]$Value, [string]$Current)
     Write-Section 'User'
+    Write-Info 'Enter an email address or (part of) a display name, or Default / Anonymous.'
     while ($true) {
         if ([string]::IsNullOrWhiteSpace($Value)) {
             if ($Current) {
@@ -321,7 +424,7 @@ function Resolve-TargetUser {
                 if ([string]::IsNullOrWhiteSpace($Value)) { $Value = $Current }
             }
             else {
-                $Value = Read-Input -Prompt 'User to grant/remove access for (email, or Default/Anonymous):'
+                $Value = Read-Input -Prompt 'User to grant/remove access for (email or display name):'
             }
         }
         if ($BuiltInPrincipals -contains $Value) {
@@ -329,16 +432,14 @@ function Resolve-TargetUser {
             Write-Ok "Using built-in principal: $principal"
             return $principal
         }
-        try {
-            $recipient = Get-EXORecipient -Identity $Value -ErrorAction Stop
+
+        $recipient = Find-Recipient -Text $Value -Kind Recipient
+        if ($recipient) {
             $address = $recipient.PrimarySmtpAddress.ToString()
-            Write-Ok "User found: $($recipient.DisplayName) <$address>"
+            Write-Ok "User: $($recipient.DisplayName) <$address> ($(Get-RecipientTypeLabel $recipient.RecipientTypeDetails))"
             return $address
         }
-        catch {
-            Write-Fail "User '$Value' was not found."
-            $Value = $null
-        }
+        $Value = $null
     }
 }
 
@@ -346,6 +447,8 @@ function Invoke-FolderPermissionChange {
     # Runs one change (action, role, folder, scope, review, apply, summary) for a resolved mailbox and user
     param(
         [string]$Mailbox,
+        [string]$MailboxLabel,
+        [string]$MailboxType,
         [string]$TargetUser,
         [string]$RootFolder,
         [string]$Action,
@@ -381,7 +484,13 @@ function Invoke-FolderPermissionChange {
         Where-Object { $_.FolderPath -notlike '/Recoverable Items*' })
     Write-Ok "$($allFolders.Count) folders loaded"
 
-    $rootFolderObj = Select-MailboxFolder -AllFolders $allFolders -InitialPath $RootFolder
+    # Room and equipment mailboxes are almost always about the calendar, so offer it as the default
+    $defaultFolder = $null
+    if ($MailboxType -in 'Room', 'Equipment') {
+        $defaultFolder = $allFolders | Where-Object { $_.FolderType -eq 'Calendar' } | Select-Object -First 1
+    }
+
+    $rootFolderObj = Select-MailboxFolder -AllFolders $allFolders -InitialPath $RootFolder -DefaultFolder $defaultFolder
     $rootPath = $rootFolderObj.FolderPath
     Write-Ok "Selected folder: $(Get-DisplayPath $rootPath)"
 
@@ -407,7 +516,7 @@ function Invoke-FolderPermissionChange {
     # 5. Review
     Write-Banner 'Review'
     $actionText = if ($Action -eq 'Add') { "Grant '$AccessRight'" } else { 'Remove permission' }
-    Write-Host ('  {0,-10} {1}' -f 'Mailbox:', $Mailbox)
+    Write-Host ('  {0,-10} {1}' -f 'Mailbox:', $MailboxLabel)
     Write-Host ('  {0,-10} {1}' -f 'User:',    $TargetUser)
     Write-Host ('  {0,-10} {1}' -f 'Action:',  $actionText) -ForegroundColor Yellow
     if ($selectedRole) {
@@ -583,11 +692,13 @@ function Start-FolderPermissionManager {
     $keepMailboxAndUser = $false
     while ($true) {
         if (-not $keepMailboxAndUser) {
-            $Mailbox    = Resolve-Mailbox    -Value $Mailbox    -Current $lastMailbox
-            $TargetUser = Resolve-TargetUser -Value $TargetUser -Current $lastUser
+            $mailboxInfo = Resolve-Mailbox    -Value $Mailbox    -Current $lastMailbox
+            $Mailbox     = $mailboxInfo.Address
+            $TargetUser  = Resolve-TargetUser -Value $TargetUser -Current $lastUser
         }
 
         Invoke-FolderPermissionChange -Mailbox $Mailbox -TargetUser $TargetUser -RootFolder $RootFolder `
+            -MailboxLabel "$($mailboxInfo.DisplayName) <$Mailbox> ($($mailboxInfo.Type))" -MailboxType $mailboxInfo.Type `
             -Action $Action -AccessRight $AccessRight -Scope $Scope -ExportPath $ExportPath
 
         # Pre-filled settings only apply to the first change
@@ -597,7 +708,7 @@ function Start-FolderPermissionManager {
         if ($Force) { break }
 
         $nextSteps = @(
-            [pscustomobject]@{ Name = 'Same';       Label = 'Modify more folders - same mailbox and user'; Detail = "$Mailbox / $TargetUser" }
+            [pscustomobject]@{ Name = 'Same';       Label = 'Modify more folders - same mailbox and user'; Detail = "$($mailboxInfo.DisplayName) / $TargetUser" }
             [pscustomobject]@{ Name = 'Different';  Label = 'Modify more folders - change mailbox or user'; Detail = 'Stays connected' }
             [pscustomobject]@{ Name = 'Exit';       Label = 'Exit (stay connected)';                        Detail = 'Paste the script again to start over' }
             [pscustomobject]@{ Name = 'Disconnect'; Label = 'Exit and disconnect from Exchange Online';     Detail = '' }

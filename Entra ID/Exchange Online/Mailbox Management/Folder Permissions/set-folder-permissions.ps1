@@ -24,7 +24,7 @@ to backslashes for the permission cmdlets. Folder names that contain a "/" are
 handled as well.
 
 Author: j0shbl0ck (https://github.com/j0shbl0ck)
-Version: 2.1.0
+Version: 2.2.0
 Date: 10.29.26
 Type: Public
 
@@ -283,68 +283,78 @@ function Select-MailboxFolder {
 
 #region ---------- Main ----------
 
-# Wrapped in a function so the whole script runs as one unit when pasted into a console
-function Start-FolderPermissionManager {
-
-    Write-Banner 'Mailbox Folder Permission Manager'
-
-    # Validate any pre-filled settings
-    if ($Action -and @('Add', 'Remove') -notcontains $Action) {
-        Write-Warn "Ignoring unknown Action '$Action'."; $Action = ''
-    }
-    if ($AccessRight -and -not ($Roles | Where-Object { $_.Name -eq $AccessRight })) {
-        Write-Warn "Ignoring unknown AccessRight '$AccessRight'."; $AccessRight = ''
-    }
-    if ($Scope -and -not ($Scopes | Where-Object { $_.Name -eq $Scope })) {
-        Write-Warn "Ignoring unknown Scope '$Scope'."; $Scope = ''
-    }
-
-    # 1. Connection
-    Write-Section 'Connection'
-    if (-not (Connect-ExchangeIfNeeded)) { return }
-
-    # 2. Mailbox
+function Resolve-Mailbox {
+    # Prompts until a valid mailbox is entered. $Current (if set) is kept when Enter is pressed.
+    param([string]$Value, [string]$Current)
     Write-Section 'Mailbox'
     while ($true) {
-        if ([string]::IsNullOrWhiteSpace($Mailbox)) {
-            $Mailbox = Read-Input -Prompt 'Mailbox to modify (e.g. shared@contoso.com):'
+        if ([string]::IsNullOrWhiteSpace($Value)) {
+            if ($Current) {
+                $Value = Read-Input -Prompt "Mailbox to modify (Enter to keep $Current):" -AllowEmpty
+                if ([string]::IsNullOrWhiteSpace($Value)) { $Value = $Current }
+            }
+            else {
+                $Value = Read-Input -Prompt 'Mailbox to modify (e.g. shared@contoso.com):'
+            }
         }
         try {
-            $mbx = Get-EXOMailbox -Identity $Mailbox -ErrorAction Stop
-            $Mailbox = $mbx.PrimarySmtpAddress.ToString()
-            Write-Ok "Mailbox found: $($mbx.DisplayName) <$Mailbox>"
-            break
+            $mbx = Get-EXOMailbox -Identity $Value -ErrorAction Stop
+            $address = $mbx.PrimarySmtpAddress.ToString()
+            Write-Ok "Mailbox found: $($mbx.DisplayName) <$address>"
+            return $address
         }
         catch {
-            Write-Fail "Mailbox '$Mailbox' was not found."
-            $Mailbox = $null
+            Write-Fail "Mailbox '$Value' was not found."
+            $Value = $null
         }
     }
+}
 
-    # 3. Target user
+function Resolve-TargetUser {
+    # Prompts until a valid user (or Default/Anonymous) is entered. $Current is kept when Enter is pressed.
+    param([string]$Value, [string]$Current)
     Write-Section 'User'
     while ($true) {
-        if ([string]::IsNullOrWhiteSpace($TargetUser)) {
-            $TargetUser = Read-Input -Prompt 'User to grant/remove access for (email, or Default/Anonymous):'
+        if ([string]::IsNullOrWhiteSpace($Value)) {
+            if ($Current) {
+                $Value = Read-Input -Prompt "User to grant/remove access for (Enter to keep $Current):" -AllowEmpty
+                if ([string]::IsNullOrWhiteSpace($Value)) { $Value = $Current }
+            }
+            else {
+                $Value = Read-Input -Prompt 'User to grant/remove access for (email, or Default/Anonymous):'
+            }
         }
-        if ($BuiltInPrincipals -contains $TargetUser) {
-            $TargetUser = ($BuiltInPrincipals | Where-Object { $_ -eq $TargetUser })
-            Write-Ok "Using built-in principal: $TargetUser"
-            break
+        if ($BuiltInPrincipals -contains $Value) {
+            $principal = $BuiltInPrincipals | Where-Object { $_ -eq $Value }
+            Write-Ok "Using built-in principal: $principal"
+            return $principal
         }
         try {
-            $recipient = Get-EXORecipient -Identity $TargetUser -ErrorAction Stop
-            $TargetUser = $recipient.PrimarySmtpAddress.ToString()
-            Write-Ok "User found: $($recipient.DisplayName) <$TargetUser>"
-            break
+            $recipient = Get-EXORecipient -Identity $Value -ErrorAction Stop
+            $address = $recipient.PrimarySmtpAddress.ToString()
+            Write-Ok "User found: $($recipient.DisplayName) <$address>"
+            return $address
         }
         catch {
-            Write-Fail "User '$TargetUser' was not found."
-            $TargetUser = $null
+            Write-Fail "User '$Value' was not found."
+            $Value = $null
         }
     }
+}
 
-    # 4. Action
+function Invoke-FolderPermissionChange {
+    # Runs one change (action, role, folder, scope, review, apply, summary) for a resolved mailbox and user
+    param(
+        [string]$Mailbox,
+        [string]$TargetUser,
+        [string]$RootFolder,
+        [string]$Action,
+        [string]$AccessRight,
+        [string]$Scope,
+        [string]$ExportPath
+    )
+
+    # 1. Action
     if (-not $Action) {
         $actions = @(
             [pscustomobject]@{ Name = 'Add';    Label = 'Grant / update permission'; Detail = 'Adds the role, or changes the existing role' }
@@ -354,7 +364,7 @@ function Start-FolderPermissionManager {
         $Action = $actions[$i].Name
     }
 
-    # 5. Role
+    # 2. Role
     if ($Action -eq 'Add' -and -not $AccessRight) {
         $i = Read-MenuChoice -Title 'Permission role' -Items $Roles `
             -LabelScript { param($r) if ($r.CalendarOnly) { "$($r.Name) *" } else { $r.Name } } `
@@ -364,7 +374,7 @@ function Start-FolderPermissionManager {
     }
     $selectedRole = $Roles | Where-Object { $_.Name -eq $AccessRight }
 
-    # 6. Folder
+    # 3. Folder
     Write-Section 'Folders'
     Write-Info "Loading folders for $Mailbox..."
     $allFolders = @(Get-MailboxFolderStatistics -Identity $Mailbox -ErrorAction Stop |
@@ -375,7 +385,7 @@ function Start-FolderPermissionManager {
     $rootPath = $rootFolderObj.FolderPath
     Write-Ok "Selected folder: $(Get-DisplayPath $rootPath)"
 
-    # 7. Scope
+    # 4. Scope
     if (-not $Scope) {
         $i = Read-MenuChoice -Title 'Apply to' -Items $Scopes -LabelScript { param($s) $s.Label }
         $Scope = $Scopes[$i].Name
@@ -394,7 +404,7 @@ function Start-FolderPermissionManager {
         return $true
     } | Sort-Object FolderPath)
 
-    # 8. Review
+    # 5. Review
     Write-Banner 'Review'
     $actionText = if ($Action -eq 'Add') { "Grant '$AccessRight'" } else { 'Remove permission' }
     Write-Host ('  {0,-10} {1}' -f 'Mailbox:', $Mailbox)
@@ -432,7 +442,7 @@ function Start-FolderPermissionManager {
         }
     }
 
-    # 9. Apply
+    # 6. Apply
     Write-Banner 'Applying changes'
     $results = New-Object System.Collections.Generic.List[object]
     $count = 0
@@ -529,7 +539,7 @@ function Start-FolderPermissionManager {
     }
     Write-Progress -Activity 'Updating folder permissions' -Completed
 
-    # 10. Summary
+    # 7. Summary
     Write-Banner 'Summary'
     $results | Group-Object Status | Sort-Object Name | ForEach-Object {
         Write-Host ('  {0,-12} {1}' -f $_.Name, $_.Count)
@@ -546,6 +556,72 @@ function Start-FolderPermissionManager {
     if ($ExportPath) {
         $results | Export-Csv -Path $ExportPath -NoTypeInformation -Encoding UTF8
         Write-Ok "Results exported to $ExportPath"
+    }
+
+}
+
+# Wrapped in a function so the whole script runs as one unit when pasted into a console
+function Start-FolderPermissionManager {
+
+    Write-Banner 'Mailbox Folder Permission Manager'
+
+    # Validate any pre-filled settings
+    if ($Action -and @('Add', 'Remove') -notcontains $Action) {
+        Write-Warn "Ignoring unknown Action '$Action'."; $Action = ''
+    }
+    if ($AccessRight -and -not ($Roles | Where-Object { $_.Name -eq $AccessRight })) {
+        Write-Warn "Ignoring unknown AccessRight '$AccessRight'."; $AccessRight = ''
+    }
+    if ($Scope -and -not ($Scopes | Where-Object { $_.Name -eq $Scope })) {
+        Write-Warn "Ignoring unknown Scope '$Scope'."; $Scope = ''
+    }
+
+    # 1. Connection
+    Write-Section 'Connection'
+    if (-not (Connect-ExchangeIfNeeded)) { return }
+
+    $keepMailboxAndUser = $false
+    while ($true) {
+        if (-not $keepMailboxAndUser) {
+            $Mailbox    = Resolve-Mailbox    -Value $Mailbox    -Current $lastMailbox
+            $TargetUser = Resolve-TargetUser -Value $TargetUser -Current $lastUser
+        }
+
+        Invoke-FolderPermissionChange -Mailbox $Mailbox -TargetUser $TargetUser -RootFolder $RootFolder `
+            -Action $Action -AccessRight $AccessRight -Scope $Scope -ExportPath $ExportPath
+
+        # Pre-filled settings only apply to the first change
+        $RootFolder = ''; $Action = ''; $AccessRight = ''; $Scope = ''; $ExportPath = ''
+
+        # Unattended runs stop after one change
+        if ($Force) { break }
+
+        $nextSteps = @(
+            [pscustomobject]@{ Name = 'Same';       Label = 'Modify more folders - same mailbox and user'; Detail = "$Mailbox / $TargetUser" }
+            [pscustomobject]@{ Name = 'Different';  Label = 'Modify more folders - change mailbox or user'; Detail = 'Stays connected' }
+            [pscustomobject]@{ Name = 'Exit';       Label = 'Exit (stay connected)';                        Detail = 'Paste the script again to start over' }
+            [pscustomobject]@{ Name = 'Disconnect'; Label = 'Exit and disconnect from Exchange Online';     Detail = '' }
+        )
+        $i = Read-MenuChoice -Title 'What next?' -Items $nextSteps -LabelScript { param($n) $n.Label } -DetailScript { param($n) $n.Detail }
+
+        switch ($nextSteps[$i].Name) {
+            'Same' {
+                $keepMailboxAndUser = $true
+            }
+            'Different' {
+                $keepMailboxAndUser = $false
+                $lastMailbox = $Mailbox; $lastUser = $TargetUser
+                $Mailbox = ''; $TargetUser = ''
+            }
+            'Disconnect' {
+                Disconnect-ExchangeOnline -Confirm:$false -ErrorAction SilentlyContinue
+                Write-Ok 'Disconnected from Exchange Online.'
+            }
+        }
+        if ($nextSteps[$i].Name -in 'Exit', 'Disconnect') { break }
+
+        Clear-Host
+        Write-Banner 'Mailbox Folder Permission Manager'
     }
 
     Write-Host ''

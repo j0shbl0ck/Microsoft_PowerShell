@@ -69,6 +69,8 @@ Runs fully interactive.
     -RootFolder "/Inbox/Projects" -Action Remove -Scope FolderOnly -Force
 #>
 
+Clear-Host
+
 [CmdletBinding(SupportsShouldProcess = $true)]
 param(
     [string]$Mailbox,
